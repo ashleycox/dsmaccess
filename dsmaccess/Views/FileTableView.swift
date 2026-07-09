@@ -27,6 +27,7 @@ struct FileTableView: NSViewRepresentable {
     var onDelete: (FileStationItem) -> Void
     var onCopy: (FileStationItem) -> Void
     var onCut: (FileStationItem) -> Void
+    var onShare: (FileStationItem) -> Void
     var onGoUp: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
@@ -55,6 +56,7 @@ struct FileTableView: NSViewRepresentable {
         table.onContextDelete = { row in context.coordinator.deleteRow(row) }
         table.onContextCopy = { row in context.coordinator.copyRow(row) }
         table.onContextCut = { row in context.coordinator.cutRow(row) }
+        table.onContextShare = { row in context.coordinator.shareRow(row) }
         table.canWrite = canWrite
 
         table.target = context.coordinator
@@ -101,6 +103,7 @@ struct FileTableView: NSViewRepresentable {
             cell.onDelete = { [weak self] in self?.delete(item) }
             cell.onCopy = { [weak self] in self?.copy(item) }
             cell.onCut = { [weak self] in self?.cut(item) }
+            cell.onShare = { [weak self] in self?.share(item) }
             return cell
         }
 
@@ -128,6 +131,10 @@ struct FileTableView: NSViewRepresentable {
             guard parent.items.indices.contains(row) else { return }
             cut(parent.items[row])
         }
+        func shareRow(_ row: Int) {
+            guard parent.items.indices.contains(row) else { return }
+            share(parent.items[row])
+        }
 
         /// Activation : dossier → ouvrir, fichier → télécharger (décidé par la coquille SwiftUI).
         private func activate(_ item: FileStationItem) { parent.onActivate(item) }
@@ -137,6 +144,7 @@ struct FileTableView: NSViewRepresentable {
         private func delete(_ item: FileStationItem) { parent.onDelete(item) }
         private func copy(_ item: FileStationItem) { parent.onCopy(item) }
         private func cut(_ item: FileStationItem) { parent.onCut(item) }
+        private func share(_ item: FileStationItem) { parent.onShare(item) }
 
         @objc func tableDoubleClicked(_ sender: NSTableView) {
             let row = sender.clickedRow
@@ -166,10 +174,12 @@ private func makeFileContextMenu(canWrite: Bool,
                                  rename: @escaping () -> Void,
                                  delete: @escaping () -> Void,
                                  copy: @escaping () -> Void,
-                                 cut: @escaping () -> Void) -> NSMenu {
+                                 cut: @escaping () -> Void,
+                                 share: @escaping () -> Void) -> NSMenu {
     let menu = NSMenu()
     menu.addItem(ClosureMenuItem(title: String(localized: "Télécharger"), handler: download))
     if canWrite {
+        menu.addItem(ClosureMenuItem(title: String(localized: "Créer un lien de partage"), handler: share))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(ClosureMenuItem(title: String(localized: "Copier"), handler: copy))
         menu.addItem(ClosureMenuItem(title: String(localized: "Couper"), handler: cut))
@@ -188,6 +198,7 @@ final class KeyboardTableView: NSTableView {
     var onContextDelete: ((Int) -> Void)?
     var onContextCopy: ((Int) -> Void)?
     var onContextCut: ((Int) -> Void)?
+    var onContextShare: ((Int) -> Void)?
     var canWrite = false
 
     override func keyDown(with event: NSEvent) {
@@ -221,7 +232,8 @@ final class KeyboardTableView: NSTableView {
             rename: { [weak self] in self?.onContextRename?(row) },
             delete: { [weak self] in self?.onContextDelete?(row) },
             copy: { [weak self] in self?.onContextCopy?(row) },
-            cut: { [weak self] in self?.onContextCut?(row) }
+            cut: { [weak self] in self?.onContextCut?(row) },
+            share: { [weak self] in self?.onContextShare?(row) }
         )
     }
 }
@@ -239,6 +251,7 @@ final class FileCellView: NSTableCellView {
     var onDelete: (() -> Void)?
     var onCopy: (() -> Void)?
     var onCut: (() -> Void)?
+    var onShare: (() -> Void)?
     var canWrite = false
 
     init(identifier: NSUserInterfaceItemIdentifier) {
@@ -305,6 +318,11 @@ final class FileCellView: NSTableCellView {
             })
         }
         if canWrite {
+            if let onShare {
+                actions.append(NSAccessibilityCustomAction(name: String(localized: "Créer un lien de partage")) {
+                    onShare(); return true
+                })
+            }
             if let onCopy {
                 actions.append(NSAccessibilityCustomAction(name: String(localized: "Copier")) {
                     onCopy(); return true
@@ -339,7 +357,8 @@ final class FileCellView: NSTableCellView {
             rename: { [weak self] in self?.onRename?() },
             delete: { [weak self] in self?.onDelete?() },
             copy: { [weak self] in self?.onCopy?() },
-            cut: { [weak self] in self?.onCut?() }
+            cut: { [weak self] in self?.onCut?() },
+            share: { [weak self] in self?.onShare?() }
         )
         menu.popUp(positioning: nil, at: NSPoint(x: bounds.minX, y: bounds.maxY), in: self)
         return true

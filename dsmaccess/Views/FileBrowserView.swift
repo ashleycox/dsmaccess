@@ -15,6 +15,7 @@ struct FileBrowserView: View {
     @AccessibilityFocusState private var focusHeader: Bool
     @State private var activeSheet: WriteSheet?
     @State private var pendingDelete: FileStationItem?
+    @State private var share: SharePresentation?
 
     /// Feuille de saisie active (créer un dossier ou renommer un élément).
     private enum WriteSheet: Identifiable {
@@ -26,6 +27,12 @@ struct FileBrowserView: View {
             case .rename(let item): return "rename-\(item.id)"
             }
         }
+    }
+
+    /// Présentation de la feuille de lien de partage (l'URL sert d'identité).
+    private struct SharePresentation: Identifiable {
+        let url: String
+        var id: String { url }
     }
 
     init(session: SessionStore) {
@@ -76,6 +83,9 @@ struct FileBrowserView: View {
             Button("Annuler", role: .cancel) { }
         } message: { item in
             Text("« \(item.name) » sera supprimé définitivement. Cette action est irréversible.")
+        }
+        .sheet(item: $share) { presentation in
+            ShareLinkSheet(url: presentation.url)
         }
     }
 
@@ -170,6 +180,14 @@ struct FileBrowserView: View {
                 onDelete: { item in pendingDelete = item },
                 onCopy: { item in VoiceOver.announce(vm.copy(item)) },
                 onCut: { item in VoiceOver.announce(vm.cut(item)) },
+                onShare: { item in
+                    Task {
+                        switch await vm.createShareLink(for: item) {
+                        case .link(let url): share = SharePresentation(url: url)
+                        case .failure(let msg): VoiceOver.announce(msg, priority: .high)
+                        }
+                    }
+                },
                 onGoUp: { Task { await vm.goUp(); announce() } }
             )
         }

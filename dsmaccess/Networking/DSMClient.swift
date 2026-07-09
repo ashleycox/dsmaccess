@@ -32,6 +32,8 @@ protocol DSMClientProtocol: AnyObject {
     func upload(fileURL: URL, to folderPath: String, sid: String) async throws
     /// Copie (`remove == false`) ou déplace (`remove == true`) `path` vers `destFolder` ; attend la fin.
     func copyMove(path: String, to destFolder: String, remove: Bool, sid: String) async throws
+    /// Crée un lien de partage public vers `path` et renvoie son URL.
+    func createShareLink(path: String, sid: String) async throws -> String
     func logout(sid: String) async throws
 }
 
@@ -46,6 +48,7 @@ final class DSMClient: DSMClientProtocol {
     private static let fileStationDeleteAPI = "SYNO.FileStation.Delete"
     private static let fileStationUploadAPI = "SYNO.FileStation.Upload"
     private static let fileStationCopyMoveAPI = "SYNO.FileStation.CopyMove"
+    private static let fileStationSharingAPI = "SYNO.FileStation.Sharing"
 
     /// Nom de session applicatif ; réutilisé au logout.
     private static let sessionName = "DSMAccess"
@@ -360,6 +363,22 @@ final class DSMClient: DSMClientProtocol {
             try await Task.sleep(for: .milliseconds(500))
         }
         throw DSMError.network(String(localized: "Délai dépassé."))
+    }
+
+    func createShareLink(path: String, sid: String) async throws -> String {
+        try await ensurePaths(for: [Self.fileStationSharingAPI])
+        let resp = try await get(cgi: self.path(for: Self.fileStationSharingAPI), query: [
+            "api": "SYNO.FileStation.Sharing",
+            "version": "3",
+            "method": "create",
+            // DSM attend le chemin dans un tableau JSON.
+            "path": "[\"\(path)\"]",
+            "_sid": sid,
+        ], as: SharingLinks.self)
+        guard resp.success, let url = resp.data?.links.first?.url else {
+            throw DSMError.apiError(code: resp.error?.code ?? -1)
+        }
+        return url
     }
 
     func logout(sid: String) async throws {

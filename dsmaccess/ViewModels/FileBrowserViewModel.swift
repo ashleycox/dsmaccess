@@ -217,6 +217,26 @@ final class FileBrowserViewModel {
         }
     }
 
+    /// Résultat de la création d'un lien de partage.
+    enum ShareOutcome {
+        case link(String)
+        case failure(String)
+    }
+
+    /// Crée un lien de partage public vers `item` et renvoie l'URL (ou l'échec).
+    func createShareLink(for item: FileStationItem) async -> ShareOutcome {
+        guard let client = session.client, let sid = session.sid else {
+            return .failure(String(localized: "Session expirée."))
+        }
+        do {
+            let url = try await client.createShareLink(path: item.path, sid: sid)
+            return .link(url)
+        } catch {
+            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
+            return .failure(String(localized: "Échec de la création du lien : \(reason)"))
+        }
+    }
+
     /// Résumé annoncé à VoiceOver après un chargement / une navigation.
     var summary: String {
         if let errorMessage { return errorMessage }

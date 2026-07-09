@@ -88,3 +88,14 @@ struct CopyMoveTask: Decodable {
 struct CopyMoveStatus: Decodable {
     let finished: Bool
 }
+
+/// Réponse de `SYNO.FileStation.Sharing` `method=create` : les liens de partage créés.
+struct SharingLinks: Decodable {
+    let links: [SharingLink]
+}
+
+/// Un lien de partage : son identifiant et l'URL publique.
+struct SharingLink: Decodable {
+    let id: String
+    let url: String
+}
