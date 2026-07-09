@@ -116,6 +116,16 @@ struct FileBrowserView: View {
             .disabled(!vm.canWrite)
             .keyboardShortcut("u", modifiers: .command)
             .accessibilityHint("Envoie des fichiers depuis votre Mac vers ce dossier")
+
+            Button {
+                VoiceOver.announce(String(localized: "Collage en cours…"), priority: .low)
+                Task { let msg = await vm.paste(); VoiceOver.announce(msg, priority: .high) }
+            } label: {
+                Label("Coller", systemImage: "doc.on.clipboard")
+            }
+            .disabled(!vm.canPaste)
+            .keyboardShortcut("v", modifiers: .command)
+            .accessibilityHint("Colle l'élément copié ou coupé dans ce dossier")
         }
         .padding(.horizontal, 16)
         .padding(.top, 12)
@@ -158,6 +168,8 @@ struct FileBrowserView: View {
                 onDownload: { item in startDownload(item) },
                 onRename: { item in activeSheet = .rename(item) },
                 onDelete: { item in pendingDelete = item },
+                onCopy: { item in VoiceOver.announce(vm.copy(item)) },
+                onCut: { item in VoiceOver.announce(vm.cut(item)) },
                 onGoUp: { Task { await vm.goUp(); announce() } }
             )
         }

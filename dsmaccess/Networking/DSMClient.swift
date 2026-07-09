@@ -30,6 +30,8 @@ protocol DSMClientProtocol: AnyObject {
     func delete(path: String, sid: String) async throws
     /// Envoie (upload) un fichier local vers le dossier `folderPath` (POST multipart).
     func upload(fileURL: URL, to folderPath: String, sid: String) async throws
+    /// Copie (`remove == false`) ou déplace (`remove == true`) `path` vers `destFolder` ; attend la fin.
+    func copyMove(path: String, to destFolder: String, remove: Bool, sid: String) async throws
     func logout(sid: String) async throws
 }
 
@@ -43,6 +45,7 @@ final class DSMClient: DSMClientProtocol {
     private static let fileStationRenameAPI = "SYNO.FileStation.Rename"
     private static let fileStationDeleteAPI = "SYNO.FileStation.Delete"
     private static let fileStationUploadAPI = "SYNO.FileStation.Upload"
+    private static let fileStationCopyMoveAPI = "SYNO.FileStation.CopyMove"
 
     /// Nom de session applicatif ; réutilisé au logout.
     private static let sessionName = "DSMAccess"
@@ -320,6 +323,43 @@ final class DSMClient: DSMClientProtocol {
         guard decoded.success else {
             throw DSMError.apiError(code: decoded.error?.code ?? -1)
         }
+    }
+
+    func copyMove(path: String, to destFolder: String, remove: Bool, sid: String) async throws {
+        try await ensurePaths(for: [Self.fileStationCopyMoveAPI])
+        let cgi = self.path(for: Self.fileStationCopyMoveAPI)
+
+        // Lance la tâche (asynchrone côté DSM) et récupère son identifiant.
+        let startResp = try await get(cgi: cgi, query: [
+            "api": "SYNO.FileStation.CopyMove",
+            "version": "3",
+            "method": "start",
+            "path": path,
+            "dest_folder_path": destFolder,
+            "overwrite": "false",
+            "remove_src": remove ? "true" : "false",
+            "_sid": sid,
+        ], as: CopyMoveTask.self)
+        guard startResp.success, let task = startResp.data else {
+            throw DSMError.apiError(code: startResp.error?.code ?? -1)
+        }
+
+        // Poll le statut jusqu'à la fin (garde-fou ≈ 5 min).
+        for _ in 0..<600 {
+            let statusResp = try await get(cgi: cgi, query: [
+                "api": "SYNO.FileStation.CopyMove",
+                "version": "3",
+                "method": "status",
+                "taskid": task.taskid,
+                "_sid": sid,
+            ], as: CopyMoveStatus.self)
+            guard statusResp.success, let status = statusResp.data else {
+                throw DSMError.apiError(code: statusResp.error?.code ?? -1)
+            }
+            if status.finished { return }
+            try await Task.sleep(for: .milliseconds(500))
+        }
+        throw DSMError.network(String(localized: "Délai dépassé."))
     }
 
     func logout(sid: String) async throws {

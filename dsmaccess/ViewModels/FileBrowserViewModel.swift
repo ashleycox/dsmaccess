@@ -39,6 +39,15 @@ final class FileBrowserViewModel {
     /// dossiers partagés, où l'on ne peut ni créer ni renommer/supprimer.
     var canWrite: Bool { currentLevel.path != nil }
 
+    /// Presse-papier interne : copier/couper un élément puis le coller ailleurs (façon Finder).
+    struct Clipboard {
+        let item: FileStationItem
+        let move: Bool
+    }
+    private(set) var clipboard: Clipboard?
+    /// Vrai si l'on peut coller ici : presse-papier non vide ET on est dans un partage.
+    var canPaste: Bool { clipboard != nil && currentLevel.path != nil }
+
     /// Fil d'Ariane lu par VoiceOver : « Fichiers ▸ photo ▸ 2024 ».
     var breadcrumb: String { stack.map(\.name).joined(separator: " ▸ ") }
 
@@ -174,6 +183,37 @@ final class FileBrowserViewModel {
         case 0: return String(localized: "Impossible d'envoyer ici.")
         case 1: return String(localized: "Fichier envoyé : \(fileURLs.first?.lastPathComponent ?? "")")
         default: return String(localized: "\(sent) fichiers envoyés")
+        }
+    }
+
+    /// Met `item` au presse-papier pour une copie.
+    func copy(_ item: FileStationItem) -> String {
+        clipboard = Clipboard(item: item, move: false)
+        return String(localized: "Copié : \(item.name)")
+    }
+
+    /// Met `item` au presse-papier pour un déplacement.
+    func cut(_ item: FileStationItem) -> String {
+        clipboard = Clipboard(item: item, move: true)
+        return String(localized: "Coupé : \(item.name)")
+    }
+
+    /// Colle l'élément du presse-papier dans le dossier courant.
+    func paste() async -> String {
+        guard let clip = clipboard else { return String(localized: "Rien à coller.") }
+        guard let client = session.client, let sid = session.sid, let dest = currentLevel.path else {
+            return String(localized: "Impossible de coller ici.")
+        }
+        do {
+            try await client.copyMove(path: clip.item.path, to: dest, remove: clip.move, sid: sid)
+            if clip.move { clipboard = nil }   // l'élément a été déplacé, il n'existe plus à la source
+            await loadCurrent()
+            return clip.move
+                ? String(localized: "Déplacé ici : \(clip.item.name)")
+                : String(localized: "Copié ici : \(clip.item.name)")
+        } catch {
+            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
+            return String(localized: "Échec du collage : \(reason)")
         }
     }
 

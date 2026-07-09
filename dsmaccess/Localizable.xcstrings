@@ -311,6 +311,136 @@
         }
       }
     },
+    "Coller" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste"
+          }
+        }
+      }
+    },
+    "Colle l'élément copié ou coupé dans ce dossier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pastes the copied or cut item into this folder"
+          }
+        }
+      }
+    },
+    "Collage en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pasting…"
+          }
+        }
+      }
+    },
+    "Copier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
+    },
+    "Copié : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied: %@"
+          }
+        }
+      }
+    },
+    "Copié ici : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copied here: %@"
+          }
+        }
+      }
+    },
+    "Couper" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut"
+          }
+        }
+      }
+    },
+    "Coupé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut: %@"
+          }
+        }
+      }
+    },
+    "Déplacé ici : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moved here: %@"
+          }
+        }
+      }
+    },
+    "Délai dépassé." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timed out."
+          }
+        }
+      }
+    },
+    "Impossible de coller ici." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot paste here."
+          }
+        }
+      }
+    },
+    "Rien à coller." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to paste."
+          }
+        }
+      }
+    },
+    "Échec du collage : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste failed: %@"
+          }
+        }
+      }
+    },
     "Aucun dossier partagé" : {
       "localizations" : {
         "en" : {

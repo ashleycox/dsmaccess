@@ -78,3 +78,13 @@ struct FileStationShares: Decodable {
 struct FileStationFiles: Decodable {
     let files: [FileStationItem]
 }
+
+/// Réponse de `SYNO.FileStation.CopyMove` `method=start` : l'identifiant de tâche à suivre.
+struct CopyMoveTask: Decodable {
+    let taskid: String
+}
+
+/// Réponse de `SYNO.FileStation.CopyMove` `method=status` : l'avancement de la tâche.
+struct CopyMoveStatus: Decodable {
+    let finished: Bool
+}

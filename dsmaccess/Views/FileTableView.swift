@@ -11,7 +11,7 @@
 //    · Cmd-↑           : remonter au dossier parent
 //    · VO-Espace       : activer la ligne (accessibilityPerformPress)
 //  Actions par ligne (menu contextuel clic droit + VO-Maj-M + actions VoiceOver) : Télécharger,
-//  et — à l'intérieur d'un partage seulement (`canWrite`) — Renommer et Supprimer.
+//  et — à l'intérieur d'un partage seulement (`canWrite`) — Copier, Couper, Renommer, Supprimer.
 //
 
 import AppKit
@@ -25,6 +25,8 @@ struct FileTableView: NSViewRepresentable {
     var onDownload: (FileStationItem) -> Void    // menu contextuel / action VoiceOver
     var onRename: (FileStationItem) -> Void
     var onDelete: (FileStationItem) -> Void
+    var onCopy: (FileStationItem) -> Void
+    var onCut: (FileStationItem) -> Void
     var onGoUp: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
@@ -51,6 +53,8 @@ struct FileTableView: NSViewRepresentable {
         table.onContextDownload = { row in context.coordinator.downloadRow(row) }
         table.onContextRename = { row in context.coordinator.renameRow(row) }
         table.onContextDelete = { row in context.coordinator.deleteRow(row) }
+        table.onContextCopy = { row in context.coordinator.copyRow(row) }
+        table.onContextCut = { row in context.coordinator.cutRow(row) }
         table.canWrite = canWrite
 
         table.target = context.coordinator
@@ -95,6 +99,8 @@ struct FileTableView: NSViewRepresentable {
             cell.onDownload = { [weak self] in self?.download(item) }
             cell.onRename = { [weak self] in self?.rename(item) }
             cell.onDelete = { [weak self] in self?.delete(item) }
+            cell.onCopy = { [weak self] in self?.copy(item) }
+            cell.onCut = { [weak self] in self?.cut(item) }
             return cell
         }
 
@@ -114,6 +120,14 @@ struct FileTableView: NSViewRepresentable {
             guard parent.items.indices.contains(row) else { return }
             delete(parent.items[row])
         }
+        func copyRow(_ row: Int) {
+            guard parent.items.indices.contains(row) else { return }
+            copy(parent.items[row])
+        }
+        func cutRow(_ row: Int) {
+            guard parent.items.indices.contains(row) else { return }
+            cut(parent.items[row])
+        }
 
         /// Activation : dossier → ouvrir, fichier → télécharger (décidé par la coquille SwiftUI).
         private func activate(_ item: FileStationItem) { parent.onActivate(item) }
@@ -121,6 +135,8 @@ struct FileTableView: NSViewRepresentable {
         private func download(_ item: FileStationItem) { parent.onDownload(item) }
         private func rename(_ item: FileStationItem) { parent.onRename(item) }
         private func delete(_ item: FileStationItem) { parent.onDelete(item) }
+        private func copy(_ item: FileStationItem) { parent.onCopy(item) }
+        private func cut(_ item: FileStationItem) { parent.onCut(item) }
 
         @objc func tableDoubleClicked(_ sender: NSTableView) {
             let row = sender.clickedRow
@@ -148,11 +164,15 @@ private final class ClosureMenuItem: NSMenuItem {
 private func makeFileContextMenu(canWrite: Bool,
                                  download: @escaping () -> Void,
                                  rename: @escaping () -> Void,
-                                 delete: @escaping () -> Void) -> NSMenu {
+                                 delete: @escaping () -> Void,
+                                 copy: @escaping () -> Void,
+                                 cut: @escaping () -> Void) -> NSMenu {
     let menu = NSMenu()
     menu.addItem(ClosureMenuItem(title: String(localized: "Télécharger"), handler: download))
     if canWrite {
         menu.addItem(NSMenuItem.separator())
+        menu.addItem(ClosureMenuItem(title: String(localized: "Copier"), handler: copy))
+        menu.addItem(ClosureMenuItem(title: String(localized: "Couper"), handler: cut))
         menu.addItem(ClosureMenuItem(title: String(localized: "Renommer"), handler: rename))
         menu.addItem(ClosureMenuItem(title: String(localized: "Supprimer"), handler: delete))
     }
@@ -166,6 +186,8 @@ final class KeyboardTableView: NSTableView {
     var onContextDownload: ((Int) -> Void)?
     var onContextRename: ((Int) -> Void)?
     var onContextDelete: ((Int) -> Void)?
+    var onContextCopy: ((Int) -> Void)?
+    var onContextCut: ((Int) -> Void)?
     var canWrite = false
 
     override func keyDown(with event: NSEvent) {
@@ -179,6 +201,10 @@ final class KeyboardTableView: NSTableView {
             if canWrite, selectedRow >= 0 { onContextRename?(selectedRow) } else { super.keyDown(with: event) }
         case 51 where command:       // Cmd-Suppr : supprimer l'élément sélectionné (façon Finder)
             if canWrite, selectedRow >= 0 { onContextDelete?(selectedRow) } else { super.keyDown(with: event) }
+        case 8 where command:        // Cmd-C : copier l'élément sélectionné (façon Finder)
+            if canWrite, selectedRow >= 0 { onContextCopy?(selectedRow) } else { super.keyDown(with: event) }
+        case 7 where command:        // Cmd-X : couper l'élément sélectionné (façon Finder)
+            if canWrite, selectedRow >= 0 { onContextCut?(selectedRow) } else { super.keyDown(with: event) }
         default:
             super.keyDown(with: event)   // ↑ ↓ (navigation) et le reste : comportement natif
         }
@@ -193,7 +219,9 @@ final class KeyboardTableView: NSTableView {
             canWrite: canWrite,
             download: { [weak self] in self?.onContextDownload?(row) },
             rename: { [weak self] in self?.onContextRename?(row) },
-            delete: { [weak self] in self?.onContextDelete?(row) }
+            delete: { [weak self] in self?.onContextDelete?(row) },
+            copy: { [weak self] in self?.onContextCopy?(row) },
+            cut: { [weak self] in self?.onContextCut?(row) }
         )
     }
 }
@@ -209,6 +237,8 @@ final class FileCellView: NSTableCellView {
     var onDownload: (() -> Void)?
     var onRename: (() -> Void)?
     var onDelete: (() -> Void)?
+    var onCopy: (() -> Void)?
+    var onCut: (() -> Void)?
     var canWrite = false
 
     init(identifier: NSUserInterfaceItemIdentifier) {
@@ -275,6 +305,16 @@ final class FileCellView: NSTableCellView {
             })
         }
         if canWrite {
+            if let onCopy {
+                actions.append(NSAccessibilityCustomAction(name: String(localized: "Copier")) {
+                    onCopy(); return true
+                })
+            }
+            if let onCut {
+                actions.append(NSAccessibilityCustomAction(name: String(localized: "Couper")) {
+                    onCut(); return true
+                })
+            }
             if let onRename {
                 actions.append(NSAccessibilityCustomAction(name: String(localized: "Renommer")) {
                     onRename(); return true
@@ -297,7 +337,9 @@ final class FileCellView: NSTableCellView {
             canWrite: canWrite,
             download: { [weak self] in self?.onDownload?() },
             rename: { [weak self] in self?.onRename?() },
-            delete: { [weak self] in self?.onDelete?() }
+            delete: { [weak self] in self?.onDelete?() },
+            copy: { [weak self] in self?.onCopy?() },
+            cut: { [weak self] in self?.onCut?() }
         )
         menu.popUp(positioning: nil, at: NSPoint(x: bounds.minX, y: bounds.maxY), in: self)
         return true
