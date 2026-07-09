@@ -771,6 +771,156 @@
         }
       }
     },
+    "%lld disques" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld disks"
+          }
+        }
+      }
+    },
+    "%lld secteurs non corrigibles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld uncorrectable sectors"
+          }
+        }
+      }
+    },
+    "Basique" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basic"
+          }
+        }
+      }
+    },
+    "Durée de vie restante" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remaining life"
+          }
+        }
+      }
+    },
+    "Extension" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expanding"
+          }
+        }
+      }
+    },
+    "Groupes de stockage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage pools"
+          }
+        }
+      }
+    },
+    "Inodes utilisés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inodes used"
+          }
+        }
+      }
+    },
+    "Opération" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operation"
+          }
+        }
+      }
+    },
+    "Reconstruction" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rebuilding"
+          }
+        }
+      }
+    },
+    "Secteurs défectueux au-delà du seuil" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bad sectors above threshold"
+          }
+        }
+      }
+    },
+    "Type RAID" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RAID type"
+          }
+        }
+      }
+    },
+    "Usure élevée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High wear"
+          }
+        }
+      }
+    },
+    "Attention" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attention"
+          }
+        }
+      }
+    },
+    "Groupe de stockage %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage pool %lld"
+          }
+        }
+      }
+    },
+    "Volume %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume %lld"
+          }
+        }
+      }
+    },
     "Aucun dossier partagé" : {
       "localizations" : {
         "en" : {

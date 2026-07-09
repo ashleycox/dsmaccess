@@ -30,6 +30,9 @@ final class StorageViewModel {
             return lhs.id.localizedStandardCompare(rhs.id) == .orderedAscending
         }
     }
+    var pools: [StoragePool] {
+        (info?.storagePools ?? []).sorted { $0.sortOrder < $1.sortOrder }
+    }
 
     func load() async {
         guard let client = session.client, let sid = session.sid else {

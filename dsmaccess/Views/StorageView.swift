@@ -51,6 +51,11 @@ struct StorageView: View {
                 }
             }
         } else {
+            if !vm.pools.isEmpty {
+                section("Groupes de stockage") {
+                    ForEach(vm.pools) { poolCard($0) }
+                }
+            }
             if !vm.volumes.isEmpty {
                 section("Volumes") {
                     ForEach(vm.volumes) { volumeCard($0) }
@@ -80,9 +85,11 @@ struct StorageView: View {
             row("État", volume.statusText)
             row("Système de fichiers", volume.filesystemText)
             if let space = volume.spaceText { row("Espace", space) }
-            if let percent = volume.usagePercent {
+            if let percent = volume.usagePercentValue {
                 row("Utilisation", "\(percent) %")
             }
+            if let op = volume.operationText { row("Opération", op) }
+            if let inodes = volume.inodePercent { row("Inodes utilisés", "\(inodes) %") }
         }
     }
 
@@ -92,6 +99,19 @@ struct StorageView: View {
             row("Santé", disk.healthText)
             if let temp = disk.temperatureText { row("Température", temp) }
             if let size = disk.sizeText { row("Capacité", size) }
+            if let unc = disk.uncText {
+                Text(unc).foregroundStyle(.orange)
+            }
+        }
+    }
+
+    private func poolCard(_ pool: StoragePool) -> some View {
+        card {
+            Text(pool.displayName).fontWeight(.medium)
+            row("État", pool.statusText)
+            row("Type RAID", pool.raidTypeText)
+            Text(pool.diskCountText).foregroundStyle(.secondary)
+            if let size = pool.sizeText { row("Capacité", size) }
         }
     }
 
