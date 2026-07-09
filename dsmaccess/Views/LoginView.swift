@@ -1,0 +1,95 @@
+//
+//  LoginView.swift
+//  dsmaccess
+//
+//  Écran de connexion : adresse du NAS, HTTPS, port, identifiants. Bascule vers la
+//  saisie du code de vérification si DSM le réclame (état needsOTP).
+//
+
+import SwiftUI
+
+struct LoginView: View {
+    @State private var vm: ConnectionViewModel
+    @AccessibilityFocusState private var focusError: Bool
+
+    init(session: SessionStore) {
+        _vm = State(initialValue: ConnectionViewModel(session: session))
+    }
+
+    var body: some View {
+        @Bindable var vm = vm
+        Group {
+            if vm.state == .needsOTP {
+                OTPView(vm: vm)
+            } else {
+                credentialsForm(vm: vm)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func credentialsForm(vm: ConnectionViewModel) -> some View {
+        @Bindable var vm = vm
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Connexion au NAS")
+                    .font(.largeTitle.bold())
+                    .accessibilityAddTraits(.isHeader)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    LabeledField(label: "Adresse du NAS (IP ou nom)") {
+                        TextField("192.168.1.10", text: $vm.host)
+                            .textContentType(.URL)
+                    }
+                    Toggle("Utiliser HTTPS (connexion sécurisée)", isOn: $vm.useHTTPS)
+                        .onChange(of: vm.useHTTPS) { _, _ in vm.syncDefaultPortIfNeeded() }
+                    LabeledField(label: "Port") {
+                        TextField("5000", text: $vm.portText)
+                    }
+                    LabeledField(label: "Nom d'utilisateur") {
+                        TextField("", text: $vm.account)
+                            .textContentType(.username)
+                    }
+                    LabeledField(label: "Mot de passe") {
+                        SecureField("", text: $vm.password)
+                            .textContentType(.password)
+                    }
+                }
+
+                if let error = vm.errorMessage {
+                    Text(error)
+                        .foregroundStyle(.red)
+                        .accessibilityFocused($focusError)
+                }
+
+                HStack(spacing: 12) {
+                    if vm.state == .connecting {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("Connexion en cours…")
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Se connecter") {
+                        Task { await vm.connect() }
+                    }
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(!vm.canSubmit)
+                }
+            }
+            .padding(28)
+            .frame(maxWidth: 460)
+        }
+        .onChange(of: vm.state) { _, newValue in
+            if newValue == .connecting {
+                AccessibilityNotification.Announcement(String(localized: "Connexion en cours")).post()
+            }
+        }
+        .onChange(of: vm.errorMessage) { _, newValue in
+            if let newValue {
+                AccessibilityNotification.Announcement(newValue).post()
+                focusError = true
+            }
+        }
+    }
+}

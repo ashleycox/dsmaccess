@@ -1,0 +1,61 @@
+//
+//  DSMError.swift
+//  dsmaccess
+//
+//  Erreurs de la couche réseau/API, avec messages en français prêts à afficher
+//  (et à faire lire par VoiceOver).
+//
+
+import Foundation
+
+enum DSMError: Error, LocalizedError, Equatable {
+    /// Adresse du NAS invalide (URL non construisible).
+    case invalidEndpoint
+    /// Problème réseau (hôte injoignable, délai dépassé, certificat refusé…).
+    case network(String)
+    /// Réponse illisible (JSON non décodable).
+    case decoding
+    /// Réponse HTTP inattendue.
+    case invalidResponse
+    /// Identifiants incorrects (code 400).
+    case invalidCredentials
+    /// Compte désactivé (code 401).
+    case accountDisabled
+    /// Permission refusée (code 402).
+    case permissionDenied
+    /// Code de vérification à deux facteurs requis (code 403).
+    case needsOTP
+    /// Code de vérification incorrect (code 404).
+    case badOTP
+    /// Double authentification obligatoire à activer côté compte (code 406).
+    case otpEnforced
+    /// Autre erreur API renvoyée par DSM.
+    case apiError(code: Int)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidEndpoint:
+            return String(localized: "Adresse du NAS invalide.")
+        case .network(let detail):
+            return String(localized: "Impossible de joindre le NAS : \(detail)")
+        case .decoding:
+            return String(localized: "La réponse du NAS n'a pas pu être lue.")
+        case .invalidResponse:
+            return String(localized: "Réponse inattendue du NAS.")
+        case .invalidCredentials:
+            return String(localized: "Nom d'utilisateur ou mot de passe incorrect.")
+        case .accountDisabled:
+            return String(localized: "Ce compte est désactivé.")
+        case .permissionDenied:
+            return String(localized: "Permission refusée pour ce compte.")
+        case .needsOTP:
+            return String(localized: "Un code de vérification à deux facteurs est requis.")
+        case .badOTP:
+            return String(localized: "Code de vérification incorrect. Réessayez.")
+        case .otpEnforced:
+            return String(localized: "La double authentification est obligatoire pour ce compte. Activez-la dans DSM.")
+        case .apiError(let code):
+            return String(localized: "Erreur du NAS (code \(code)).")
+        }
+    }
+}

@@ -6,27 +6,18 @@
 //
 
 import SwiftUI
-import SwiftData
 
 @main
 struct dsmaccessApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    /// État de session partagé pour toute l'app (SID courant, hôte, connecté ou non).
+    @State private var session = SessionStore()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environment(session)
         }
-        .modelContainer(sharedModelContainer)
+        // Fenêtre unique et lisible ; pas de sidebar automatique pour le MVP.
+        .windowResizability(.contentSize)
     }
 }

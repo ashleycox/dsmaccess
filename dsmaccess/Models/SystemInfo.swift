@@ -1,0 +1,30 @@
+//
+//  SystemInfo.swift
+//  dsmaccess
+//
+//  Charge utile de SYNO.DSM.Info (method=getinfo) : infos système de base du NAS.
+//  Sert d'écran « preuve que la connexion fonctionne » pour le MVP.
+//
+
+import Foundation
+
+/// Informations système de base du NAS.
+struct SystemInfo: Decodable {
+    let model: String
+    let serial: String
+    let ram: Int?
+    let versionString: String
+    let uptime: Int?
+    let temperature: Int?
+    let temperatureWarn: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case model
+        case serial
+        case ram
+        case versionString = "version_string"
+        case uptime
+        case temperature
+        case temperatureWarn = "temperature_warn"
+    }
+}
