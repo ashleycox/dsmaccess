@@ -891,6 +891,46 @@
         }
       }
     },
+    "Mémorise le mot de passe pour la prochaine ouverture de l'app" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saves your password for the next time you open the app"
+          }
+        }
+      }
+    },
+    "Reconnexion à %@…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnecting to %@…"
+          }
+        }
+      }
+    },
+    "Reconnexion en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconnecting"
+          }
+        }
+      }
+    },
+    "Rester connecté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stay signed in"
+          }
+        }
+      }
+    },
     "Attention" : {
       "localizations" : {
         "en" : {

@@ -26,10 +26,18 @@ final class ConnectionViewModel {
     var password: String = ""
     var otpCode: String = ""
     var rememberDevice: Bool = true
+    /// « Rester connecté » : mémoriser le mot de passe pour la reconnexion automatique.
+    var rememberPassword: Bool
 
     private(set) var state: State = .editing
+    /// Reconnexion automatique en cours au lancement (masque le formulaire).
+    private(set) var isRestoring: Bool
     /// Message d'erreur à afficher et à annoncer (nil si aucun).
     var errorMessage: String?
+    /// Dernière erreur typée (sert à décider d'oublier un mot de passe mémorisé périmé).
+    private var lastError: DSMError?
+    /// Empêche de relancer la reconnexion automatique plus d'une fois.
+    private var hasRunStartup = false
 
     private let session: SessionStore
     private var client: DSMClient?
@@ -37,14 +45,21 @@ final class ConnectionViewModel {
 
     init(session: SessionStore) {
         self.session = session
-        self.host = Preferences.lastHost
-        self.account = Preferences.lastAccount
         let https = Preferences.lastUseHTTPS
+        let host = Preferences.lastHost
+        let account = Preferences.lastAccount
+        let effectivePort = Preferences.lastPort ?? DSMEndpoint.defaultPort(useHTTPS: https)
+        self.host = host
+        self.account = account
         self.useHTTPS = https
-        if let savedPort = Preferences.lastPort {
-            self.portText = String(savedPort)
+        self.portText = String(effectivePort)
+        self.rememberPassword = Preferences.rememberPassword
+        // Reconnexion possible au lancement si un mot de passe est mémorisé pour ce NAS.
+        if Preferences.rememberPassword, !host.isEmpty, !account.isEmpty {
+            let endpoint = DSMEndpoint(useHTTPS: https, host: host, port: effectivePort)
+            self.isRestoring = CredentialStore.password(account: account, endpoint: endpoint) != nil
         } else {
-            self.portText = String(DSMEndpoint.defaultPort(useHTTPS: https))
+            self.isRestoring = false
         }
     }
 
@@ -88,6 +103,7 @@ final class ConnectionViewModel {
 
         state = .connecting
         errorMessage = nil
+        lastError = nil
 
         let deviceID = KeychainStore.load(service: KeychainStore.deviceTokenService, account: keychainKey(cleanedAccount, endpoint))
 
@@ -102,7 +118,34 @@ final class ConnectionViewModel {
             errorMessage = nil
         } catch {
             state = .editing
+            lastError = error as? DSMError
             errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
+        }
+    }
+
+    /// Reconnexion automatique au lancement, si un mot de passe est mémorisé pour ce NAS.
+    /// Réutilise `connect()` ; si le mot de passe est refusé (périmé), on l'oublie pour
+    /// ne pas retenter en boucle au prochain lancement.
+    func startupIfNeeded() async {
+        guard isRestoring, !hasRunStartup else { return }
+        hasRunStartup = true
+
+        let cleanedHost = host.trimmingCharacters(in: .whitespaces)
+        let cleanedAccount = account.trimmingCharacters(in: .whitespaces)
+        let endpoint = DSMEndpoint(useHTTPS: useHTTPS, host: cleanedHost, port: port)
+        guard let saved = CredentialStore.password(account: cleanedAccount, endpoint: endpoint) else {
+            isRestoring = false
+            return
+        }
+
+        password = saved
+        await connect()
+        isRestoring = false
+
+        if !session.isLoggedIn, lastError?.isCredentialFailure == true {
+            CredentialStore.forget(account: cleanedAccount, endpoint: endpoint)
+            rememberPassword = false
+            password = ""
         }
     }
 
@@ -149,11 +192,18 @@ final class ConnectionViewModel {
         if rememberDevice, let did = result.did, !did.isEmpty {
             KeychainStore.save(did, service: KeychainStore.deviceTokenService, account: keychainKey(account, endpoint))
         }
+        // Mémoriser (ou oublier) le mot de passe selon le choix « Rester connecté ».
+        if rememberPassword {
+            CredentialStore.remember(password: password, account: account, endpoint: endpoint)
+        } else {
+            CredentialStore.forget(account: account, endpoint: endpoint)
+        }
         persistPreferences(account: account, endpoint: endpoint)
         session.establish(endpoint: endpoint, sid: result.sid, client: client)
         // RootView bascule automatiquement vers l'écran de contenu.
         state = .editing
         errorMessage = nil
+        lastError = nil
         password = ""
         otpCode = ""
     }

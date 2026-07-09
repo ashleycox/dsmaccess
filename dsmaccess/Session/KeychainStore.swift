@@ -13,6 +13,8 @@ import Security
 enum KeychainStore {
     /// Service utilisé pour les jetons d'appareil DSM.
     static let deviceTokenService = "math65.dsmaccess.deviceToken"
+    /// Service utilisé pour les mots de passe mémorisés (reconnexion automatique).
+    static let passwordService = "math65.dsmaccess.password"
 
     /// Enregistre (ou remplace) une valeur pour un couple service/compte.
     @discardableResult

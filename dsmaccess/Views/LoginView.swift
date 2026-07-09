@@ -11,6 +11,7 @@ import SwiftUI
 struct LoginView: View {
     @State private var vm: ConnectionViewModel
     @AccessibilityFocusState private var focusError: Bool
+    @AccessibilityFocusState private var focusRestoring: Bool
 
     init(session: SessionStore) {
         _vm = State(initialValue: ConnectionViewModel(session: session))
@@ -19,11 +20,31 @@ struct LoginView: View {
     var body: some View {
         @Bindable var vm = vm
         Group {
-            if vm.state == .needsOTP {
+            if vm.isRestoring {
+                restoringView
+            } else if vm.state == .needsOTP {
                 OTPView(vm: vm)
             } else {
                 credentialsForm(vm: vm)
             }
+        }
+        .task { await vm.startupIfNeeded() }
+    }
+
+    /// Écran plein affiché pendant la reconnexion automatique au lancement.
+    private var restoringView: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+            Text("Reconnexion à \(vm.host)…")
+                .font(.title2.bold())
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityFocused($focusRestoring)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(28)
+        .task {
+            focusRestoring = true
+            VoiceOver.announce(String(localized: "Reconnexion en cours"))
         }
     }
 
@@ -54,6 +75,8 @@ struct LoginView: View {
                         SecureField("", text: $vm.password)
                             .textContentType(.password)
                     }
+                    Toggle("Rester connecté", isOn: $vm.rememberPassword)
+                        .accessibilityHint("Mémorise le mot de passe pour la prochaine ouverture de l'app")
                 }
 
                 if let error = vm.errorMessage {

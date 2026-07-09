@@ -19,6 +19,7 @@ enum Preferences {
         static let lastPort = "lastPort"
         static let lastUseHTTPS = "lastUseHTTPS"
         static let lastAccount = "lastAccount"
+        static let rememberPassword = "rememberPassword"
     }
 
     /// Dernière adresse (hôte) du NAS saisie au login.
@@ -45,5 +46,12 @@ enum Preferences {
     static var lastAccount: String {
         get { defaults.string(forKey: Key.lastAccount) ?? "" }
         set { defaults.set(newValue, forKey: Key.lastAccount) }
+    }
+
+    /// L'utilisateur a demandé « Rester connecté » : le mot de passe est mémorisé au
+    /// Trousseau et l'app tente une reconnexion automatique au lancement.
+    static var rememberPassword: Bool {
+        get { defaults.bool(forKey: Key.rememberPassword) }
+        set { defaults.set(newValue, forKey: Key.rememberPassword) }
     }
 }

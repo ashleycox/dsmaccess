@@ -58,4 +58,15 @@ enum DSMError: Error, LocalizedError, Equatable {
             return String(localized: "Erreur du NAS (code \(code)).")
         }
     }
+
+    /// Échec « définitif » lié au compte : inutile de retenter avec le même mot de passe
+    /// (sert à décider d'oublier un mot de passe mémorisé lors d'une reconnexion auto).
+    var isCredentialFailure: Bool {
+        switch self {
+        case .invalidCredentials, .accountDisabled, .permissionDenied, .otpEnforced:
+            return true
+        default:
+            return false
+        }
+    }
 }
