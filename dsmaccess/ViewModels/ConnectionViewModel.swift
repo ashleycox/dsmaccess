@@ -35,20 +35,13 @@ final class ConnectionViewModel {
     private var client: DSMClient?
     private var pendingEndpoint: DSMEndpoint?
 
-    // Clés de préférences (valeurs non secrètes uniquement).
-    private static let hostKey = "lastHost"
-    private static let portKey = "lastPort"
-    private static let httpsKey = "lastUseHTTPS"
-    private static let accountKey = "lastAccount"
-
     init(session: SessionStore) {
         self.session = session
-        let defaults = UserDefaults.standard
-        self.host = defaults.string(forKey: Self.hostKey) ?? ""
-        self.account = defaults.string(forKey: Self.accountKey) ?? ""
-        let https = defaults.object(forKey: Self.httpsKey) as? Bool ?? false
+        self.host = Preferences.lastHost
+        self.account = Preferences.lastAccount
+        let https = Preferences.lastUseHTTPS
         self.useHTTPS = https
-        if let savedPort = defaults.object(forKey: Self.portKey) as? Int {
+        if let savedPort = Preferences.lastPort {
             self.portText = String(savedPort)
         } else {
             self.portText = String(DSMEndpoint.defaultPort(useHTTPS: https))
@@ -170,10 +163,9 @@ final class ConnectionViewModel {
     }
 
     private func persistPreferences(account: String, endpoint: DSMEndpoint) {
-        let defaults = UserDefaults.standard
-        defaults.set(endpoint.host, forKey: Self.hostKey)
-        defaults.set(endpoint.port, forKey: Self.portKey)
-        defaults.set(endpoint.useHTTPS, forKey: Self.httpsKey)
-        defaults.set(account, forKey: Self.accountKey)
+        Preferences.lastHost = endpoint.host
+        Preferences.lastPort = endpoint.port
+        Preferences.lastUseHTTPS = endpoint.useHTTPS
+        Preferences.lastAccount = account
     }
 }
