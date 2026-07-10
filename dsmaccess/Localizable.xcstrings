@@ -1912,6 +1912,226 @@
           }
         }
       }
+    },
+    "SMB (Windows, macOS)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SMB (Windows, macOS)"
+          }
+        }
+      }
+    },
+    "NFS (Linux, virtualisation)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NFS (Linux, virtualization)"
+          }
+        }
+      }
+    },
+    "FTP": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FTP"
+          }
+        }
+      }
+    },
+    "rsync (sauvegarde réseau)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "rsync (network backup)"
+          }
+        }
+      }
+    },
+    "%@ activé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ enabled"
+          }
+        }
+      }
+    },
+    "%@ désactivé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ disabled"
+          }
+        }
+      }
+    },
+    "Échec pour %@ : %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed for %@: %@"
+          }
+        }
+      }
+    },
+    "Services de fichiers : %lld activés sur %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File services: %lld of %lld enabled"
+          }
+        }
+      }
+    },
+    "Services de fichiers": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File Services"
+          }
+        }
+      }
+    },
+    "Activez ou désactivez les protocoles de partage de fichiers du NAS.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable or disable the NAS file-sharing protocols."
+          }
+        }
+      }
+    },
+    "Recharge l'état des services": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reloads the services' status"
+          }
+        }
+      }
+    },
+    "Désactiver ce service ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disable this service?"
+          }
+        }
+      }
+    },
+    "Désactiver %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disable %@"
+          }
+        }
+      }
+    },
+    "Désactiver": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disable"
+          }
+        }
+      }
+    },
+    "Activer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        }
+      }
+    },
+    "Activer %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable %@"
+          }
+        }
+      }
+    },
+    "Réessayer %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry %@"
+          }
+        }
+      }
+    },
+    "Activé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enabled"
+          }
+        }
+      }
+    },
+    "Désactivé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disabled"
+          }
+        }
+      }
+    },
+    "État indisponible": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status unavailable"
+          }
+        }
+      }
+    },
+    "SMB est le protocole utilisé par le Finder et l'Explorateur Windows. Le désactiver coupera l'accès aux fichiers depuis ces apps, y compris depuis cet appareil. Vous pourrez le réactiver ici.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SMB is the protocol used by Finder and Windows Explorer. Disabling it will cut off file access from those apps, including from this device. You can re-enable it here."
+          }
+        }
+      }
+    },
+    "Le service sera arrêté et les connexions en cours interrompues. Vous pourrez le réactiver ici.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The service will be stopped and any active connections dropped. You can re-enable it here."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

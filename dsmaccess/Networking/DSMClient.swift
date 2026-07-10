@@ -48,6 +48,10 @@ protocol DSMClientProtocol: AnyObject {
     func createSharedFolder(name: String, volumePath: String, description: String, sid: String) async throws
     /// Supprime le dossier partagé `name` — et TOUT son contenu.
     func deleteSharedFolder(name: String, sid: String) async throws
+    /// État d'activation d'un service de fichiers (SMB, NFS…) ; nil si l'info est absente de la réponse.
+    func fileServiceEnabled(_ service: FileService, sid: String) async throws -> Bool?
+    /// Active ou désactive un service de fichiers.
+    func setFileService(_ service: FileService, enabled: Bool, sid: String) async throws
     func logout(sid: String) async throws
 }
 
@@ -515,6 +519,39 @@ final class DSMClient: DSMClientProtocol {
             "_sid": sid,
         ]
         let resp = try await get(cgi: path(for: Self.shareAPI), query: query, as: EmptyData.self)
+        guard resp.success else {
+            throw DSMError.apiError(code: resp.error?.code ?? -1)
+        }
+    }
+
+    func fileServiceEnabled(_ service: FileService, sid: String) async throws -> Bool? {
+        try await ensurePaths(for: [service.api])
+        // API non documentée : on utilise la version maximale découverte via SYNO.API.Info.
+        let version = apiPaths[service.api]?.maxVersion ?? 1
+        let query = [
+            "api": service.api,
+            "version": String(version),
+            "method": "get",
+            "_sid": sid,
+        ]
+        let resp = try await get(cgi: path(for: service.api), query: query, as: FileServiceStatus.self)
+        guard resp.success, let data = resp.data else {
+            throw DSMError.apiError(code: resp.error?.code ?? -1)
+        }
+        return data.enabled(for: service)
+    }
+
+    func setFileService(_ service: FileService, enabled: Bool, sid: String) async throws {
+        try await ensurePaths(for: [service.api])
+        let version = apiPaths[service.api]?.maxVersion ?? 1
+        let query = [
+            "api": service.api,
+            "version": String(version),
+            "method": "set",
+            service.enableKey: enabled ? "true" : "false",
+            "_sid": sid,
+        ]
+        let resp = try await get(cgi: path(for: service.api), query: query, as: EmptyData.self)
         guard resp.success else {
             throw DSMError.apiError(code: resp.error?.code ?? -1)
         }
