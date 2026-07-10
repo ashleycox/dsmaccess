@@ -4,12 +4,12 @@
         <title>dsmaccess</title>
         <item>
             <title>1.0</title>
-            <pubDate>Fri, 10 Jul 2026 12:05:57 +0200</pubDate>
+            <pubDate>Fri, 10 Jul 2026 12:37:49 +0200</pubDate>
             <link>https://github.com/math65/dsmaccess/releases/tag/v1.0</link>
             <sparkle:version>1</sparkle:version>
             <sparkle:shortVersionString>1.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>26.5</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/math65/dsmaccess/releases/download/v1.0/dsmaccess-1.0.zip" length="1667135" type="application/octet-stream" sparkle:edSignature="Ap7836jv2e200df+NxcSR3u1UtO/R/MVwekUAc81bovtuVaRwUyA7qxl8gNeVmTcOCHwCsYmtn1tYxDDRIhlDQ=="/>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/math65/dsmaccess/releases/download/v1.0/dsmaccess-1.0.zip" length="1687858" type="application/octet-stream" sparkle:edSignature="eKPPic7Zv76nZliBWgPCpMWyQ0TkhuSd+aPBVKyYCng4g8O+gqwJ43a7CNel1YmjNLWoFdZE5vTAjxkGIM9WAA=="/>
         </item>
     </channel>
 </rss>
