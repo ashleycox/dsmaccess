@@ -7,5 +7,13 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- Sparkle : requis en sandbox pour lancer le service XPC d'installation. -->
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<!-- URL de l'appcast. PROVISOIRE : à confirmer/ajuster à l'étape distribution. -->
+	<key>SUFeedURL</key>
+	<string>https://math65.github.io/dsmaccess/appcast.xml</string>
+	<!-- SUPublicEDKey : ajouté après « generate_keys » (étape distribution). En son
+	     absence, Sparkle valide les mises à jour via la signature Developer ID. -->
 </dict>
 </plist>

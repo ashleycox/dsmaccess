@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		5AF1A0510000000000000003 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 5AF1A0510000000000000002 /* Sparkle */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		94BBDF202FFF2A0400FA27D3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AF1A0510000000000000003 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +130,7 @@
 			);
 			name = dsmaccess;
 			packageProductDependencies = (
+				5AF1A0510000000000000002 /* Sparkle */,
 			);
 			productName = dsmaccess;
 			productReference = 94BBDF102FFF2A0300FA27D3 /* dsmaccess.app */;
@@ -209,6 +215,9 @@
 			);
 			mainGroup = 94BBDF072FFF2A0300FA27D3;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5AF1A0510000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 94BBDF112FFF2A0300FA27D3 /* Products */;
 			projectDirPath = "";
@@ -593,6 +602,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5AF1A0510000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5AF1A0510000000000000002 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5AF1A0510000000000000001 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 94BBDF082FFF2A0300FA27D3 /* Project object */;
 }
