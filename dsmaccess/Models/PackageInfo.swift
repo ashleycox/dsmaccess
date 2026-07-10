@@ -13,6 +13,18 @@ struct PackageList: Decodable {
     let packages: [PackageInfo]?
 }
 
+/// Réponse de SYNO.Core.Package.Server (method=list) : le catalogue des paquets disponibles
+/// (officiels et tiers-parti). On n'en retient que l'identifiant et la version pour comparer
+/// avec l'installé et détecter les mises à jour.
+struct ServerPackageList: Decodable {
+    let packages: [ServerPackage]?
+}
+
+struct ServerPackage: Decodable {
+    let id: String?
+    let version: String?
+}
+
 struct PackageInfo: Decodable, Identifiable {
     let pkgId: String?
     let name: String?

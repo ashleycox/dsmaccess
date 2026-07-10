@@ -54,6 +54,9 @@ protocol DSMClientProtocol: AnyObject {
     func setFileService(_ service: FileService, enabled: Bool, sid: String) async throws
     /// Liste les paquets installés (SYNO.Core.Package).
     func listPackages(sid: String) async throws -> [PackageInfo]
+    /// Versions disponibles au catalogue (SYNO.Core.Package.Server), indexées par identifiant
+    /// minuscule — pour détecter les mises à jour en comparant avec l'installé.
+    func availablePackageVersions(sid: String) async throws -> [String: String]
     func logout(sid: String) async throws
 }
 
@@ -73,6 +76,7 @@ final class DSMClient: DSMClientProtocol {
     private static let utilizationAPI = "SYNO.Core.System.Utilization"
     private static let shareAPI = "SYNO.Core.Share"
     private static let packageAPI = "SYNO.Core.Package"
+    private static let packageServerAPI = "SYNO.Core.Package.Server"
 
     /// Nom de session applicatif ; réutilisé au logout.
     private static let sessionName = "DSMAccess"
@@ -577,6 +581,32 @@ final class DSMClient: DSMClientProtocol {
             throw DSMError.apiError(code: resp.error?.code ?? -1)
         }
         return data.packages ?? []
+    }
+
+    func availablePackageVersions(sid: String) async throws -> [String: String] {
+        try await ensurePaths(for: [Self.packageServerAPI])
+        let version = apiPaths[Self.packageServerAPI]?.maxVersion ?? 2
+        var versions: [String: String] = [:]
+        // Deux sources : catalogue officiel Synology (blloadothers=false) puis tiers-parti (true).
+        // On lit le cache du NAS (blforcerefresh=false) pour rester rapide.
+        for loadOthers in ["false", "true"] {
+            let query = [
+                "api": "SYNO.Core.Package.Server",
+                "version": String(version),
+                "method": "list",
+                "blforcerefresh": "false",
+                "blloadothers": loadOthers,
+                "_sid": sid,
+            ]
+            guard let resp = try? await get(cgi: path(for: Self.packageServerAPI), query: query, as: ServerPackageList.self),
+                  resp.success, let list = resp.data?.packages else { continue }
+            for package in list {
+                if let id = package.id?.lowercased(), let ver = package.version {
+                    versions[id] = ver
+                }
+            }
+        }
+        return versions
     }
 
     func logout(sid: String) async throws {

@@ -78,6 +78,11 @@ struct PackagesView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                if let newVersion = vm.updateVersion(for: package) {
+                    Text("Mise à jour disponible : \(newVersion)")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                }
             }
             Spacer()
             Text(package.statusText)

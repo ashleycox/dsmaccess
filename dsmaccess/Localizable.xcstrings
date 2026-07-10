@@ -2183,6 +2183,26 @@
         }
       }
     },
+    "%lld paquets, %lld mises à jour disponibles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld packages, %lld updates available"
+          }
+        }
+      }
+    },
+    "Mise à jour disponible : %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update available: %@"
+          }
+        }
+      }
+    },
     "Recharge la liste des paquets": {
       "localizations": {
         "en": {
