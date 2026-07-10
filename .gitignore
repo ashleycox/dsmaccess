@@ -4,6 +4,7 @@
 # Xcode — dérivés de build
 build/
 DerivedData/
+BuildArtifacts/
 *.moved-aside
 *.pbxuser
 !default.pbxuser
@@ -30,6 +31,8 @@ Carthage/Build/
 
 # Instructions personnelles Claude Code (privées)
 CLAUDE.local.md
+# Config/skills Claude Code locales (non publiées)
+.claude/
 
 # Divers
 *.log
