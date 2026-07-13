@@ -15,8 +15,21 @@ import SwiftUI
 import Combine
 import Sparkle
 
+/// Abonne le build au canal de mises à jour approprié. Un build **beta** (version contenant
+/// « beta », ex. « 1.1-beta.1 ») suit le canal `beta` de l'appcast ; un build **stable** ne
+/// suit que le canal par défaut. Le mécanisme est ainsi auto-cohérent : rien à basculer à la
+/// main quand on passe d'une beta à une version stable.
+final class UpdaterChannelDelegate: NSObject, SPUUpdaterDelegate {
+    func allowedChannels(for updater: SPUUpdater) -> Set<String> {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        return version.localizedCaseInsensitiveContains("beta") ? ["beta"] : []
+    }
+}
+
 final class UpdaterViewModel: ObservableObject {
     private let updaterController: SPUStandardUpdaterController
+    /// Retenu fortement : Sparkle ne garde qu'une référence faible au delegate.
+    private let channelDelegate = UpdaterChannelDelegate()
 
     /// Vrai quand Sparkle est prêt à vérifier (évite de proposer l'action trop tôt).
     @Published var canCheckForUpdates = false
@@ -26,7 +39,7 @@ final class UpdaterViewModel: ObservableObject {
         // Sparkle (fenêtre « mise à jour disponible », progression, notes de version),
         // qui est en AppKit natif donc accessible VoiceOver sans code supplémentaire.
         updaterController = SPUStandardUpdaterController(startingUpdater: true,
-                                                        updaterDelegate: nil,
+                                                        updaterDelegate: channelDelegate,
                                                         userDriverDelegate: nil)
         updaterController.updater.publisher(for: \.canCheckForUpdates)
             .assign(to: &$canCheckForUpdates)

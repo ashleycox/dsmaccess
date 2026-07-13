@@ -82,6 +82,17 @@ codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 
 VERSION=$(defaults read "$APP_PATH/Contents/Info" CFBundleShortVersionString)
 BUILD=$(defaults read "$APP_PATH/Contents/Info" CFBundleVersion)
+
+# Version « …-beta… » → pré-release : entrée d'appcast taguée sur le canal `beta` (seuls les
+# builds beta la voient) et release GitHub marquée prerelease. La 1.0 stable reste intacte.
+CHANNEL_ARGS=()
+PRERELEASE_ARGS=()
+if [[ "$VERSION" == *beta* ]]; then
+    CHANNEL_ARGS=(--channel beta)
+    PRERELEASE_ARGS=(--prerelease)
+    echo "==> Version beta détectée ($VERSION) → canal Sparkle « beta » + release prerelease."
+fi
+
 mkdir -p "$OUTPUT_DIR"
 ZIP_NAME="${APP_NAME}-${VERSION}.zip"
 ZIP_PATH="$OUTPUT_DIR/$ZIP_NAME"
@@ -118,6 +129,7 @@ if [[ $NOTARIZE -eq 1 ]]; then
     mkdir -p "$DOCS_DIR"
     "$SPARKLE_BIN/generate_appcast" \
         "$STAGING" \
+        ${CHANNEL_ARGS[@]+"${CHANNEL_ARGS[@]}"} \
         --download-url-prefix "https://github.com/${REPO}/releases/download/v${VERSION}/" \
         --link "https://github.com/${REPO}/releases/tag/v${VERSION}" \
         -o "$DOCS_DIR/appcast.xml"
@@ -141,7 +153,9 @@ if [[ $RELEASE -eq 1 ]]; then
     else
         gh release create "$TAG" "$ZIP_PATH" \
             --title "DSM Access ${VERSION}" \
-            --notes-file "$NOTES_FILE" -R "$REPO"
+            --notes-file "$NOTES_FILE" \
+            ${PRERELEASE_ARGS[@]+"${PRERELEASE_ARGS[@]}"} \
+            -R "$REPO"
     fi
     echo "✓ https://github.com/${REPO}/releases/tag/$TAG"
 
