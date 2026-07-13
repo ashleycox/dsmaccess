@@ -61,6 +61,9 @@ protocol DSMClientProtocol: AnyObject {
     func setPackageRunning(id: String, running: Bool, sid: String) async throws
     /// Désinstalle un paquet installé (SYNO.Core.Package.Uninstallation).
     func uninstallPackage(id: String, sid: String) async throws
+    /// Réglages globaux du Centre de paquets (SYNO.Core.Package.Setting).
+    func packageSettings(sid: String) async throws -> PackageSettings
+    func setPackageSettings(_ settings: PackageSettings, sid: String) async throws
     func logout(sid: String) async throws
 }
 
@@ -83,6 +86,7 @@ final class DSMClient: DSMClientProtocol {
     private static let packageServerAPI = "SYNO.Core.Package.Server"
     private static let packageControlAPI = "SYNO.Core.Package.Control"
     private static let packageUninstallAPI = "SYNO.Core.Package.Uninstallation"
+    private static let packageSettingAPI = "SYNO.Core.Package.Setting"
 
     /// Nom de session applicatif ; réutilisé au logout.
     private static let sessionName = "DSMAccess"
@@ -646,6 +650,47 @@ final class DSMClient: DSMClientProtocol {
             "_sid": sid,
         ]
         let resp = try await get(cgi: path(for: Self.packageUninstallAPI), query: query, as: EmptyData.self)
+        guard resp.success else {
+            throw DSMError.apiError(code: resp.error?.code ?? -1)
+        }
+    }
+
+    func packageSettings(sid: String) async throws -> PackageSettings {
+        try await ensurePaths(for: [Self.packageSettingAPI])
+        let version = apiPaths[Self.packageSettingAPI]?.maxVersion ?? 1
+        let query = [
+            "api": Self.packageSettingAPI,
+            "version": String(version),
+            "method": "get",
+            "_sid": sid,
+        ]
+        let resp = try await get(cgi: path(for: Self.packageSettingAPI), query: query, as: PackageSettings.self)
+        guard resp.success, let data = resp.data else {
+            throw DSMError.apiError(code: resp.error?.code ?? -1)
+        }
+        return data
+    }
+
+    func setPackageSettings(_ settings: PackageSettings, sid: String) async throws {
+        try await ensurePaths(for: [Self.packageSettingAPI])
+        let version = apiPaths[Self.packageSettingAPI]?.maxVersion ?? 1
+        func flag(_ value: Bool) -> String { value ? "true" : "false" }
+        // On renvoie l'objet complet : default_vol et trust_level sont préservés tels quels.
+        let query = [
+            "api": Self.packageSettingAPI,
+            "version": String(version),
+            "method": "set",
+            "enable_autoupdate": flag(settings.enableAutoupdate),
+            "autoupdateall": flag(settings.autoupdateAll),
+            "autoupdateimportant": flag(settings.autoupdateImportant),
+            "enable_dsm": flag(settings.enableDsm),
+            "enable_email": flag(settings.enableEmail),
+            "default_vol": settings.defaultVol,
+            "trust_level": String(settings.trustLevel),
+            "update_channel": settings.updateChannelBeta ? "beta" : "stable",
+            "_sid": sid,
+        ]
+        let resp = try await get(cgi: path(for: Self.packageSettingAPI), query: query, as: EmptyData.self)
         guard resp.success else {
             throw DSMError.apiError(code: resp.error?.code ?? -1)
         }

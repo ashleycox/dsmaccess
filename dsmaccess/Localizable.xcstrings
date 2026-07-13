@@ -2372,6 +2372,176 @@
           }
         }
       }
+    },
+    "Réglages du Centre de paquets": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Package Center Settings"
+          }
+        }
+      }
+    },
+    "Ouvre les réglages du Centre de paquets": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens Package Center settings"
+          }
+        }
+      }
+    },
+    "Mise à jour automatique": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic updates"
+          }
+        }
+      }
+    },
+    "Désactivée": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disabled"
+          }
+        }
+      }
+    },
+    "Versions importantes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Important versions"
+          }
+        }
+      }
+    },
+    "Dernières versions": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latest versions"
+          }
+        }
+      }
+    },
+    "Certains paquets ne prennent pas en charge la mise à jour automatique.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some packages don’t support automatic updates."
+          }
+        }
+      }
+    },
+    "Afficher les versions bêta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show beta versions"
+          }
+        }
+      }
+    },
+    "Les versions bêta permettent d'essayer les nouvelles fonctionnalités avant leur publication officielle.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beta versions let you try new features before their official release."
+          }
+        }
+      }
+    },
+    "Notifications de mise à jour": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update notifications"
+          }
+        }
+      }
+    },
+    "Activer les notifications sur le bureau": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable desktop notifications"
+          }
+        }
+      }
+    },
+    "Activer la notification par courriel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable email notification"
+          }
+        }
+      }
+    },
+    "Terminé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Réglage enregistré": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setting saved"
+          }
+        }
+      }
+    },
+    "Échec de l'enregistrement : %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to save: %@"
+          }
+        }
+      }
+    },
+    "Réglages non chargés.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings not loaded."
+          }
+        }
+      }
+    },
+    "Réglages du Centre de paquets chargés": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Package Center settings loaded"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

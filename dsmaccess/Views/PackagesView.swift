@@ -11,9 +11,13 @@ import SwiftUI
 struct PackagesView: View {
     @State private var vm: PackagesViewModel
     @State private var pendingUninstall: PackageInfo?
+    @State private var showSettings = false
     @AccessibilityFocusState private var focusTitle: Bool
 
+    private let session: SessionStore
+
     init(session: SessionStore) {
+        self.session = session
         _vm = State(initialValue: PackagesViewModel(session: session))
     }
 
@@ -44,6 +48,9 @@ struct PackagesView: View {
         } message: { package in
             Text(uninstallWarning(for: package))
         }
+        .sheet(isPresented: $showSettings) {
+            PackageSettingsSheet(session: session)
+        }
     }
 
     private var header: some View {
@@ -53,6 +60,13 @@ struct PackagesView: View {
                 .accessibilityAddTraits(.isHeader)
                 .accessibilityFocused($focusTitle)
             Spacer()
+            Button {
+                showSettings = true
+            } label: {
+                Label("Réglages du Centre de paquets", systemImage: "gearshape")
+            }
+            .accessibilityLabel("Réglages du Centre de paquets")
+            .accessibilityHint("Ouvre les réglages du Centre de paquets")
             Button {
                 Task { await vm.load(); AccessibilityNotification.Announcement(vm.summary).post() }
             } label: {
