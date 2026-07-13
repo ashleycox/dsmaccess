@@ -2302,6 +2302,76 @@
           }
         }
       }
+    },
+    "Désinstaller…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uninstall…"
+          }
+        }
+      }
+    },
+    "Désinstaller %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uninstall %@"
+          }
+        }
+      }
+    },
+    "%@ désinstallé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ uninstalled"
+          }
+        }
+      }
+    },
+    "Désinstaller ce paquet ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uninstall this package?"
+          }
+        }
+      }
+    },
+    "Échec de la désinstallation de %@ : %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to uninstall %@: %@"
+          }
+        }
+      }
+    },
+    "« %@ » sera désinstallé. Les données stockées dans des dossiers partagés (photos, bases de données…) peuvent être conservées selon le paquet ; pour les supprimer, utilisez le module Partages. Vous pourrez réinstaller le paquet depuis DSM.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” will be uninstalled. Data stored in shared folders (photos, databases…) may be kept depending on the package; to delete it, use the Shares module. You can reinstall the package from DSM."
+          }
+        }
+      }
+    },
+    "Ce paquet propose des options de désinstallation dans DSM (conserver ou supprimer les données) qui ne sont pas disponibles ici : les réglages par défaut seront appliqués.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This package offers uninstall options in DSM (keep or delete data) that aren’t available here: the default settings will be applied."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

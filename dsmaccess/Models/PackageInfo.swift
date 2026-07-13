@@ -37,11 +37,17 @@ struct PackageInfo: Decodable, Identifiable {
         let installType: String?
         /// Le paquet peut-il être démarré/arrêté ? (absent pour les paquets non pilotables).
         let startable: Bool?
+        /// Le paquet est-il désinstallable depuis l'UI ? (faux pour certains paquets système).
+        let ctlUninstall: Bool?
+        /// Le paquet propose-t-il des options de désinstallation custom dans DSM ?
+        let isUninstallPages: Bool?
 
         enum CodingKeys: String, CodingKey {
             case status
             case installType = "install_type"
             case startable
+            case ctlUninstall = "ctl_uninstall"
+            case isUninstallPages = "is_uninstall_pages"
         }
     }
 
@@ -78,4 +84,10 @@ struct PackageInfo: Decodable, Identifiable {
 
     /// Vrai si le paquet peut être démarré/arrêté (certains paquets système ne le sont pas).
     var canStartStop: Bool { additional?.startable == true }
+
+    /// Vrai si le paquet peut être désinstallé depuis l'app (certains paquets système non).
+    var canUninstall: Bool { additional?.ctlUninstall == true }
+
+    /// Vrai si le paquet propose des options de désinstallation dans DSM (non exposées ici).
+    var hasUninstallOptions: Bool { additional?.isUninstallPages == true }
 }

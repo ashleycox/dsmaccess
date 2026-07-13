@@ -59,6 +59,8 @@ protocol DSMClientProtocol: AnyObject {
     func availablePackageVersions(sid: String) async throws -> [String: String]
     /// Démarre (start) ou arrête (stop) un paquet installé (SYNO.Core.Package.Control).
     func setPackageRunning(id: String, running: Bool, sid: String) async throws
+    /// Désinstalle un paquet installé (SYNO.Core.Package.Uninstallation).
+    func uninstallPackage(id: String, sid: String) async throws
     func logout(sid: String) async throws
 }
 
@@ -80,6 +82,7 @@ final class DSMClient: DSMClientProtocol {
     private static let packageAPI = "SYNO.Core.Package"
     private static let packageServerAPI = "SYNO.Core.Package.Server"
     private static let packageControlAPI = "SYNO.Core.Package.Control"
+    private static let packageUninstallAPI = "SYNO.Core.Package.Uninstallation"
 
     /// Nom de session applicatif ; réutilisé au logout.
     private static let sessionName = "DSMAccess"
@@ -575,8 +578,8 @@ final class DSMClient: DSMClientProtocol {
             "api": "SYNO.Core.Package",
             "version": String(version),
             "method": "list",
-            // Champs supplémentaires (tableau JSON) : état, version et pilotabilité des paquets.
-            "additional": "[\"status\",\"installed_info\",\"startable\"]",
+            // Champs supplémentaires (tableau JSON) : état, version, pilotabilité et désinstallabilité.
+            "additional": "[\"status\",\"installed_info\",\"startable\",\"ctl_uninstall\",\"is_uninstall_pages\"]",
             "_sid": sid,
         ]
         let resp = try await get(cgi: path(for: Self.packageAPI), query: query, as: PackageList.self)
@@ -624,6 +627,25 @@ final class DSMClient: DSMClientProtocol {
             "_sid": sid,
         ]
         let resp = try await get(cgi: path(for: Self.packageControlAPI), query: query, as: EmptyData.self)
+        guard resp.success else {
+            throw DSMError.apiError(code: resp.error?.code ?? -1)
+        }
+    }
+
+    func uninstallPackage(id: String, sid: String) async throws {
+        try await ensurePaths(for: [Self.packageUninstallAPI])
+        // API non documentée : on utilise la version maximale découverte via SYNO.API.Info.
+        let version = apiPaths[Self.packageUninstallAPI]?.maxVersion ?? 1
+        let query = [
+            "api": Self.packageUninstallAPI,
+            "version": String(version),
+            "method": "uninstall",
+            "id": id,
+            // dsm_apps vide : désinstallation standard, réglages par défaut du paquet.
+            "dsm_apps": "",
+            "_sid": sid,
+        ]
+        let resp = try await get(cgi: path(for: Self.packageUninstallAPI), query: query, as: EmptyData.self)
         guard resp.success else {
             throw DSMError.apiError(code: resp.error?.code ?? -1)
         }

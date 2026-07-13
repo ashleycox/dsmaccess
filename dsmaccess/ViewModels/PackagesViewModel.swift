@@ -69,6 +69,27 @@ final class PackagesViewModel {
         }
     }
 
+    /// Désinstalle un paquet. Renvoie le message à annoncer à VoiceOver.
+    func uninstall(_ package: PackageInfo) async -> String {
+        guard let client = session.client, let sid = session.sid else {
+            return String(localized: "Session expirée.")
+        }
+        guard let id = package.pkgId else {
+            return String(localized: "Identifiant de paquet introuvable.")
+        }
+        busy.insert(id)
+        defer { busy.remove(id) }
+        do {
+            try await client.uninstallPackage(id: id, sid: sid)
+            await load()
+            return String(localized: "\(package.displayName) désinstallé")
+        } catch {
+            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
+            await load()
+            return String(localized: "Échec de la désinstallation de \(package.displayName) : \(reason)")
+        }
+    }
+
     /// Version disponible au catalogue si elle est *strictement plus récente* que
     /// l'installée (= vraie mise à jour), sinon nil. On compare l'ordre des versions et
     /// non une simple différence : un paquet système (ex. FileStation, livré avec DSM) ou

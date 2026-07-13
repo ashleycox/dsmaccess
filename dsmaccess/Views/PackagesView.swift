@@ -10,6 +10,7 @@ import SwiftUI
 
 struct PackagesView: View {
     @State private var vm: PackagesViewModel
+    @State private var pendingUninstall: PackageInfo?
     @AccessibilityFocusState private var focusTitle: Bool
 
     init(session: SessionStore) {
@@ -27,6 +28,21 @@ struct PackagesView: View {
             focusTitle = true
             await vm.load()
             AccessibilityNotification.Announcement(vm.summary).post()
+        }
+        .confirmationDialog(
+            "Désinstaller ce paquet ?",
+            isPresented: Binding(
+                get: { pendingUninstall != nil },
+                set: { if !$0 { pendingUninstall = nil } }
+            ),
+            presenting: pendingUninstall
+        ) { package in
+            Button("Désinstaller \(package.displayName)", role: .destructive) {
+                requestUninstall(package)
+            }
+            Button("Annuler", role: .cancel) { }
+        } message: { package in
+            Text(uninstallWarning(for: package))
         }
     }
 
@@ -90,24 +106,39 @@ struct PackagesView: View {
             Spacer()
             control(for: package)
         }
+        .contextMenu {
+            if package.canUninstall {
+                Button("Désinstaller…", role: .destructive) { pendingUninstall = package }
+            }
+        }
     }
 
-    /// Bouton Démarrer/Arrêter, seulement pour les paquets pilotables.
+    /// Boutons d'action à droite : Démarrer/Arrêter (si pilotable) et Désinstaller (si permis).
     @ViewBuilder
     private func control(for package: PackageInfo) -> some View {
         let isBusy = vm.busy.contains(package.id)
-        if package.canStartStop {
-            if package.isRunning {
-                Button("Arrêter") { setRunning(package, running: false) }
-                    .disabled(isBusy)
-                    .accessibilityLabel("Arrêter \(package.displayName)")
-            } else {
-                Button("Démarrer") { setRunning(package, running: true) }
-                    .disabled(isBusy)
-                    .accessibilityLabel("Démarrer \(package.displayName)")
+        HStack(spacing: 8) {
+            if package.canStartStop {
+                if package.isRunning {
+                    Button("Arrêter") { setRunning(package, running: false) }
+                        .disabled(isBusy)
+                        .accessibilityLabel("Arrêter \(package.displayName)")
+                } else {
+                    Button("Démarrer") { setRunning(package, running: true) }
+                        .disabled(isBusy)
+                        .accessibilityLabel("Démarrer \(package.displayName)")
+                }
+            }
+            if package.canUninstall {
+                Button(role: .destructive) {
+                    pendingUninstall = package
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .disabled(isBusy)
+                .accessibilityLabel("Désinstaller \(package.displayName)")
             }
         }
-        // Sinon : pas de bouton (l'état reste lisible dans le bloc de gauche).
     }
 
     private func setRunning(_ package: PackageInfo, running: Bool) {
@@ -115,5 +146,21 @@ struct PackagesView: View {
             let msg = await vm.setRunning(package, running: running)
             VoiceOver.announce(msg, priority: .high)
         }
+    }
+
+    private func requestUninstall(_ package: PackageInfo) {
+        Task {
+            let msg = await vm.uninstall(package)
+            VoiceOver.announce(msg, priority: .high)
+        }
+    }
+
+    /// Avertissement honnête affiché avant la désinstallation.
+    private func uninstallWarning(for package: PackageInfo) -> String {
+        var text = String(localized: "« \(package.displayName) » sera désinstallé. Les données stockées dans des dossiers partagés (photos, bases de données…) peuvent être conservées selon le paquet ; pour les supprimer, utilisez le module Partages. Vous pourrez réinstaller le paquet depuis DSM.")
+        if package.hasUninstallOptions {
+            text += " " + String(localized: "Ce paquet propose des options de désinstallation dans DSM (conserver ou supprimer les données) qui ne sont pas disponibles ici : les réglages par défaut seront appliqués.")
+        }
+        return text
     }
 }
