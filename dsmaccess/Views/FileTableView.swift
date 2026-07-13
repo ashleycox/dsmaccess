@@ -7,9 +7,12 @@
 //  clavier native (flèches) et l'accessibilité VoiceOver de première classe que la List
 //  SwiftUI ne fournit pas correctement sur macOS. Clavier façon Finder :
 //    · ↑ / ↓          : parcourir (natif)
-//    · Cmd-↓ / Entrée  : activer (dossier → ouvrir, fichier → télécharger)
-//    · Cmd-↑           : remonter au dossier parent
+//    · Cmd-↓          : activer (dossier → ouvrir, fichier → télécharger)
 //    · VO-Espace       : activer la ligne (accessibilityPerformPress)
+//    · Cmd-↑           : remonter au dossier parent
+//    · Entrée          : renommer (façon Finder ; dans un partage seulement)
+//    · Cmd-C / Cmd-X   : copier / couper (dans un partage seulement)
+//    · Cmd-Suppr       : supprimer (dans un partage seulement)
 //  Actions par ligne (menu contextuel clic droit + VO-Maj-M + actions VoiceOver) : Télécharger,
 //  et — à l'intérieur d'un partage seulement (`canWrite`) — Copier, Couper, Renommer, Supprimer.
 //
@@ -21,7 +24,7 @@ struct FileTableView: NSViewRepresentable {
     var items: [FileStationItem]
     /// Actions d'écriture disponibles (faux à la racine des partages).
     var canWrite: Bool
-    var onActivate: (FileStationItem) -> Void   // Entrée / VO-Espace / double-clic
+    var onActivate: (FileStationItem) -> Void   // Cmd-↓ / VO-Espace / double-clic
     var onDownload: (FileStationItem) -> Void    // menu contextuel / action VoiceOver
     var onRename: (FileStationItem) -> Void
     var onDelete: (FileStationItem) -> Void
