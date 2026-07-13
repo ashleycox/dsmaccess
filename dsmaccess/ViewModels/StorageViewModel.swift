@@ -44,7 +44,11 @@ final class StorageViewModel {
         do {
             info = try await client.storageInfo(sid: sid)
         } catch {
-            errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
+            // Une annulation (vue quittée / requête remplacée) n'est pas un échec : on l'ignore,
+            // sinon un faux « impossible de joindre le NAS » s'affiche alors que les données arrivent.
+            if !DSMError.isCancellation(error) {
+                errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
+            }
         }
         isLoading = false
     }

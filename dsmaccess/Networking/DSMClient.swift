@@ -232,7 +232,7 @@ final class DSMClient: DSMClientProtocol {
         do {
             (tempURL, response) = try await session.download(from: url)
         } catch let error as URLError {
-            throw DSMError.network(error.localizedDescription)
+            throw error.code == .cancelled ? DSMError.cancelled : DSMError.network(error.localizedDescription)
         }
 
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
@@ -350,7 +350,7 @@ final class DSMClient: DSMClientProtocol {
         do {
             (data, response) = try await session.upload(for: request, from: body)
         } catch let error as URLError {
-            throw DSMError.network(error.localizedDescription)
+            throw error.code == .cancelled ? DSMError.cancelled : DSMError.network(error.localizedDescription)
         }
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
             throw DSMError.invalidResponse
@@ -737,7 +737,7 @@ final class DSMClient: DSMClientProtocol {
         } catch let error as DSMError {
             throw error
         } catch let error as URLError {
-            throw DSMError.network(error.localizedDescription)
+            throw error.code == .cancelled ? DSMError.cancelled : DSMError.network(error.localizedDescription)
         }
     }
 

@@ -17,6 +17,8 @@ enum DSMError: Error, LocalizedError, Equatable {
     case decoding
     /// Réponse HTTP inattendue.
     case invalidResponse
+    /// Requête annulée (vue quittée / requête remplacée) — à ignorer, pas un vrai échec.
+    case cancelled
     /// Identifiants incorrects (code 400).
     case invalidCredentials
     /// Compte désactivé (code 401).
@@ -42,6 +44,8 @@ enum DSMError: Error, LocalizedError, Equatable {
             return String(localized: "La réponse du NAS n'a pas pu être lue.")
         case .invalidResponse:
             return String(localized: "Réponse inattendue du NAS.")
+        case .cancelled:
+            return String(localized: "Requête annulée.")
         case .invalidCredentials:
             return String(localized: "Nom d'utilisateur ou mot de passe incorrect.")
         case .accountDisabled:
@@ -68,5 +72,14 @@ enum DSMError: Error, LocalizedError, Equatable {
         default:
             return false
         }
+    }
+
+    /// Vrai si l'erreur n'est qu'une annulation (tâche interrompue parce que la vue a été
+    /// quittée ou la requête remplacée). À traiter silencieusement : ni message, ni annonce.
+    static func isCancellation(_ error: Error) -> Bool {
+        if error is CancellationError { return true }
+        if let url = error as? URLError, url.code == .cancelled { return true }
+        if case DSMError.cancelled = error { return true }
+        return false
     }
 }

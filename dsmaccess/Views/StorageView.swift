@@ -32,6 +32,8 @@ struct StorageView: View {
         .task {
             focusTitle = true
             await vm.load()
+            // Tâche annulée (vue quittée avant la fin) : ne rien annoncer, un rechargement suivra.
+            guard !Task.isCancelled else { return }
             AccessibilityNotification.Announcement(vm.summary).post()
         }
     }

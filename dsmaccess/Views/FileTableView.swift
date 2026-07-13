@@ -182,7 +182,7 @@ private func makeFileContextMenu(canWrite: Bool,
         menu.addItem(ClosureMenuItem(title: String(localized: "Créer un lien de partage"), handler: share))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(ClosureMenuItem(title: String(localized: "Copier"), handler: copy))
-        menu.addItem(ClosureMenuItem(title: String(localized: "Couper"), handler: cut))
+        menu.addItem(ClosureMenuItem(title: String(localized: "Déplacer (couper)"), handler: cut))
         menu.addItem(ClosureMenuItem(title: String(localized: "Renommer"), handler: rename))
         menu.addItem(ClosureMenuItem(title: String(localized: "Supprimer"), handler: delete))
     }
@@ -329,7 +329,7 @@ final class FileCellView: NSTableCellView {
                 })
             }
             if let onCut {
-                actions.append(NSAccessibilityCustomAction(name: String(localized: "Couper")) {
+                actions.append(NSAccessibilityCustomAction(name: String(localized: "Déplacer (couper)")) {
                     onCut(); return true
                 })
             }

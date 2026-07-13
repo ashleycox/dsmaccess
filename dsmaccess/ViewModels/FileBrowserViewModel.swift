@@ -195,7 +195,8 @@ final class FileBrowserViewModel {
     /// Met `item` au presse-papier pour un déplacement.
     func cut(_ item: FileStationItem) -> String {
         clipboard = Clipboard(item: item, move: true)
-        return String(localized: "Coupé : \(item.name)")
+        // Rappelle l'étape suivante : le déplacement se termine par un Coller dans la destination.
+        return String(localized: "Coupé : \(item.name). Ouvrez la destination puis Coller pour déplacer.")
     }
 
     /// Colle l'élément du presse-papier dans le dossier courant.

@@ -43,6 +43,8 @@ struct FileBrowserView: View {
         .task {
             focusHeader = true
             await vm.loadCurrent()
+            // Tâche annulée (module quitté avant la fin) : ne rien annoncer.
+            guard !Task.isCancelled else { return }
             announce()
         }
         .sheet(item: $activeSheet) { sheet in
@@ -92,7 +94,7 @@ struct FileBrowserView: View {
     private var header: some View {
         HStack(spacing: 10) {
             Button {
-                Task { await vm.goUp(); announce() }
+                Task { await vm.goUp(); settle() }
             } label: {
                 Label("Dossier parent", systemImage: "chevron.up")
             }
@@ -162,7 +164,7 @@ struct FileBrowserView: View {
                     .foregroundStyle(.red)
                     .multilineTextAlignment(.center)
                 Button("Réessayer") {
-                    Task { await vm.loadCurrent(); announce() }
+                    Task { await vm.loadCurrent(); settle() }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -177,7 +179,7 @@ struct FileBrowserView: View {
                 canWrite: vm.canWrite,
                 onActivate: { item in
                     if item.isdir {
-                        Task { await vm.open(item); announce() }
+                        Task { await vm.open(item); settle() }
                     } else {
                         startDownload(item)
                     }
@@ -188,13 +190,22 @@ struct FileBrowserView: View {
                 onCopy: { item in VoiceOver.announce(vm.copy(item)) },
                 onCut: { item in VoiceOver.announce(vm.cut(item)) },
                 onShare: { item in shareItem = item },
-                onGoUp: { Task { await vm.goUp(); announce() } }
+                onGoUp: { Task { await vm.goUp(); settle() } }
             )
         }
     }
 
     private func announce() {
         VoiceOver.announce(vm.summary)
+    }
+
+    /// À appeler après un changement de dossier : réancre le focus VoiceOver sur l'en-tête
+    /// (fil d'Ariane + bouton « Dossier parent », toujours présents même dans un dossier vide)
+    /// puis annonce le résumé. Corrige la navigation « perdue » en entrant dans un dossier vide,
+    /// où la liste — et son focus — disparaissent.
+    private func settle() {
+        focusHeader = true
+        announce()
     }
 
     /// Choisit une destination via un panneau d'enregistrement, puis lance le téléchargement.

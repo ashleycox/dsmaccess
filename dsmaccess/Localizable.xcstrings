@@ -371,22 +371,22 @@
         }
       }
     },
-    "Couper": {
+    "Déplacer (couper)": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cut"
+            "value": "Move (cut)"
           }
         }
       }
     },
-    "Coupé : %@": {
+    "Coupé : %@. Ouvrez la destination puis Coller pour déplacer.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cut: %@"
+            "value": "Cut: %@. Open the destination, then Paste to move it."
           }
         }
       }
@@ -427,6 +427,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nothing to paste."
+          }
+        }
+      }
+    },
+    "Requête annulée.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request cancelled."
           }
         }
       }
