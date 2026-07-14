@@ -35,7 +35,12 @@ final class LogsSecurityViewModel {
         defer { isLoading = false }
 
         do {
-            logs = try await client.listSystemLogs(sid: sid)
+            if session.capabilities.supports("SYNO.Core.SyslogClient.Log") {
+                logs = try await client.listSystemLogs(sid: sid)
+            } else {
+                logs = []
+            }
+
             do {
                 blockedAddresses = try await client.listBlockedAddresses(sid: sid).sorted(using: KeyPathComparator(\.address))
             } catch let error as DSMError where isOptionalBlockListError(error) {

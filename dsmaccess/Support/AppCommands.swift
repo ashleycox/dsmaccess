@@ -42,6 +42,10 @@ private struct SessionCommandActionsKey: FocusedValueKey {
     typealias Value = SessionCommandActions
 }
 
+private struct AvailableModulesKey: FocusedValueKey {
+    typealias Value = Set<AppModule>
+}
+
 private struct FileCommandActionsKey: FocusedValueKey {
     typealias Value = FileCommandActions
 }
@@ -57,6 +61,11 @@ extension FocusedValues {
         set { self[SessionCommandActionsKey.self] = newValue }
     }
 
+    var availableModules: Set<AppModule>? {
+        get { self[AvailableModulesKey.self] }
+        set { self[AvailableModulesKey.self] = newValue }
+    }
+
 
     var fileCommandActions: FileCommandActions? {
         get { self[FileCommandActionsKey.self] }
@@ -66,6 +75,7 @@ extension FocusedValues {
 
 struct DSMCommands: Commands {
     @FocusedBinding(\.selectedModule) private var selectedModule
+    @FocusedValue(\.availableModules) private var availableModules
     @FocusedValue(\.sessionCommandActions) private var sessionActions
     @FocusedValue(\.fileCommandActions) private var fileActions
 
@@ -77,8 +87,13 @@ struct DSMCommands: Commands {
                         Button(module.title) {
                             selectedModule = module
                         }
-                        .keyboardShortcut(module.keyboardShortcut, modifiers: .command)
-                        .disabled(selectedModule == nil)
+                        .keyboardShortcut(
+                            module.keyboardShortcut.key,
+                            modifiers: module.keyboardShortcut.modifiers
+                        )
+                        .disabled(
+                            selectedModule == nil || availableModules?.contains(module) != true
+                        )
                     }
                 }
             }
