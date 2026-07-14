@@ -137,13 +137,17 @@ struct SurveillanceView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(cameraAccessibilityLabel(camera))
-        .accessibilityAction(named: camera.enabled ? "Désactiver" : "Activer") {
-            Task { await set(enabled: !camera.enabled, ids: [camera.id]) }
-        }
-        .accessibilityAction(named: "Charger l’instantané") {
-            selection = [camera.id]
-            showInspector = true
-            Task { await loadSnapshot(camera) }
+        .accessibilityActions {
+            if !viewModel.busyIDs.contains(camera.id) {
+                Button(camera.enabled ? "Désactiver" : "Activer") {
+                    Task { await set(enabled: !camera.enabled, ids: [camera.id]) }
+                }
+            }
+            Button("Charger l’instantané") {
+                selection = [camera.id]
+                showInspector = true
+                Task { await loadSnapshot(camera) }
+            }
         }
     }
 

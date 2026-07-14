@@ -166,13 +166,17 @@ struct DownloadStationView: View {
         .padding(.vertical, 3)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(taskAccessibilityLabel(task))
-        .accessibilityAction(named: "Mettre en pause") {
-            guard task.canPause else { return }
-            Task { await pause(ids: [task.id]) }
-        }
-        .accessibilityAction(named: "Reprendre") {
-            guard task.canResume else { return }
-            Task { await resume(ids: [task.id]) }
+        .accessibilityActions {
+            if task.canPause {
+                Button("Mettre en pause") { Task { await pause(ids: [task.id]) } }
+            }
+            if task.canResume {
+                Button("Reprendre") { Task { await resume(ids: [task.id]) } }
+            }
+            Button("Supprimer…", role: .destructive) {
+                selection = [task.id]
+                showDeleteConfirmation = true
+            }
         }
     }
 

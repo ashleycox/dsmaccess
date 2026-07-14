@@ -451,7 +451,7 @@ final class FileBrowserViewModel {
         case 1: count = String(localized: "1 élément")
         default: count = String(localized: "\(sortedItems.count) éléments")
         }
-        return "\(title), \(count)"
+        return String(localized: "\(title), \(count)")
     }
 
     private func performAndReload(_ operation: () async throws -> String) async -> String {

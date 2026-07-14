@@ -169,9 +169,15 @@ struct UsersGroupsView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(userAccessibilityLabel(user))
-        .accessibilityAction(named: user.isDisabled ? "Activer" : "Désactiver") {
-            guard !isProtected(user), !isBusy(user) else { return }
-            Task { await announce(viewModel.setUser(user, disabled: !user.isDisabled)) }
+        .accessibilityActions {
+            if !isProtected(user), !isBusy(user) {
+                Button(user.isDisabled ? "Activer" : "Désactiver") {
+                    Task { await announce(viewModel.setUser(user, disabled: !user.isDisabled)) }
+                }
+                Button("Supprimer l’utilisateur…", role: .destructive) {
+                    userToDelete = user
+                }
+            }
         }
     }
 
@@ -188,6 +194,13 @@ struct UsersGroupsView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(group.name), \(groupSummary(group))")
+        .accessibilityActions {
+            if !isProtected(group) {
+                Button("Supprimer le groupe…", role: .destructive) {
+                    groupToDelete = group
+                }
+            }
+        }
     }
 
     @ViewBuilder

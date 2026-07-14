@@ -149,8 +149,18 @@ struct ContainersView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(containerAccessibilityLabel(container))
-        .accessibilityAction(named: container.isRunning ? "Arrêter" : "Démarrer") {
-            Task { await perform(container.isRunning ? .stop : .start, on: container) }
+        .accessibilityActions {
+            Button(container.isRunning ? "Arrêter" : "Démarrer") {
+                Task { await perform(container.isRunning ? .stop : .start, on: container) }
+            }
+            if container.isRunning {
+                Button("Redémarrer") { Task { await perform(.restart, on: container) } }
+            }
+            Button("Informations et journaux") {
+                selection = container.id
+                showInspector = true
+                Task { await viewModel.loadLogs(for: container) }
+            }
         }
     }
 

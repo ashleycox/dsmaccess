@@ -154,13 +154,20 @@ struct VirtualMachinesView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(machineAccessibilityLabel(machine))
-        .accessibilityAction(named: "Démarrer") {
-            guard machine.canStart else { return }
-            Task { await perform(.powerOn, on: machine) }
-        }
-        .accessibilityAction(named: "Arrêter proprement") {
-            guard machine.canStop else { return }
-            Task { await perform(.shutdown, on: machine) }
+        .accessibilityActions {
+            if machine.canStart {
+                Button("Démarrer") { Task { await perform(.powerOn, on: machine) } }
+            }
+            if machine.canStop {
+                Button("Arrêter proprement") { Task { await perform(.shutdown, on: machine) } }
+                Button("Forcer l’extinction…", role: .destructive) {
+                    pendingPowerOff = machine
+                }
+            }
+            Button("Lire les informations") {
+                selection = machine.id
+                showInspector = true
+            }
         }
     }
 
