@@ -94,12 +94,19 @@ final class DSMClient: DSMClientProtocol {
     private let endpoint: DSMEndpoint
     private let session: URLSession
     private let trustDelegate: ServerTrustDelegate
+    let transport: DSMTransport
+    let authentication: DSMAuthenticationService
+    let system: DSMSystemService
 
     /// Cache des chemins/versions d'API découverts via SYNO.API.Info.
     private var apiPaths: [String: APIInfoEntry] = [:]
 
     init(endpoint: DSMEndpoint) {
         self.endpoint = endpoint
+        let transport = DSMTransport(endpoint: endpoint)
+        self.transport = transport
+        self.authentication = DSMAuthenticationService(transport: transport)
+        self.system = DSMSystemService(transport: transport)
         let delegate = ServerTrustDelegate(trustedHost: endpoint.host)
         self.trustDelegate = delegate
         let config = URLSessionConfiguration.ephemeral
@@ -129,57 +136,17 @@ final class DSMClient: DSMClientProtocol {
     func login(account: String, password: String,
                otpCode: String?, deviceID: String?,
                rememberDevice: Bool) async throws -> LoginResult {
-        try await ensurePaths(for: [Self.authAPI, Self.systemInfoAPI])
-
-        var query: [String: String] = [
-            "api": "SYNO.API.Auth",
-            "version": "6",
-            "method": "login",
-            "account": account,
-            "passwd": password,
-            "session": Self.sessionName,
-            "format": "sid",
-        ]
-        if let otpCode, !otpCode.isEmpty {
-            query["otp_code"] = otpCode
-        }
-        if let deviceID, !deviceID.isEmpty {
-            query["device_id"] = deviceID
-        }
-        if rememberDevice {
-            query["enable_device_token"] = "yes"
-            query["device_name"] = "DSM Access (Mac)"
-        }
-
-        let resp = try await get(cgi: path(for: Self.authAPI), query: query, as: LoginResult.self)
-        if resp.success, let data = resp.data {
-            return data
-        }
-        switch resp.error?.code {
-        case 400: throw DSMError.invalidCredentials
-        case 401: throw DSMError.accountDisabled
-        case 402: throw DSMError.permissionDenied
-        case 403: throw DSMError.needsOTP
-        case 404: throw DSMError.badOTP
-        case 406: throw DSMError.otpEnforced
-        case let code?: throw DSMError.apiError(code: code)
-        case nil: throw DSMError.invalidResponse
-        }
+        try await authentication.login(
+            account: account,
+            password: password,
+            otpCode: otpCode,
+            deviceID: deviceID,
+            rememberDevice: rememberDevice
+        )
     }
 
     func systemInfo(sid: String) async throws -> SystemInfo {
-        try await ensurePaths(for: [Self.systemInfoAPI])
-        let query = [
-            "api": "SYNO.DSM.Info",
-            "version": "2",
-            "method": "getinfo",
-            "_sid": sid,
-        ]
-        let resp = try await get(cgi: path(for: Self.systemInfoAPI), query: query, as: SystemInfo.self)
-        guard resp.success, let data = resp.data else {
-            throw DSMError.apiError(code: resp.error?.code ?? -1)
-        }
-        return data
+        try await system.information()
     }
 
     func listShares(sid: String) async throws -> [FileStationItem] {
@@ -468,20 +435,7 @@ final class DSMClient: DSMClientProtocol {
     }
 
     func resourceUsage(sid: String) async throws -> ResourceUsage {
-        try await ensurePaths(for: [Self.utilizationAPI])
-        // API non documentée : on utilise la version maximale découverte via SYNO.API.Info.
-        let version = apiPaths[Self.utilizationAPI]?.maxVersion ?? 1
-        let query = [
-            "api": "SYNO.Core.System.Utilization",
-            "version": String(version),
-            "method": "get",
-            "_sid": sid,
-        ]
-        let resp = try await get(cgi: path(for: Self.utilizationAPI), query: query, as: ResourceUsage.self)
-        guard resp.success, let data = resp.data else {
-            throw DSMError.apiError(code: resp.error?.code ?? -1)
-        }
-        return data
+        try await system.resourceUsage()
     }
 
     func listSharedFolders(sid: String) async throws -> [SharedFolder] {
@@ -697,14 +651,7 @@ final class DSMClient: DSMClientProtocol {
     }
 
     func logout(sid: String) async throws {
-        let query = [
-            "api": "SYNO.API.Auth",
-            "version": "6",
-            "method": "logout",
-            "session": Self.sessionName,
-            "_sid": sid,
-        ]
-        _ = try? await get(cgi: path(for: Self.authAPI), query: query, as: EmptyData.self)
+        await authentication.logout()
     }
 
     // MARK: - Internes
