@@ -63,6 +63,19 @@ protocol DSMClientProtocol: AnyObject {
     func uninstallPackage(id: String, sid: String) async throws
     func packageSettings(sid: String) async throws -> PackageSettings
     func setPackageSettings(_ settings: PackageSettings, sid: String) async throws
+    func listUsers(sid: String) async throws -> [DSMUser]
+    func listGroups(sid: String) async throws -> [DSMGroup]
+    func createUser(_ draft: DSMUserDraft, sid: String) async throws
+    func setUser(_ name: String, disabled: Bool, sid: String) async throws
+    func deleteUser(_ name: String, sid: String) async throws
+    func createGroup(_ draft: DSMGroupDraft, sid: String) async throws
+    func deleteGroup(_ name: String, sid: String) async throws
+    func listDownloadTasks(sid: String) async throws -> [DownloadTask]
+    func downloadStatistic(sid: String) async throws -> DownloadStatistic
+    func createDownload(uri: String, destination: String?, sid: String) async throws
+    func pauseDownloads(ids: Set<String>, sid: String) async throws
+    func resumeDownloads(ids: Set<String>, sid: String) async throws
+    func deleteDownloads(ids: Set<String>, forceComplete: Bool, sid: String) async throws
     func logout(sid: String) async throws
 }
 
@@ -76,6 +89,8 @@ final class DSMClient: DSMClientProtocol {
     let shares: DSMShareService
     let fileServiceSettings: DSMFileServiceSettingsService
     let packages: DSMPackageService
+    let accounts: DSMAccountService
+    let downloadStation: DSMDownloadStationService
 
     init(endpoint: DSMEndpoint) {
         let transport = DSMTransport(endpoint: endpoint)
@@ -87,6 +102,8 @@ final class DSMClient: DSMClientProtocol {
         shares = DSMShareService(transport: transport)
         fileServiceSettings = DSMFileServiceSettingsService(transport: transport)
         packages = DSMPackageService(transport: transport)
+        accounts = DSMAccountService(transport: transport)
+        downloadStation = DSMDownloadStationService(transport: transport)
     }
 
     var capabilities: DSMCapabilities { transport.capabilities }
@@ -259,6 +276,58 @@ final class DSMClient: DSMClientProtocol {
 
     func setPackageSettings(_ settings: PackageSettings, sid: String) async throws {
         try await packages.setSettings(settings)
+    }
+
+    func listUsers(sid: String) async throws -> [DSMUser] {
+        try await accounts.users()
+    }
+
+    func listGroups(sid: String) async throws -> [DSMGroup] {
+        try await accounts.groups()
+    }
+
+    func createUser(_ draft: DSMUserDraft, sid: String) async throws {
+        try await accounts.createUser(draft)
+    }
+
+    func setUser(_ name: String, disabled: Bool, sid: String) async throws {
+        try await accounts.setUser(name, disabled: disabled)
+    }
+
+    func deleteUser(_ name: String, sid: String) async throws {
+        try await accounts.deleteUser(name)
+    }
+
+    func createGroup(_ draft: DSMGroupDraft, sid: String) async throws {
+        try await accounts.createGroup(draft)
+    }
+
+    func deleteGroup(_ name: String, sid: String) async throws {
+        try await accounts.deleteGroup(name)
+    }
+
+    func listDownloadTasks(sid: String) async throws -> [DownloadTask] {
+        try await downloadStation.tasks()
+    }
+
+    func downloadStatistic(sid: String) async throws -> DownloadStatistic {
+        try await downloadStation.statistic()
+    }
+
+    func createDownload(uri: String, destination: String?, sid: String) async throws {
+        try await downloadStation.create(uri: uri, destination: destination)
+    }
+
+    func pauseDownloads(ids: Set<String>, sid: String) async throws {
+        try await downloadStation.pause(ids: ids)
+    }
+
+    func resumeDownloads(ids: Set<String>, sid: String) async throws {
+        try await downloadStation.resume(ids: ids)
+    }
+
+    func deleteDownloads(ids: Set<String>, forceComplete: Bool, sid: String) async throws {
+        try await downloadStation.delete(ids: ids, forceComplete: forceComplete)
     }
 
     func logout(sid: String) async throws {

@@ -75,18 +75,3 @@ struct ResourceUsage: Decodable {
         }
     }
 }
-
-// MARK: - Décodage souple
-
-extension KeyedDecodingContainer {
-    /// Décode un entier que DSM renvoie en nombre JSON ou en chaîne ("42"), sinon nil.
-    func flexInt(_ key: Key) -> Int? {
-        if let i = try? decode(Int.self, forKey: key) { return i }
-        if let d = try? decode(Double.self, forKey: key) { return Int(d.rounded()) }
-        if let s = try? decode(String.self, forKey: key) {
-            if let i = Int(s) { return i }
-            if let d = Double(s) { return Int(d.rounded()) }
-        }
-        return nil
-    }
-}
