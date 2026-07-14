@@ -76,6 +76,15 @@ protocol DSMClientProtocol: AnyObject {
     func pauseDownloads(ids: Set<String>, sid: String) async throws
     func resumeDownloads(ids: Set<String>, sid: String) async throws
     func deleteDownloads(ids: Set<String>, forceComplete: Bool, sid: String) async throws
+    func listVirtualMachines(sid: String) async throws -> [VirtualMachine]
+    func performVirtualMachineAction(
+        _ action: VirtualMachinePowerAction,
+        guestID: String,
+        sid: String
+    ) async throws
+    func listContainers(sid: String) async throws -> [ContainerItem]
+    func performContainerAction(_ action: ContainerAction, name: String, sid: String) async throws
+    func containerLogs(name: String, sid: String) async throws -> [ContainerLogEntry]
     func logout(sid: String) async throws
 }
 
@@ -91,6 +100,8 @@ final class DSMClient: DSMClientProtocol {
     let packages: DSMPackageService
     let accounts: DSMAccountService
     let downloadStation: DSMDownloadStationService
+    let virtualMachines: DSMVirtualMachineService
+    let containers: DSMContainerService
 
     init(endpoint: DSMEndpoint) {
         let transport = DSMTransport(endpoint: endpoint)
@@ -104,6 +115,8 @@ final class DSMClient: DSMClientProtocol {
         packages = DSMPackageService(transport: transport)
         accounts = DSMAccountService(transport: transport)
         downloadStation = DSMDownloadStationService(transport: transport)
+        virtualMachines = DSMVirtualMachineService(transport: transport)
+        containers = DSMContainerService(transport: transport)
     }
 
     var capabilities: DSMCapabilities { transport.capabilities }
@@ -328,6 +341,30 @@ final class DSMClient: DSMClientProtocol {
 
     func deleteDownloads(ids: Set<String>, forceComplete: Bool, sid: String) async throws {
         try await downloadStation.delete(ids: ids, forceComplete: forceComplete)
+    }
+
+    func listVirtualMachines(sid: String) async throws -> [VirtualMachine] {
+        try await virtualMachines.guests()
+    }
+
+    func performVirtualMachineAction(
+        _ action: VirtualMachinePowerAction,
+        guestID: String,
+        sid: String
+    ) async throws {
+        try await virtualMachines.perform(action, guestID: guestID)
+    }
+
+    func listContainers(sid: String) async throws -> [ContainerItem] {
+        try await containers.containers()
+    }
+
+    func performContainerAction(_ action: ContainerAction, name: String, sid: String) async throws {
+        try await containers.perform(action, name: name)
+    }
+
+    func containerLogs(name: String, sid: String) async throws -> [ContainerLogEntry] {
+        try await containers.logs(name: name)
     }
 
     func logout(sid: String) async throws {
