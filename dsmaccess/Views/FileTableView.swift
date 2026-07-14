@@ -2,19 +2,9 @@
 //  FileTableView.swift
 //  dsmaccess
 //
-//  Navigateur File Station en AppKit (NSTableView) exposé à SwiftUI via NSViewRepresentable.
-//  On descend en AppKit UNIQUEMENT pour cette liste : NSTableView donne la navigation
-//  clavier native (flèches) et l'accessibilité VoiceOver de première classe que la List
-//  SwiftUI ne fournit pas correctement sur macOS. Clavier façon Finder :
-//    · ↑ / ↓          : parcourir (natif)
-//    · Cmd-↓          : activer (dossier → ouvrir, fichier → télécharger)
-//    · VO-Espace       : activer la ligne (accessibilityPerformPress)
-//    · Cmd-↑           : remonter au dossier parent
-//    · Entrée          : renommer (façon Finder ; dans un partage seulement)
-//    · Cmd-C / Cmd-X   : copier / couper (dans un partage seulement)
-//    · Cmd-Suppr       : supprimer (dans un partage seulement)
-//  Actions par ligne (menu contextuel clic droit + VO-Maj-M + actions VoiceOver) : Télécharger,
-//  et — à l'intérieur d'un partage seulement (`canWrite`) — Copier, Couper, Renommer, Supprimer.
+//  Native File Station table with Finder-style selection, keyboard handling and
+//  contextual actions. AppKit is used here because NSTableView provides the Mac's
+//  expected multi-selection and VoiceOver table semantics.
 //
 
 import AppKit
@@ -22,15 +12,20 @@ import SwiftUI
 
 struct FileTableView: NSViewRepresentable {
     var items: [FileStationItem]
-    /// Actions d'écriture disponibles (faux à la racine des partages).
+    @Binding var selection: Set<String>
     var canWrite: Bool
-    var onActivate: (FileStationItem) -> Void   // Cmd-↓ / VO-Espace / double-clic
-    var onDownload: (FileStationItem) -> Void    // menu contextuel / action VoiceOver
+    var showsPath: Bool
+    var canExtract: (FileStationItem) -> Bool
+    var onActivate: (FileStationItem) -> Void
+    var onDownload: ([FileStationItem]) -> Void
     var onRename: (FileStationItem) -> Void
-    var onDelete: (FileStationItem) -> Void
-    var onCopy: (FileStationItem) -> Void
-    var onCut: (FileStationItem) -> Void
+    var onDelete: ([FileStationItem]) -> Void
+    var onCopy: ([FileStationItem]) -> Void
+    var onCut: ([FileStationItem]) -> Void
     var onShare: (FileStationItem) -> Void
+    var onCompress: ([FileStationItem]) -> Void
+    var onExtract: (FileStationItem) -> Void
+    var onShowInfo: (FileStationItem) -> Void
     var onGoUp: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
@@ -39,7 +34,7 @@ struct FileTableView: NSViewRepresentable {
         let table = KeyboardTableView()
         table.headerView = nil
         table.rowHeight = 28
-        table.allowsMultipleSelection = false
+        table.allowsMultipleSelection = true
         table.allowsEmptySelection = true
         table.style = .inset
         table.dataSource = context.coordinator
@@ -49,18 +44,17 @@ struct FileTableView: NSViewRepresentable {
         column.resizingMask = .autoresizingMask
         table.addTableColumn(column)
 
-        table.onActivate = { [weak table] in
-            guard let table, table.selectedRow >= 0 else { return }
-            context.coordinator.activateRow(table.selectedRow)
+        table.onActivate = { [weak coordinator = context.coordinator] in coordinator?.activateSelection() }
+        table.onGoUp = { [weak coordinator = context.coordinator] in coordinator?.parent.onGoUp() }
+        table.onDownload = { [weak coordinator = context.coordinator] in coordinator?.downloadSelection() }
+        table.onRename = { [weak coordinator = context.coordinator] in coordinator?.renameSelection() }
+        table.onDelete = { [weak coordinator = context.coordinator] in coordinator?.deleteSelection() }
+        table.onCopy = { [weak coordinator = context.coordinator] in coordinator?.copySelection() }
+        table.onCut = { [weak coordinator = context.coordinator] in coordinator?.cutSelection() }
+        table.onShowInfo = { [weak coordinator = context.coordinator] in coordinator?.showInfoForSelection() }
+        table.menuProvider = { [weak coordinator = context.coordinator] event in
+            coordinator?.contextMenu(for: event)
         }
-        table.onGoUp = { context.coordinator.parent.onGoUp() }
-        table.onContextDownload = { row in context.coordinator.downloadRow(row) }
-        table.onContextRename = { row in context.coordinator.renameRow(row) }
-        table.onContextDelete = { row in context.coordinator.deleteRow(row) }
-        table.onContextCopy = { row in context.coordinator.copyRow(row) }
-        table.onContextCut = { row in context.coordinator.cutRow(row) }
-        table.onContextShare = { row in context.coordinator.shareRow(row) }
-        table.canWrite = canWrite
 
         table.target = context.coordinator
         table.doubleAction = #selector(Coordinator.tableDoubleClicked(_:))
@@ -77,17 +71,25 @@ struct FileTableView: NSViewRepresentable {
     func updateNSView(_ nsView: NSScrollView, context: Context) {
         context.coordinator.parent = self
         guard let table = nsView.documentView as? KeyboardTableView else { return }
-        table.canWrite = canWrite
-        table.reloadData()
-        if !items.isEmpty && (table.selectedRow < 0 || table.selectedRow >= items.count) {
-            table.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false)
-            table.scrollRowToVisible(0)
+
+        context.coordinator.isApplyingSelection = true
+        let currentRows = items.map {
+            "\(canWrite)|\(showsPath)|\($0.path)|\($0.name)|\($0.detailText ?? "")"
         }
+        if context.coordinator.rowPresentationKeys != currentRows {
+            table.reloadData()
+            context.coordinator.rowPresentationKeys = currentRows
+        }
+        let selectedRows = IndexSet(items.indices.filter { selection.contains(items[$0].path) })
+        table.selectRowIndexes(selectedRows, byExtendingSelection: false)
+        context.coordinator.isApplyingSelection = false
     }
 
     final class Coordinator: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         var parent: FileTableView
         weak var tableView: NSTableView?
+        var isApplyingSelection = false
+        var rowPresentationKeys = [String]()
 
         init(_ parent: FileTableView) { self.parent = parent }
 
@@ -96,154 +98,221 @@ struct FileTableView: NSViewRepresentable {
         func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
             guard parent.items.indices.contains(row) else { return nil }
             let item = parent.items[row]
-            let id = NSUserInterfaceItemIdentifier("FileCell")
-            let cell = (tableView.makeView(withIdentifier: id, owner: self) as? FileCellView) ?? FileCellView(identifier: id)
-            cell.configure(with: item)
+            let identifier = NSUserInterfaceItemIdentifier("FileCell")
+            let cell = (tableView.makeView(withIdentifier: identifier, owner: self) as? FileCellView)
+                ?? FileCellView(identifier: identifier)
+            cell.configure(with: item, showsPath: parent.showsPath)
             cell.canWrite = parent.canWrite
-            cell.onPress = { [weak self] in self?.activate(item) }
-            cell.onDownload = { [weak self] in self?.download(item) }
-            cell.onRename = { [weak self] in self?.rename(item) }
-            cell.onDelete = { [weak self] in self?.delete(item) }
-            cell.onCopy = { [weak self] in self?.copy(item) }
-            cell.onCut = { [weak self] in self?.cut(item) }
-            cell.onShare = { [weak self] in self?.share(item) }
+            cell.canExtract = parent.canWrite && parent.canExtract(item)
+            cell.onPress = { [weak self] in self?.parent.onActivate(item) }
+            cell.onDownload = { [weak self] in self?.parent.onDownload([item]) }
+            cell.onRename = { [weak self] in self?.parent.onRename(item) }
+            cell.onDelete = { [weak self] in self?.parent.onDelete([item]) }
+            cell.onCopy = { [weak self] in self?.parent.onCopy([item]) }
+            cell.onCut = { [weak self] in self?.parent.onCut([item]) }
+            cell.onShare = { [weak self] in self?.parent.onShare(item) }
+            cell.onCompress = { [weak self] in self?.parent.onCompress([item]) }
+            cell.onExtract = { [weak self] in self?.parent.onExtract(item) }
+            cell.onShowInfo = { [weak self] in self?.parent.onShowInfo(item) }
             return cell
         }
 
-        func activateRow(_ row: Int) {
-            guard parent.items.indices.contains(row) else { return }
-            activate(parent.items[row])
-        }
-        func downloadRow(_ row: Int) {
-            guard parent.items.indices.contains(row) else { return }
-            download(parent.items[row])
-        }
-        func renameRow(_ row: Int) {
-            guard parent.items.indices.contains(row) else { return }
-            rename(parent.items[row])
-        }
-        func deleteRow(_ row: Int) {
-            guard parent.items.indices.contains(row) else { return }
-            delete(parent.items[row])
-        }
-        func copyRow(_ row: Int) {
-            guard parent.items.indices.contains(row) else { return }
-            copy(parent.items[row])
-        }
-        func cutRow(_ row: Int) {
-            guard parent.items.indices.contains(row) else { return }
-            cut(parent.items[row])
-        }
-        func shareRow(_ row: Int) {
-            guard parent.items.indices.contains(row) else { return }
-            share(parent.items[row])
+        func tableViewSelectionDidChange(_ notification: Notification) {
+            guard !isApplyingSelection else { return }
+            parent.selection = Set(selectedItems.map(\.path))
         }
 
-        /// Activation : dossier → ouvrir, fichier → télécharger (décidé par la coquille SwiftUI).
-        private func activate(_ item: FileStationItem) { parent.onActivate(item) }
-        /// Téléchargement explicite (marche aussi pour un dossier → ZIP).
-        private func download(_ item: FileStationItem) { parent.onDownload(item) }
-        private func rename(_ item: FileStationItem) { parent.onRename(item) }
-        private func delete(_ item: FileStationItem) { parent.onDelete(item) }
-        private func copy(_ item: FileStationItem) { parent.onCopy(item) }
-        private func cut(_ item: FileStationItem) { parent.onCut(item) }
-        private func share(_ item: FileStationItem) { parent.onShare(item) }
+        var selectedItems: [FileStationItem] {
+            guard let tableView else { return [] }
+            return tableView.selectedRowIndexes.compactMap { row in
+                parent.items.indices.contains(row) ? parent.items[row] : nil
+            }
+        }
+
+        func activateSelection() {
+            guard selectedItems.count == 1, let item = selectedItems.first else { return }
+            parent.onActivate(item)
+        }
+
+        func downloadSelection() {
+            let items = selectedItems
+            guard !items.isEmpty else { return }
+            parent.onDownload(items)
+        }
+
+        func renameSelection() {
+            guard parent.canWrite, selectedItems.count == 1, let item = selectedItems.first else { return }
+            parent.onRename(item)
+        }
+
+        func deleteSelection() {
+            let items = selectedItems
+            guard parent.canWrite, !items.isEmpty else { return }
+            parent.onDelete(items)
+        }
+
+        func copySelection() {
+            let items = selectedItems
+            guard parent.canWrite, !items.isEmpty else { return }
+            parent.onCopy(items)
+        }
+
+        func cutSelection() {
+            let items = selectedItems
+            guard parent.canWrite, !items.isEmpty else { return }
+            parent.onCut(items)
+        }
+
+        func showInfoForSelection() {
+            guard selectedItems.count == 1, let item = selectedItems.first else { return }
+            parent.onShowInfo(item)
+        }
+
+        func contextMenu(for event: NSEvent) -> NSMenu? {
+            guard let tableView else { return nil }
+            let point = tableView.convert(event.locationInWindow, from: nil)
+            let row = tableView.row(at: point)
+            guard row >= 0 else { return nil }
+
+            if !tableView.selectedRowIndexes.contains(row) {
+                tableView.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+            }
+            let items = selectedItems
+            guard !items.isEmpty else { return nil }
+
+            return makeFileContextMenu(
+                canWrite: parent.canWrite,
+                canExtract: items.count == 1 && parent.canExtract(items[0]),
+                activate: items.count == 1 ? { [weak self] in self?.activateSelection() } : nil,
+                download: { [weak self] in self?.downloadSelection() },
+                rename: items.count == 1 ? { [weak self] in self?.renameSelection() } : nil,
+                delete: { [weak self] in self?.deleteSelection() },
+                copy: { [weak self] in self?.copySelection() },
+                cut: { [weak self] in self?.cutSelection() },
+                share: items.count == 1 ? { [weak self] in
+                    guard let item = self?.selectedItems.first else { return }
+                    self?.parent.onShare(item)
+                } : nil,
+                compress: { [weak self] in
+                    guard let items = self?.selectedItems, !items.isEmpty else { return }
+                    self?.parent.onCompress(items)
+                },
+                extract: items.count == 1 ? { [weak self] in
+                    guard let item = self?.selectedItems.first else { return }
+                    self?.parent.onExtract(item)
+                } : nil,
+                showInfo: items.count == 1 ? { [weak self] in self?.showInfoForSelection() } : nil
+            )
+        }
 
         @objc func tableDoubleClicked(_ sender: NSTableView) {
-            let row = sender.clickedRow
-            if row >= 0 { activateRow(row) }
+            guard sender.clickedRow >= 0, parent.items.indices.contains(sender.clickedRow) else { return }
+            parent.onActivate(parent.items[sender.clickedRow])
         }
     }
 }
 
-/// NSMenuItem qui exécute une closure (NSMenuItem ne connaît nativement que target/action).
 private final class ClosureMenuItem: NSMenuItem {
     private let handler: () -> Void
+
     init(title: String, handler: @escaping () -> Void) {
         self.handler = handler
         super.init(title: title, action: #selector(fire), keyEquivalent: "")
         target = self
     }
+
     @available(*, unavailable)
     required init(coder: NSCoder) { fatalError("init(coder:) non supporté") }
+
     @objc private func fire() { handler() }
 }
 
-/// Menu contextuel d'un élément, PARTAGÉ entre le clic droit (souris → `menu(for:)`) et
-/// VO-Maj-M (VoiceOver → `accessibilityPerformShowMenu()`). Point unique où ajouter les
-/// futures actions. Renommer / Supprimer n'apparaissent qu'à l'intérieur d'un partage.
-private func makeFileContextMenu(canWrite: Bool,
-                                 download: @escaping () -> Void,
-                                 rename: @escaping () -> Void,
-                                 delete: @escaping () -> Void,
-                                 copy: @escaping () -> Void,
-                                 cut: @escaping () -> Void,
-                                 share: @escaping () -> Void) -> NSMenu {
+private func makeFileContextMenu(
+    canWrite: Bool,
+    canExtract: Bool,
+    activate: (() -> Void)?,
+    download: @escaping () -> Void,
+    rename: (() -> Void)?,
+    delete: @escaping () -> Void,
+    copy: @escaping () -> Void,
+    cut: @escaping () -> Void,
+    share: (() -> Void)?,
+    compress: @escaping () -> Void,
+    extract: (() -> Void)?,
+    showInfo: (() -> Void)?
+) -> NSMenu {
     let menu = NSMenu()
+    if let activate {
+        menu.addItem(ClosureMenuItem(title: String(localized: "Ouvrir"), handler: activate))
+    }
     menu.addItem(ClosureMenuItem(title: String(localized: "Télécharger"), handler: download))
+
     if canWrite {
-        menu.addItem(ClosureMenuItem(title: String(localized: "Créer un lien de partage"), handler: share))
+        if let share {
+            menu.addItem(ClosureMenuItem(title: String(localized: "Créer un lien de partage"), handler: share))
+        }
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(ClosureMenuItem(title: String(localized: "Compresser…"), handler: compress))
+        if canExtract, let extract {
+            menu.addItem(ClosureMenuItem(title: String(localized: "Extraire"), handler: extract))
+        }
         menu.addItem(NSMenuItem.separator())
         menu.addItem(ClosureMenuItem(title: String(localized: "Copier"), handler: copy))
         menu.addItem(ClosureMenuItem(title: String(localized: "Déplacer (couper)"), handler: cut))
-        menu.addItem(ClosureMenuItem(title: String(localized: "Renommer"), handler: rename))
-        menu.addItem(ClosureMenuItem(title: String(localized: "Supprimer"), handler: delete))
+        if let rename {
+            menu.addItem(ClosureMenuItem(title: String(localized: "Renommer…"), handler: rename))
+        }
+        menu.addItem(ClosureMenuItem(title: String(localized: "Supprimer…"), handler: delete))
+    }
+
+    if let showInfo {
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(ClosureMenuItem(title: String(localized: "Lire les informations"), handler: showInfo))
     }
     return menu
 }
 
-/// NSTableView qui mappe les touches façon Finder et fournit le menu contextuel partagé.
 final class KeyboardTableView: NSTableView {
     var onActivate: (() -> Void)?
     var onGoUp: (() -> Void)?
-    var onContextDownload: ((Int) -> Void)?
-    var onContextRename: ((Int) -> Void)?
-    var onContextDelete: ((Int) -> Void)?
-    var onContextCopy: ((Int) -> Void)?
-    var onContextCut: ((Int) -> Void)?
-    var onContextShare: ((Int) -> Void)?
-    var canWrite = false
+    var onDownload: (() -> Void)?
+    var onRename: (() -> Void)?
+    var onDelete: (() -> Void)?
+    var onCopy: (() -> Void)?
+    var onCut: (() -> Void)?
+    var onShowInfo: (() -> Void)?
+    var menuProvider: ((NSEvent) -> NSMenu?)?
 
     override func keyDown(with event: NSEvent) {
         let command = event.modifierFlags.contains(.command)
+        let shift = event.modifierFlags.contains(.shift)
         switch event.keyCode {
-        case 125 where command:      // Cmd-↓ : ouvrir / activer (façon Finder)
+        case 125 where command:
             onActivate?()
-        case 126 where command:      // Cmd-↑ : remonter (aussi géré par le bouton, pour les dossiers vides)
+        case 126 where command:
             onGoUp?()
-        case 36, 76:                 // Entrée : renommer l'élément sélectionné (façon Finder)
-            if canWrite, selectedRow >= 0 { onContextRename?(selectedRow) } else { super.keyDown(with: event) }
-        case 51 where command:       // Cmd-Suppr : supprimer l'élément sélectionné (façon Finder)
-            if canWrite, selectedRow >= 0 { onContextDelete?(selectedRow) } else { super.keyDown(with: event) }
-        case 8 where command:        // Cmd-C : copier l'élément sélectionné (façon Finder)
-            if canWrite, selectedRow >= 0 { onContextCopy?(selectedRow) } else { super.keyDown(with: event) }
-        case 7 where command:        // Cmd-X : couper l'élément sélectionné (façon Finder)
-            if canWrite, selectedRow >= 0 { onContextCut?(selectedRow) } else { super.keyDown(with: event) }
+        case 36, 76:
+            onRename?()
+        case 51 where command:
+            onDelete?()
+        case 8 where command:
+            onCopy?()
+        case 7 where command:
+            onCut?()
+        case 2 where command && shift:
+            onDownload?()
+        case 34 where command:
+            onShowInfo?()
         default:
-            super.keyDown(with: event)   // ↑ ↓ (navigation) et le reste : comportement natif
+            super.keyDown(with: event)
         }
     }
 
     override func menu(for event: NSEvent) -> NSMenu? {
-        let point = convert(event.locationInWindow, from: nil)
-        let row = self.row(at: point)
-        guard row >= 0 else { return nil }
-        selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
-        return makeFileContextMenu(
-            canWrite: canWrite,
-            download: { [weak self] in self?.onContextDownload?(row) },
-            rename: { [weak self] in self?.onContextRename?(row) },
-            delete: { [weak self] in self?.onContextDelete?(row) },
-            copy: { [weak self] in self?.onContextCopy?(row) },
-            cut: { [weak self] in self?.onContextCut?(row) },
-            share: { [weak self] in self?.onContextShare?(row) }
-        )
+        menuProvider?(event)
     }
 }
 
-/// Cellule : icône + nom + détail (taille · date), avec un libellé VoiceOver unifié, l'action
-/// « presser » (VO-Espace → activer) et les actions VoiceOver (Télécharger, + Renommer/Supprimer
-/// quand `canWrite`).
 final class FileCellView: NSTableCellView {
     private let iconView = NSImageView()
     private let nameField = NSTextField(labelWithString: "")
@@ -255,7 +324,11 @@ final class FileCellView: NSTableCellView {
     var onCopy: (() -> Void)?
     var onCut: (() -> Void)?
     var onShare: (() -> Void)?
+    var onCompress: (() -> Void)?
+    var onExtract: (() -> Void)?
+    var onShowInfo: (() -> Void)?
     var canWrite = false
+    var canExtract = false
 
     init(identifier: NSUserInterfaceItemIdentifier) {
         super.init(frame: .zero)
@@ -270,15 +343,13 @@ final class FileCellView: NSTableCellView {
         iconView.translatesAutoresizingMaskIntoConstraints = false
         nameField.translatesAutoresizingMaskIntoConstraints = false
         detailField.translatesAutoresizingMaskIntoConstraints = false
-
         nameField.lineBreakMode = .byTruncatingTail
         nameField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-
         detailField.textColor = .secondaryLabelColor
         detailField.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
         detailField.alignment = .right
-        detailField.setContentCompressionResistancePriority(.required, for: .horizontal)
-        detailField.setContentHuggingPriority(.required, for: .horizontal)
+        detailField.lineBreakMode = .byTruncatingHead
+        detailField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
         addSubview(iconView)
         addSubview(nameField)
@@ -290,22 +361,25 @@ final class FileCellView: NSTableCellView {
             iconView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 4),
             iconView.centerYAnchor.constraint(equalTo: centerYAnchor),
             iconView.widthAnchor.constraint(equalToConstant: 18),
-
+            iconView.heightAnchor.constraint(equalToConstant: 18),
             nameField.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 6),
             nameField.centerYAnchor.constraint(equalTo: centerYAnchor),
-
-            detailField.leadingAnchor.constraint(greaterThanOrEqualTo: nameField.trailingAnchor, constant: 8),
+            detailField.leadingAnchor.constraint(greaterThanOrEqualTo: nameField.trailingAnchor, constant: 12),
             detailField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -6),
             detailField.centerYAnchor.constraint(equalTo: centerYAnchor),
+            detailField.widthAnchor.constraint(lessThanOrEqualTo: widthAnchor, multiplier: 0.55),
         ])
     }
 
-    func configure(with item: FileStationItem) {
-        iconView.image = NSImage(systemSymbolName: item.isdir ? "folder" : "doc", accessibilityDescription: nil)
+    func configure(with item: FileStationItem, showsPath: Bool) {
+        iconView.image = NSImage(
+            systemSymbolName: item.isdir ? "folder" : "doc",
+            accessibilityDescription: nil
+        )
         iconView.contentTintColor = item.isdir ? .controlAccentColor : .secondaryLabelColor
         nameField.stringValue = item.name
-        detailField.stringValue = item.detailText ?? ""
-        setAccessibilityLabel(item.accessibilityLabel)
+        detailField.stringValue = showsPath ? item.path : item.detailText ?? ""
+        setAccessibilityLabel(showsPath ? "\(item.accessibilityLabel), \(item.path)" : item.accessibilityLabel)
     }
 
     override func accessibilityPerformPress() -> Bool {
@@ -314,56 +388,52 @@ final class FileCellView: NSTableCellView {
     }
 
     override func accessibilityCustomActions() -> [NSAccessibilityCustomAction]? {
-        var actions: [NSAccessibilityCustomAction] = []
-        if let onDownload {
-            actions.append(NSAccessibilityCustomAction(name: String(localized: "Télécharger")) {
-                onDownload(); return true
-            })
-        }
+        var actions = [NSAccessibilityCustomAction]()
+        appendAction(named: String(localized: "Télécharger"), handler: onDownload, to: &actions)
         if canWrite {
-            if let onShare {
-                actions.append(NSAccessibilityCustomAction(name: String(localized: "Créer un lien de partage")) {
-                    onShare(); return true
-                })
+            appendAction(named: String(localized: "Créer un lien de partage"), handler: onShare, to: &actions)
+            appendAction(named: String(localized: "Compresser"), handler: onCompress, to: &actions)
+            if canExtract {
+                appendAction(named: String(localized: "Extraire"), handler: onExtract, to: &actions)
             }
-            if let onCopy {
-                actions.append(NSAccessibilityCustomAction(name: String(localized: "Copier")) {
-                    onCopy(); return true
-                })
-            }
-            if let onCut {
-                actions.append(NSAccessibilityCustomAction(name: String(localized: "Déplacer (couper)")) {
-                    onCut(); return true
-                })
-            }
-            if let onRename {
-                actions.append(NSAccessibilityCustomAction(name: String(localized: "Renommer")) {
-                    onRename(); return true
-                })
-            }
-            if let onDelete {
-                actions.append(NSAccessibilityCustomAction(name: String(localized: "Supprimer")) {
-                    onDelete(); return true
-                })
-            }
+            appendAction(named: String(localized: "Copier"), handler: onCopy, to: &actions)
+            appendAction(named: String(localized: "Déplacer (couper)"), handler: onCut, to: &actions)
+            appendAction(named: String(localized: "Renommer"), handler: onRename, to: &actions)
+            appendAction(named: String(localized: "Supprimer"), handler: onDelete, to: &actions)
         }
+        appendAction(named: String(localized: "Lire les informations"), handler: onShowInfo, to: &actions)
         return actions.isEmpty ? nil : actions
     }
 
-    /// Menu contextuel VoiceOver : VO-Maj-M appelle CETTE méthode (et non le `menu(for:)`
-    /// de la souris), il faut donc présenter le menu nous-mêmes pour qu'il soit atteignable.
     override func accessibilityPerformShowMenu() -> Bool {
         guard onDownload != nil else { return false }
         let menu = makeFileContextMenu(
             canWrite: canWrite,
+            canExtract: canExtract,
+            activate: onPress,
             download: { [weak self] in self?.onDownload?() },
-            rename: { [weak self] in self?.onRename?() },
+            rename: onRename,
             delete: { [weak self] in self?.onDelete?() },
             copy: { [weak self] in self?.onCopy?() },
             cut: { [weak self] in self?.onCut?() },
-            share: { [weak self] in self?.onShare?() }
+            share: onShare,
+            compress: { [weak self] in self?.onCompress?() },
+            extract: onExtract,
+            showInfo: onShowInfo
         )
         menu.popUp(positioning: nil, at: NSPoint(x: bounds.minX, y: bounds.maxY), in: self)
         return true
+    }
+
+    private func appendAction(
+        named name: String,
+        handler: (() -> Void)?,
+        to actions: inout [NSAccessibilityCustomAction]
+    ) {
+        guard let handler else { return }
+        actions.append(NSAccessibilityCustomAction(name: name) {
+            handler()
+            return true
+        })
     }
 }

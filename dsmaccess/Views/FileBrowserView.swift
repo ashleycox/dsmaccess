@@ -2,9 +2,8 @@
 //  FileBrowserView.swift
 //  dsmaccess
 //
-//  Coquille SwiftUI du module « Fichiers » : en-tête (bouton Remonter + fil d'Ariane) et
-//  états chargement / erreur / vide. La liste elle-même est un NSTableView AppKit
-//  (voir FileTableView) pour une navigation clavier et VoiceOver dignes du Finder.
+//  Native Mac shell for File Station: toolbar, search, favourites, multi-selection,
+//  file panels and accessible operation feedback.
 //
 
 import AppKit
@@ -12,20 +11,25 @@ import SwiftUI
 
 struct FileBrowserView: View {
     @State private var vm: FileBrowserViewModel
-    @AccessibilityFocusState private var focusHeader: Bool
+    @State private var selection = Set<String>()
+    @State private var searchText = ""
     @State private var activeSheet: WriteSheet?
-    @State private var pendingDelete: FileStationItem?
+    @State private var pendingDeleteItems = [FileStationItem]()
     @State private var shareItem: FileStationItem?
+    @State private var infoItem: FileStationItem?
     @State private var showingShareLinks = false
+    @AccessibilityFocusState private var focusBreadcrumb: Bool
 
-    /// Feuille de saisie active (créer un dossier ou renommer un élément).
     private enum WriteSheet: Identifiable {
         case createFolder
         case rename(FileStationItem)
+        case compress([FileStationItem])
+
         var id: String {
             switch self {
-            case .createFolder: return "createFolder"
-            case .rename(let item): return "rename-\(item.id)"
+            case .createFolder: "create-folder"
+            case .rename(let item): "rename-\(item.id)"
+            case .compress(let items): "compress-\(items.map(\.id).joined(separator: "|"))"
             }
         }
     }
@@ -35,204 +39,459 @@ struct FileBrowserView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            header
-            Divider()
-            content
-        }
-        .task {
-            focusHeader = true
-            await vm.loadCurrent()
-            // Tâche annulée (module quitté avant la fin) : ne rien annoncer.
-            guard !Task.isCancelled else { return }
-            announce()
-        }
-        .sheet(item: $activeSheet) { sheet in
-            switch sheet {
-            case .createFolder:
-                NameEntrySheet(
-                    title: "Créer un dossier",
-                    fieldLabel: "Nom du dossier",
-                    confirmLabel: "Créer",
-                    announcement: String(localized: "Créer un dossier")
-                ) { name in
-                    Task { let msg = await vm.createFolder(named: name); VoiceOver.announce(msg, priority: .high) }
-                }
-            case .rename(let item):
-                NameEntrySheet(
-                    title: "Renommer",
-                    fieldLabel: "Nouveau nom",
-                    confirmLabel: "Renommer",
-                    announcement: String(localized: "Renommer « \(item.name) »"),
-                    initialName: item.name
-                ) { name in
-                    Task { let msg = await vm.rename(item, to: name); VoiceOver.announce(msg, priority: .high) }
+        content
+            .navigationTitle(vm.title)
+            .searchable(text: $searchText, prompt: "Rechercher dans ce dossier")
+            .toolbar { fileToolbar }
+            .focusedSceneValue(\.fileCommandActions, commandActions)
+            .task {
+                VoiceOver.announce(String(localized: "Chargement des fichiers…"), priority: .low)
+                await vm.loadCurrent()
+                guard !Task.isCancelled else { return }
+                await vm.loadFavorites()
+                focusBreadcrumb = true
+                announceSummary()
+            }
+            .task(id: searchText) {
+                do {
+                    if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        try await Task.sleep(for: .milliseconds(300))
+                    }
+                    try Task.checkCancellation()
+                    if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        VoiceOver.announce(String(localized: "Recherche en cours…"), priority: .low)
+                    }
+                    await vm.search(searchText)
+                    try Task.checkCancellation()
+                    selection.removeAll()
+                    announceSummary()
+                } catch is CancellationError {
+                    return
+                } catch {
+                    VoiceOver.announce(error.localizedDescription, priority: .high)
                 }
             }
-        }
-        .alert("Supprimer cet élément ?",
-               isPresented: Binding(get: { pendingDelete != nil },
-                                    set: { if !$0 { pendingDelete = nil } }),
-               presenting: pendingDelete) { item in
-            Button("Supprimer", role: .destructive) {
-                Task { let msg = await vm.delete(item); VoiceOver.announce(msg, priority: .high) }
+            .sheet(item: $activeSheet, content: writeSheet)
+            .alert(
+                deleteTitle,
+                isPresented: Binding(
+                    get: { !pendingDeleteItems.isEmpty },
+                    set: { if !$0 { pendingDeleteItems.removeAll() } }
+                )
+            ) {
+                Button("Supprimer", role: .destructive) {
+                    let items = pendingDeleteItems
+                    pendingDeleteItems.removeAll()
+                    Task {
+                        let message = await vm.delete(items)
+                        selection.removeAll()
+                        VoiceOver.announce(message, priority: .high)
+                    }
+                }
+                Button("Annuler", role: .cancel) { pendingDeleteItems.removeAll() }
+            } message: {
+                Text(deleteMessage)
             }
-            Button("Annuler", role: .cancel) { }
-        } message: { item in
-            Text("« \(item.name) » sera supprimé définitivement. Cette action est irréversible.")
-        }
-        .sheet(item: $shareItem) { item in
-            ShareSheet(item: item) { password, dateExpired in
-                await vm.createShareLink(for: item, password: password, dateExpired: dateExpired)
+            .sheet(item: $shareItem) { item in
+                ShareSheet(item: item) { password, dateExpired in
+                    await vm.createShareLink(for: item, password: password, dateExpired: dateExpired)
+                }
             }
-        }
-        .sheet(isPresented: $showingShareLinks) {
-            ShareLinksView(vm: vm)
+            .sheet(item: $infoItem) { item in
+                FileInfoSheet(item: item)
+            }
+            .sheet(isPresented: $showingShareLinks) {
+                ShareLinksView(vm: vm)
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if vm.isLoading && vm.items.isEmpty {
+            ModuleLoadingView()
+        } else if vm.isSearching && vm.items.isEmpty {
+            ModuleLoadingView("Recherche en cours…")
+        } else if vm.isWorking && vm.items.isEmpty {
+            ModuleLoadingView("Opération en cours…")
+        } else if let error = vm.errorMessage {
+            ModuleErrorView(message: error) {
+                Task { await refresh() }
+            }
+        } else if vm.sortedItems.isEmpty {
+            EmptyModuleView(
+                title: vm.isShowingSearchResults ? "Aucun résultat" : "Dossier vide",
+                systemImage: vm.isShowingSearchResults ? "magnifyingglass" : "folder",
+                description: vm.isShowingSearchResults
+                    ? "Aucun élément ne correspond à votre recherche."
+                    : "Ce dossier ne contient aucun élément."
+            )
+        } else {
+            FileTableView(
+                items: vm.sortedItems,
+                selection: $selection,
+                canWrite: vm.canWrite && !vm.isWorking,
+                showsPath: vm.isShowingSearchResults,
+                canExtract: vm.canExtract,
+                onActivate: activate,
+                onDownload: startDownload,
+                onRename: { activeSheet = .rename($0) },
+                onDelete: { pendingDeleteItems = $0 },
+                onCopy: { VoiceOver.announce(vm.copy($0)) },
+                onCut: { VoiceOver.announce(vm.cut($0)) },
+                onShare: { shareItem = $0 },
+                onCompress: { activeSheet = .compress($0) },
+                onExtract: extract,
+                onShowInfo: { infoItem = $0 },
+                onGoUp: goUp
+            )
+            .overlay(alignment: .topTrailing) {
+                if vm.isSearching || vm.isWorking || vm.isDownloading {
+                    ProgressView()
+                        .controlSize(.small)
+                        .padding(10)
+                        .accessibilityLabel(progressLabel)
+                }
+            }
         }
     }
 
-    private var header: some View {
-        HStack(spacing: 10) {
-            Button {
-                Task { await vm.goUp(); settle() }
-            } label: {
+    @ToolbarContentBuilder
+    private var fileToolbar: some ToolbarContent {
+        ToolbarItem(placement: .navigation) {
+            Button(action: goUp) {
                 Label("Dossier parent", systemImage: "chevron.up")
             }
-            .disabled(!vm.canGoUp)
-            .keyboardShortcut(.upArrow, modifiers: .command)
+            .disabled(!vm.canGoUp || vm.isLoading)
+            .help("Dossier parent")
             .accessibilityHint("Remonte au dossier parent")
+        }
 
+        ToolbarItem(placement: .principal) {
             Text(vm.breadcrumb)
                 .font(.headline)
                 .lineLimit(1)
                 .truncationMode(.head)
                 .accessibilityAddTraits(.isHeader)
-                .accessibilityFocused($focusHeader)
+                .accessibilityFocused($focusBreadcrumb)
+        }
 
-            Spacer()
-
-            Button {
-                activeSheet = .createFolder
+        ToolbarItemGroup(placement: .primaryAction) {
+            Menu {
+                Button("Nouveau dossier", systemImage: "folder.badge.plus") {
+                    activeSheet = .createFolder
+                }
+                Button("Envoyer des fichiers…", systemImage: "square.and.arrow.up") {
+                    startUpload()
+                }
             } label: {
-                Label("Créer un dossier", systemImage: "folder.badge.plus")
+                Label("Ajouter", systemImage: "plus")
             }
-            .disabled(!vm.canWrite)
-            .keyboardShortcut("n", modifiers: [.command, .shift])
-            .accessibilityHint("Crée un dossier dans le dossier courant")
+            .disabled(!vm.canWrite || vm.isWorking)
+            .help("Ajouter des éléments")
 
             Button {
-                startUpload()
-            } label: {
-                Label("Envoyer", systemImage: "square.and.arrow.up")
-            }
-            .disabled(!vm.canWrite)
-            .keyboardShortcut("u", modifiers: .command)
-            .accessibilityHint("Envoie des fichiers depuis votre Mac vers ce dossier")
-
-            Button {
-                VoiceOver.announce(String(localized: "Collage en cours…"), priority: .low)
-                Task { let msg = await vm.paste(); VoiceOver.announce(msg, priority: .high) }
+                paste()
             } label: {
                 Label("Coller", systemImage: "doc.on.clipboard")
             }
-            .disabled(!vm.canPaste)
-            .keyboardShortcut("v", modifiers: .command)
-            .accessibilityHint("Colle l'élément copié ou coupé dans ce dossier")
+            .disabled(!vm.canPaste || vm.isWorking)
+            .help("Coller dans ce dossier")
+
+            favoritesMenu
+            sortMenu
 
             Button {
                 showingShareLinks = true
             } label: {
                 Label("Liens de partage", systemImage: "link")
             }
-            .accessibilityHint("Gère les liens de partage existants")
+            .help("Gérer les liens de partage")
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 12)
+    }
+
+    private var favoritesMenu: some View {
+        Menu {
+            if let path = vm.currentLevel.path {
+                Button {
+                    Task {
+                        let message = await vm.toggleCurrentFavorite()
+                        VoiceOver.announce(message)
+                    }
+                } label: {
+                    if vm.isFavorite(path: path) {
+                        Label("Retirer des favoris", systemImage: "star.slash")
+                    } else {
+                        Label("Ajouter aux favoris", systemImage: "star")
+                    }
+                }
+                Divider()
+            }
+
+            if vm.favorites.isEmpty {
+                Text("Aucun favori")
+            } else {
+                ForEach(vm.favorites) { favorite in
+                    Button(favorite.name) {
+                        searchText = ""
+                        Task {
+                            await vm.openFavorite(favorite)
+                            settleAfterNavigation()
+                        }
+                    }
+                    .disabled(!favorite.isAvailable)
+                }
+            }
+        } label: {
+            Label("Favoris", systemImage: "star")
+        }
+        .help("Favoris File Station")
+    }
+
+    private var sortMenu: some View {
+        Menu {
+            Picker("Trier par", selection: sortModeBinding) {
+                ForEach(FileBrowserViewModel.SortMode.allCases) { mode in
+                    Text(mode.title).tag(mode)
+                }
+            }
+            Divider()
+            Toggle("Ordre croissant", isOn: sortAscendingBinding)
+        } label: {
+            Label("Trier", systemImage: "arrow.up.arrow.down")
+        }
+        .help("Options de tri")
     }
 
     @ViewBuilder
-    private var content: some View {
-        if vm.isLoading && vm.items.isEmpty {
-            HStack(spacing: 12) {
-                ProgressView().controlSize(.small)
-                Text("Chargement…").foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if let error = vm.errorMessage {
-            VStack(spacing: 12) {
-                Text(error)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                Button("Réessayer") {
-                    Task { await vm.loadCurrent(); settle() }
+    private func writeSheet(_ sheet: WriteSheet) -> some View {
+        switch sheet {
+        case .createFolder:
+            NameEntrySheet(
+                title: "Créer un dossier",
+                fieldLabel: "Nom du dossier",
+                confirmLabel: "Créer",
+                announcement: String(localized: "Créer un dossier")
+            ) { name in
+                VoiceOver.announce(String(localized: "Création du dossier en cours…"), priority: .low)
+                Task {
+                    let message = await vm.createFolder(named: name)
+                    VoiceOver.announce(message, priority: .high)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding()
-        } else if vm.items.isEmpty {
-            Text("Dossier vide")
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
-            FileTableView(
-                items: vm.items,
-                canWrite: vm.canWrite,
-                onActivate: { item in
-                    if item.isdir {
-                        Task { await vm.open(item); settle() }
-                    } else {
-                        startDownload(item)
-                    }
-                },
-                onDownload: { item in startDownload(item) },
-                onRename: { item in activeSheet = .rename(item) },
-                onDelete: { item in pendingDelete = item },
-                onCopy: { item in VoiceOver.announce(vm.copy(item)) },
-                onCut: { item in VoiceOver.announce(vm.cut(item)) },
-                onShare: { item in shareItem = item },
-                onGoUp: { Task { await vm.goUp(); settle() } }
-            )
+        case .rename(let item):
+            NameEntrySheet(
+                title: "Renommer",
+                fieldLabel: "Nouveau nom",
+                confirmLabel: "Renommer",
+                announcement: String(localized: "Renommer « \(item.name) »"),
+                initialName: item.name
+            ) { name in
+                VoiceOver.announce(String(localized: "Modification du nom en cours…"), priority: .low)
+                Task {
+                    let message = await vm.rename(item, to: name)
+                    selection = [item.path.deletingLastNASPathComponent.appendingNASPathComponent(name)]
+                    VoiceOver.announce(message, priority: .high)
+                }
+            }
+        case .compress(let items):
+            NameEntrySheet(
+                title: "Compresser",
+                fieldLabel: "Nom de l’archive",
+                confirmLabel: "Créer l’archive",
+                announcement: String(localized: "Créer une archive"),
+                initialName: suggestedArchiveName(for: items)
+            ) { name in
+                VoiceOver.announce(String(localized: "Compression en cours…"), priority: .low)
+                Task {
+                    let message = await vm.compress(items, archiveName: name)
+                    selection.removeAll()
+                    VoiceOver.announce(message, priority: .high)
+                }
+            }
         }
     }
 
-    private func announce() {
-        VoiceOver.announce(vm.summary)
+    private var commandActions: FileCommandActions {
+        FileCommandActions(
+            canGoUp: vm.canGoUp,
+            hasSelection: !selectedItems.isEmpty,
+            hasSingleSelection: selectedItems.count == 1,
+            canWrite: vm.canWrite && !vm.isWorking,
+            canPaste: vm.canPaste && !vm.isWorking,
+            canExtract: selectedItems.count == 1 && vm.canExtract(selectedItems[0]),
+            refresh: { Task { await refresh() } },
+            goUp: goUp,
+            open: activateSelection,
+            createFolder: { activeSheet = .createFolder },
+            upload: startUpload,
+            download: { startDownload(selectedItems) },
+            rename: { if let item = singleSelectedItem { activeSheet = .rename(item) } },
+            copy: { VoiceOver.announce(vm.copy(selectedItems)) },
+            cut: { VoiceOver.announce(vm.cut(selectedItems)) },
+            paste: paste,
+            compress: { activeSheet = .compress(selectedItems) },
+            extract: { if let item = singleSelectedItem { extract(item) } },
+            delete: { pendingDeleteItems = selectedItems },
+            showInfo: { infoItem = singleSelectedItem }
+        )
     }
 
-    /// À appeler après un changement de dossier : réancre le focus VoiceOver sur l'en-tête
-    /// (fil d'Ariane + bouton « Dossier parent », toujours présents même dans un dossier vide)
-    /// puis annonce le résumé. Corrige la navigation « perdue » en entrant dans un dossier vide,
-    /// où la liste — et son focus — disparaissent.
-    private func settle() {
-        focusHeader = true
-        announce()
+    private var selectedItems: [FileStationItem] {
+        vm.sortedItems.filter { selection.contains($0.path) }
     }
 
-    /// Choisit une destination via un panneau d'enregistrement, puis lance le téléchargement.
-    private func startDownload(_ item: FileStationItem) {
-        let panel = NSSavePanel()
-        panel.nameFieldStringValue = vm.suggestedFilename(for: item)
-        panel.canCreateDirectories = true
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-        VoiceOver.announce(String(localized: "Téléchargement en cours…"), priority: .low)
+    private var singleSelectedItem: FileStationItem? {
+        selectedItems.count == 1 ? selectedItems[0] : nil
+    }
+
+    private var sortModeBinding: Binding<FileBrowserViewModel.SortMode> {
+        Binding(get: { vm.sortMode }, set: { vm.sortMode = $0 })
+    }
+
+    private var sortAscendingBinding: Binding<Bool> {
+        Binding(get: { vm.sortAscending }, set: { vm.sortAscending = $0 })
+    }
+
+    private var progressLabel: String {
+        if vm.isSearching { return String(localized: "Recherche en cours…") }
+        if vm.isDownloading { return String(localized: "Téléchargement en cours…") }
+        return String(localized: "Opération en cours…")
+    }
+
+    private var deleteTitle: String {
+        pendingDeleteItems.count == 1
+            ? String(localized: "Supprimer cet élément ?")
+            : String(localized: "Supprimer \(pendingDeleteItems.count) éléments ?")
+    }
+
+    private var deleteMessage: String {
+        if pendingDeleteItems.count == 1, let item = pendingDeleteItems.first {
+            return String(localized: "« \(item.name) » sera supprimé définitivement. Cette action est irréversible.")
+        }
+        return String(localized: "Les éléments sélectionnés seront supprimés définitivement. Cette action est irréversible.")
+    }
+
+    private func activate(_ item: FileStationItem) {
+        if item.isdir {
+            searchText = ""
+            Task {
+                await vm.open(item)
+                settleAfterNavigation()
+            }
+        } else {
+            startDownload([item])
+        }
+    }
+
+    private func activateSelection() {
+        guard let item = singleSelectedItem else { return }
+        activate(item)
+    }
+
+    private func goUp() {
+        guard vm.canGoUp else { return }
+        searchText = ""
         Task {
-            let message = await vm.downloadItem(item, to: url)
+            await vm.goUp()
+            settleAfterNavigation()
+        }
+    }
+
+    private func refresh() async {
+        await vm.loadCurrent()
+        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            await vm.search(searchText)
+        }
+        announceSummary()
+    }
+
+    private func paste() {
+        VoiceOver.announce(String(localized: "Collage en cours…"), priority: .low)
+        Task {
+            let message = await vm.paste()
+            selection.removeAll()
             VoiceOver.announce(message, priority: .high)
         }
     }
 
-    /// Choisit un ou plusieurs fichiers via un panneau d'ouverture, puis lance l'envoi.
+    private func extract(_ item: FileStationItem) {
+        VoiceOver.announce(String(localized: "Extraction en cours…"), priority: .low)
+        Task {
+            let message = await vm.extract(item)
+            selection.removeAll()
+            VoiceOver.announce(message, priority: .high)
+        }
+    }
+
+    private func startDownload(_ items: [FileStationItem]) {
+        guard !items.isEmpty else { return }
+        if items.count == 1, let item = items.first {
+            let panel = NSSavePanel()
+            panel.nameFieldStringValue = vm.suggestedFilename(for: item)
+            panel.canCreateDirectories = true
+            guard panel.runModal() == .OK, let url = panel.url else { return }
+            VoiceOver.announce(String(localized: "Téléchargement en cours…"), priority: .low)
+            Task {
+                let message = await vm.download(item, to: url)
+                VoiceOver.announce(message, priority: .high)
+            }
+            return
+        }
+
+        let panel = NSOpenPanel()
+        panel.canChooseFiles = false
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        panel.canCreateDirectories = true
+        panel.prompt = String(localized: "Choisir")
+        panel.message = String(localized: "Choisissez le dossier de destination des téléchargements.")
+        guard panel.runModal() == .OK, let directory = panel.url else { return }
+        VoiceOver.announce(String(localized: "Téléchargements en cours…"), priority: .low)
+        Task {
+            let message = await vm.download(items, to: directory)
+            VoiceOver.announce(message, priority: .high)
+        }
+    }
+
     private func startUpload() {
+        guard vm.canWrite else { return }
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = true
+        panel.prompt = String(localized: "Envoyer")
         guard panel.runModal() == .OK, !panel.urls.isEmpty else { return }
-        let urls = panel.urls
         VoiceOver.announce(String(localized: "Envoi en cours…"), priority: .low)
         Task {
-            let message = await vm.upload(fileURLs: urls)
+            let message = await vm.upload(fileURLs: panel.urls)
             VoiceOver.announce(message, priority: .high)
         }
+    }
+
+    private func suggestedArchiveName(for items: [FileStationItem]) -> String {
+        guard items.count == 1, let item = items.first else {
+            return String(localized: "Archive.zip")
+        }
+        return "\(item.name).zip"
+    }
+
+    private func settleAfterNavigation() {
+        selection.removeAll()
+        focusBreadcrumb = true
+        announceSummary()
+    }
+
+    private func announceSummary() {
+        VoiceOver.announce(vm.summary)
+    }
+}
+
+private extension String {
+    var deletingLastNASPathComponent: String {
+        (self as NSString).deletingLastPathComponent
+    }
+
+    func appendingNASPathComponent(_ component: String) -> String {
+        hasSuffix("/") ? self + component : self + "/" + component
     }
 }

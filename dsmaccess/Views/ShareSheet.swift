@@ -142,10 +142,7 @@ struct ShareSheet: View {
     private func expiryDate(for expiry: Expiry) -> String? {
         guard let days = expiry.days,
               let date = Calendar.current.date(byAdding: .day, value: days, to: Date()) else { return nil }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: date)
+        return date.formatted(.iso8601.year().month().day().dateSeparator(.dash))
     }
 
     private func copyToClipboard(_ url: String, announce: Bool = true) {

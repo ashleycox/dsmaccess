@@ -2,9 +2,7 @@
 //  FileBrowserViewModel.swift
 //  dsmaccess
 //
-//  État du navigateur File Station en mode « drill-in » façon Finder : une pile de
-//  niveaux (racine = dossiers partagés, puis un dossier par descente). Ouvrir empile
-//  et charge le contenu ; remonter dépile. Le contenu courant alimente le NSTableView.
+//  Navigation, recherche et opérations File Station.
 //
 
 import Foundation
@@ -13,45 +11,92 @@ import Observation
 @MainActor
 @Observable
 final class FileBrowserViewModel {
-    /// Un niveau de la pile de navigation. `path == nil` désigne la racine (dossiers partagés).
     struct Level: Equatable {
         let name: String
         let path: String?
     }
 
+    struct Clipboard {
+        let items: [FileStationItem]
+        let movesItems: Bool
+    }
+
+    enum SortMode: String, CaseIterable, Identifiable {
+        case name
+        case modificationDate
+        case size
+        case kind
+
+        var id: Self { self }
+
+        var title: String {
+            switch self {
+            case .name: String(localized: "Nom")
+            case .modificationDate: String(localized: "Date de modification")
+            case .size: String(localized: "Taille")
+            case .kind: String(localized: "Type")
+            }
+        }
+    }
+
     private(set) var stack: [Level]
     private(set) var items: [FileStationItem] = []
+    private(set) var favorites: [FileStationFavorite] = []
     private(set) var isLoading = false
+    private(set) var isSearching = false
+    private(set) var isWorking = false
     private(set) var isDownloading = false
-    var errorMessage: String?
+    private(set) var isShowingSearchResults = false
+    private(set) var searchQuery = ""
+    private(set) var clipboard: Clipboard?
+    private(set) var shareLinks: [SharingLink] = []
+    private(set) var isLoadingShareLinks = false
 
+    var errorMessage: String?
+    var shareLinksError: String?
+    var sortMode = SortMode.name
+    var sortAscending = true
+
+    private var directoryItems: [FileStationItem] = []
     private let session: SessionStore
 
     init(session: SessionStore) {
         self.session = session
-        self.stack = [Level(name: String(localized: "Fichiers"), path: nil)]
+        stack = [Level(name: String(localized: "Fichiers"), path: nil)]
     }
 
-    var currentLevel: Level { stack.last ?? Level(name: String(localized: "Fichiers"), path: nil) }
+    var currentLevel: Level {
+        stack.last ?? Level(name: String(localized: "Fichiers"), path: nil)
+    }
+
     var title: String { currentLevel.name }
     var canGoUp: Bool { stack.count > 1 }
-    /// Vrai à l'intérieur d'un partage (actions d'écriture permises) ; faux à la racine des
-    /// dossiers partagés, où l'on ne peut ni créer ni renommer/supprimer.
     var canWrite: Bool { currentLevel.path != nil }
-
-    /// Presse-papier interne : copier/couper un élément puis le coller ailleurs (façon Finder).
-    struct Clipboard {
-        let item: FileStationItem
-        let move: Bool
-    }
-    private(set) var clipboard: Clipboard?
-    /// Vrai si l'on peut coller ici : presse-papier non vide ET on est dans un partage.
-    var canPaste: Bool { clipboard != nil && currentLevel.path != nil }
-
-    /// Fil d'Ariane lu par VoiceOver : « Fichiers ▸ photo ▸ 2024 ».
+    var canPaste: Bool { clipboard != nil && canWrite }
     var breadcrumb: String { stack.map(\.name).joined(separator: " ▸ ") }
 
-    /// Charge le contenu du niveau courant (partages à la racine, sinon contenu du dossier).
+    var sortedItems: [FileStationItem] {
+        items.sorted { left, right in
+            if left.isdir != right.isdir {
+                return left.isdir && !right.isdir
+            }
+            let result: ComparisonResult
+            switch sortMode {
+            case .name:
+                result = left.name.localizedStandardCompare(right.name)
+            case .modificationDate:
+                result = compare(left.additional?.time?.mtime, right.additional?.time?.mtime)
+            case .size:
+                result = compare(left.additional?.size, right.additional?.size)
+            case .kind:
+                let leftKind = left.additional?.type ?? left.name.pathExtension
+                let rightKind = right.additional?.type ?? right.name.pathExtension
+                result = leftKind.localizedStandardCompare(rightKind)
+            }
+            return sortAscending ? result == .orderedAscending : result == .orderedDescending
+        }
+    }
+
     func loadCurrent() async {
         guard let client = session.client, let sid = session.sid else {
             session.clear()
@@ -66,30 +111,100 @@ final class FileBrowserViewModel {
             } else {
                 result = try await client.listShares(sid: sid)
             }
-            items = result.sortedForBrowsing()
+            try Task.checkCancellation()
+            directoryItems = result
+            items = result
+            isShowingSearchResults = false
+        } catch is CancellationError {
+            // Une nouvelle navigation ou recherche a remplacé ce chargement.
         } catch {
-            errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
+            errorMessage = errorMessage(for: error)
         }
         isLoading = false
     }
 
-    /// Entre dans un dossier (ignore les fichiers en navigation seule).
+    func loadFavorites() async {
+        guard let client = session.client, let sid = session.sid else { return }
+        do {
+            favorites = try await client.fileStationFavorites(sid: sid)
+        } catch {
+            // Les favoris sont un complément : leur absence ne masque jamais les fichiers.
+            favorites = []
+        }
+    }
+
+    func search(_ query: String) async {
+        let pattern = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        searchQuery = pattern
+        guard !pattern.isEmpty else {
+            isSearching = false
+            isShowingSearchResults = false
+            errorMessage = nil
+            items = directoryItems
+            return
+        }
+
+        if currentLevel.path == nil {
+            items = directoryItems.filter {
+                $0.name.localizedCaseInsensitiveContains(pattern)
+            }
+            isShowingSearchResults = true
+            return
+        }
+
+        guard let client = session.client, let sid = session.sid, let path = currentLevel.path else {
+            return
+        }
+        isSearching = true
+        defer { isSearching = false }
+        errorMessage = nil
+        do {
+            let result = try await client.searchFiles(in: path, matching: pattern, sid: sid)
+            try Task.checkCancellation()
+            items = result
+            isShowingSearchResults = true
+        } catch is CancellationError {
+            return
+        } catch {
+            errorMessage = errorMessage(for: error)
+        }
+    }
+
     func open(_ item: FileStationItem) async {
         guard item.isdir else { return }
+        searchQuery = ""
         stack.append(Level(name: item.name, path: item.path))
+        directoryItems = []
+        items = []
         await loadCurrent()
     }
 
-    /// Remonte au dossier parent.
+    func openFavorite(_ favorite: FileStationFavorite) async {
+        guard favorite.isAvailable else { return }
+        searchQuery = ""
+        stack = [
+            Level(name: String(localized: "Fichiers"), path: nil),
+            Level(name: favorite.name, path: favorite.path),
+        ]
+        directoryItems = []
+        items = []
+        await loadCurrent()
+    }
+
     func goUp() async {
         guard canGoUp else { return }
+        searchQuery = ""
         stack.removeLast()
+        directoryItems = []
+        items = []
         await loadCurrent()
     }
 
-    /// Télécharge `item` vers `destination` (un dossier arrive en ZIP). Renvoie le message
-    /// à annoncer à VoiceOver (succès ou échec).
-    func downloadItem(_ item: FileStationItem, to destination: URL) async -> String {
+    func suggestedFilename(for item: FileStationItem) -> String {
+        item.isdir ? "\(item.name).zip" : item.name
+    }
+
+    func download(_ item: FileStationItem, to destination: URL) async -> String {
         guard let client = session.client, let sid = session.sid else {
             session.clear()
             return String(localized: "Session expirée.")
@@ -100,151 +215,206 @@ final class FileBrowserViewModel {
             try await client.downloadFile(path: item.path, sid: sid, to: destination)
             return String(localized: "Téléchargement terminé : \(item.name)")
         } catch {
-            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec du téléchargement : \(reason)")
+            return String(localized: "Échec du téléchargement : \(errorMessage(for: error))")
         }
     }
 
-    /// Nom de fichier proposé dans le panneau d'enregistrement (dossier → `nom.zip`).
-    func suggestedFilename(for item: FileStationItem) -> String {
-        item.isdir ? "\(item.name).zip" : item.name
+    func download(_ selectedItems: [FileStationItem], to directory: URL) async -> String {
+        guard let client = session.client, let sid = session.sid else {
+            session.clear()
+            return String(localized: "Session expirée.")
+        }
+        isDownloading = true
+        defer { isDownloading = false }
+        var completed = 0
+        var firstError: String?
+        for item in selectedItems {
+            let destination = directory.appendingPathComponent(suggestedFilename(for: item))
+            do {
+                try Task.checkCancellation()
+                try await client.downloadFile(path: item.path, sid: sid, to: destination)
+                completed += 1
+            } catch is CancellationError {
+                break
+            } catch {
+                if firstError == nil { firstError = errorMessage(for: error) }
+            }
+        }
+        if completed == selectedItems.count {
+            return String(localized: "\(completed) éléments téléchargés")
+        }
+        return String(localized: "\(completed) téléchargés, \(selectedItems.count - completed) en échec. \(firstError ?? "")")
     }
 
-    // MARK: - Actions d'écriture (renvoient le message à annoncer à VoiceOver)
-
-    /// Crée un dossier `name` dans le dossier courant.
     func createFolder(named name: String) async -> String {
         guard let client = session.client, let sid = session.sid, let parent = currentLevel.path else {
             return String(localized: "Impossible de créer le dossier ici.")
         }
-        do {
+        return await performAndReload {
             try await client.createFolder(in: parent, name: name, sid: sid)
-            await loadCurrent()
             return String(localized: "Dossier créé : \(name)")
-        } catch {
-            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec de la création : \(reason)")
         }
     }
 
-    /// Renomme `item` en `name`.
     func rename(_ item: FileStationItem, to name: String) async -> String {
         guard let client = session.client, let sid = session.sid else {
             return String(localized: "Session expirée.")
         }
-        do {
+        return await performAndReload {
             try await client.rename(path: item.path, to: name, sid: sid)
-            await loadCurrent()
             return String(localized: "Renommé en : \(name)")
-        } catch {
-            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec du renommage : \(reason)")
         }
     }
 
-    /// Supprime `item`.
-    func delete(_ item: FileStationItem) async -> String {
+    func delete(_ selectedItems: [FileStationItem]) async -> String {
         guard let client = session.client, let sid = session.sid else {
             return String(localized: "Session expirée.")
         }
-        do {
-            try await client.delete(path: item.path, sid: sid)
-            await loadCurrent()
-            return String(localized: "Supprimé : \(item.name)")
-        } catch {
-            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec de la suppression : \(reason)")
+        return await performAndReload {
+            try await client.delete(paths: selectedItems.map(\.path), sid: sid)
+            return selectedItems.count == 1
+                ? String(localized: "Supprimé : \(selectedItems[0].name)")
+                : String(localized: "\(selectedItems.count) éléments supprimés")
         }
     }
 
-    /// Envoie les fichiers `fileURLs` dans le dossier courant. Renvoie le message VoiceOver.
     func upload(fileURLs: [URL]) async -> String {
         guard let client = session.client, let sid = session.sid, let parent = currentLevel.path else {
-            return String(localized: "Impossible d'envoyer ici.")
+            return String(localized: "Impossible d’envoyer ici.")
         }
+        isWorking = true
+        defer { isWorking = false }
         var sent = 0
         var firstFailure: String?
+        let query = searchQuery
         for url in fileURLs {
             do {
+                try Task.checkCancellation()
                 try await client.upload(fileURL: url, to: parent, sid: sid)
                 sent += 1
             } catch {
-                if firstFailure == nil {
-                    firstFailure = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-                }
+                if firstFailure == nil { firstFailure = errorMessage(for: error) }
             }
         }
         await loadCurrent()
+        if !query.isEmpty {
+            await search(query)
+        }
         let failed = fileURLs.count - sent
-        if failed > 0, let firstFailure {
-            return String(localized: "\(sent) envoyés, \(failed) en échec : \(firstFailure)")
+        if failed > 0 {
+            return String(localized: "\(sent) envoyés, \(failed) en échec : \(firstFailure ?? "")")
         }
-        switch sent {
-        case 0: return String(localized: "Impossible d'envoyer ici.")
-        case 1: return String(localized: "Fichier envoyé : \(fileURLs.first?.lastPathComponent ?? "")")
-        default: return String(localized: "\(sent) fichiers envoyés")
-        }
+        return sent == 1
+            ? String(localized: "Fichier envoyé : \(fileURLs[0].lastPathComponent)")
+            : String(localized: "\(sent) fichiers envoyés")
     }
 
-    /// Met `item` au presse-papier pour une copie.
-    func copy(_ item: FileStationItem) -> String {
-        clipboard = Clipboard(item: item, move: false)
-        return String(localized: "Copié : \(item.name)")
+    func copy(_ selectedItems: [FileStationItem]) -> String {
+        clipboard = Clipboard(items: selectedItems, movesItems: false)
+        return selectedItems.count == 1
+            ? String(localized: "Copié : \(selectedItems[0].name)")
+            : String(localized: "\(selectedItems.count) éléments copiés")
     }
 
-    /// Met `item` au presse-papier pour un déplacement.
-    func cut(_ item: FileStationItem) -> String {
-        clipboard = Clipboard(item: item, move: true)
-        // Rappelle l'étape suivante : le déplacement se termine par un Coller dans la destination.
-        return String(localized: "Coupé : \(item.name). Ouvrez la destination puis Coller pour déplacer.")
+    func cut(_ selectedItems: [FileStationItem]) -> String {
+        clipboard = Clipboard(items: selectedItems, movesItems: true)
+        return selectedItems.count == 1
+            ? String(localized: "Coupé : \(selectedItems[0].name). Ouvrez la destination puis Coller pour déplacer.")
+            : String(localized: "\(selectedItems.count) éléments coupés. Ouvrez la destination puis Coller pour déplacer.")
     }
 
-    /// Colle l'élément du presse-papier dans le dossier courant.
     func paste() async -> String {
-        guard let clip = clipboard else { return String(localized: "Rien à coller.") }
-        guard let client = session.client, let sid = session.sid, let dest = currentLevel.path else {
+        guard let clipboard else { return String(localized: "Rien à coller.") }
+        guard let client = session.client, let sid = session.sid, let destination = currentLevel.path else {
             return String(localized: "Impossible de coller ici.")
         }
-        do {
-            try await client.copyMove(path: clip.item.path, to: dest, remove: clip.move, sid: sid)
-            if clip.move { clipboard = nil }   // l'élément a été déplacé, il n'existe plus à la source
-            await loadCurrent()
-            return clip.move
-                ? String(localized: "Déplacé ici : \(clip.item.name)")
-                : String(localized: "Copié ici : \(clip.item.name)")
-        } catch {
-            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec du collage : \(reason)")
+        return await performAndReload {
+            try await client.copyMove(
+                paths: clipboard.items.map(\.path),
+                to: destination,
+                remove: clipboard.movesItems,
+                sid: sid
+            )
+            if clipboard.movesItems { self.clipboard = nil }
+            return clipboard.movesItems
+                ? String(localized: "\(clipboard.items.count) éléments déplacés ici")
+                : String(localized: "\(clipboard.items.count) éléments copiés ici")
         }
     }
 
-    /// Résultat de la création d'un lien de partage.
+    func compress(_ selectedItems: [FileStationItem], archiveName: String) async -> String {
+        guard let client = session.client, let sid = session.sid, let folder = currentLevel.path else {
+            return String(localized: "Impossible de créer une archive ici.")
+        }
+        let trimmed = archiveName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let filename = trimmed.lowercased().hasSuffix(".zip") ? trimmed : "\(trimmed).zip"
+        let destination = folder.appendingNASPathComponent(filename)
+        return await performAndReload {
+            try await client.compress(paths: selectedItems.map(\.path), to: destination, sid: sid)
+            return String(localized: "Archive créée : \(filename)")
+        }
+    }
+
+    func extract(_ item: FileStationItem) async -> String {
+        guard let client = session.client, let sid = session.sid, let folder = currentLevel.path else {
+            return String(localized: "Impossible d’extraire l’archive ici.")
+        }
+        return await performAndReload {
+            try await client.extract(archivePath: item.path, to: folder, sid: sid)
+            return String(localized: "Archive extraite : \(item.name)")
+        }
+    }
+
+    func canExtract(_ item: FileStationItem) -> Bool {
+        guard !item.isdir else { return false }
+        let extensions = ["zip", "gz", "tar", "tgz", "tbz", "bz2", "rar", "7z", "iso"]
+        return extensions.contains(item.name.pathExtension.lowercased())
+    }
+
+    func isFavorite(path: String) -> Bool {
+        favorites.contains { $0.path == path }
+    }
+
+    func toggleCurrentFavorite() async -> String {
+        guard let client = session.client, let sid = session.sid, let path = currentLevel.path else {
+            return String(localized: "Impossible d’ajouter ce dossier aux favoris.")
+        }
+        do {
+            if isFavorite(path: path) {
+                try await client.removeFileStationFavorite(path: path, sid: sid)
+                await loadFavorites()
+                return String(localized: "Favori supprimé : \(currentLevel.name)")
+            }
+            try await client.addFileStationFavorite(path: path, name: currentLevel.name, sid: sid)
+            await loadFavorites()
+            return String(localized: "Favori ajouté : \(currentLevel.name)")
+        } catch {
+            return String(localized: "Échec de la modification du favori : \(errorMessage(for: error))")
+        }
+    }
+
     enum ShareOutcome {
         case link(String)
         case failure(String)
     }
 
-    /// Crée un lien de partage public vers `item` (mot de passe / expiration optionnels).
     func createShareLink(for item: FileStationItem, password: String?, dateExpired: String?) async -> ShareOutcome {
         guard let client = session.client, let sid = session.sid else {
             return .failure(String(localized: "Session expirée."))
         }
         do {
-            let url = try await client.createShareLink(path: item.path, password: password, dateExpired: dateExpired, sid: sid)
+            let url = try await client.createShareLink(
+                path: item.path,
+                password: password,
+                dateExpired: dateExpired,
+                sid: sid
+            )
             return .link(url)
         } catch {
-            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return .failure(String(localized: "Échec de la création du lien : \(reason)"))
+            return .failure(String(localized: "Échec de la création du lien : \(errorMessage(for: error))"))
         }
     }
 
-    // MARK: - Gestion des liens de partage existants
-
-    private(set) var shareLinks: [SharingLink] = []
-    private(set) var isLoadingShareLinks = false
-    var shareLinksError: String?
-
-    /// Charge la liste des liens de partage actifs.
     func loadShareLinks() async {
         guard let client = session.client, let sid = session.sid else {
             session.clear()
@@ -255,12 +425,11 @@ final class FileBrowserViewModel {
         do {
             shareLinks = try await client.listShareLinks(sid: sid)
         } catch {
-            shareLinksError = (error as? DSMError)?.errorDescription ?? error.localizedDescription
+            shareLinksError = errorMessage(for: error)
         }
         isLoadingShareLinks = false
     }
 
-    /// Supprime (révoque) un lien de partage puis recharge la liste. Renvoie le message VoiceOver.
     func deleteShareLink(_ link: SharingLink) async -> String {
         guard let client = session.client, let sid = session.sid else {
             return String(localized: "Session expirée.")
@@ -270,20 +439,58 @@ final class FileBrowserViewModel {
             await loadShareLinks()
             return String(localized: "Lien supprimé")
         } catch {
-            let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec de la suppression du lien : \(reason)")
+            return String(localized: "Échec de la suppression du lien : \(errorMessage(for: error))")
         }
     }
 
-    /// Résumé annoncé à VoiceOver après un chargement / une navigation.
     var summary: String {
         if let errorMessage { return errorMessage }
         let count: String
-        switch items.count {
-        case 0: count = String(localized: "Dossier vide")
+        switch sortedItems.count {
+        case 0: count = isShowingSearchResults ? String(localized: "Aucun résultat") : String(localized: "Dossier vide")
         case 1: count = String(localized: "1 élément")
-        default: count = String(localized: "\(items.count) éléments")
+        default: count = String(localized: "\(sortedItems.count) éléments")
         }
         return "\(title), \(count)"
+    }
+
+    private func performAndReload(_ operation: () async throws -> String) async -> String {
+        isWorking = true
+        defer { isWorking = false }
+        do {
+            let message = try await operation()
+            let query = searchQuery
+            await loadCurrent()
+            if !query.isEmpty {
+                await search(query)
+            }
+            return message
+        } catch {
+            return String(localized: "Échec de l’opération : \(errorMessage(for: error))")
+        }
+    }
+
+    private func errorMessage(for error: Error) -> String {
+        (error as? DSMError)?.errorDescription ?? error.localizedDescription
+    }
+
+    private func compare<Value: Comparable>(_ left: Value?, _ right: Value?) -> ComparisonResult {
+        switch (left, right) {
+        case let (left?, right?) where left < right: .orderedAscending
+        case let (left?, right?) where left > right: .orderedDescending
+        case (nil, .some): .orderedAscending
+        case (.some, nil): .orderedDescending
+        default: .orderedSame
+        }
+    }
+}
+
+private extension String {
+    var pathExtension: String {
+        (self as NSString).pathExtension
+    }
+
+    func appendingNASPathComponent(_ component: String) -> String {
+        hasSuffix("/") ? self + component : self + "/" + component
     }
 }
