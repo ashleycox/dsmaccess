@@ -64,5 +64,6 @@ struct SystemInfoView: View {
         await vm.load()
         guard !Task.isCancelled else { return }
         focusContent = true
+        VoiceOver.announce(vm.summary)
     }
 }

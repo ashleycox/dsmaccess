@@ -1,12 +1,7 @@
 //
 //  FileServicesView.swift
 //  dsmaccess
-//
-//  Module « Services de fichiers » (Panneau de configuration) : active/désactive les
-//  protocoles de partage (SMB, NFS, FTP). Liste plate d'actions → List SwiftUI, comme
-//  SharesView. Toute désactivation passe par une confirmation (couper SMB coupe l'accès
-//  Finder, y compris celui de cet appareil).
-//
+//  Gestion des protocoles de partage de fichiers DSM.
 
 import SwiftUI
 
@@ -89,20 +84,44 @@ struct FileServicesView: View {
             Spacer()
             control(for: service, state: state)
         }
+        .contextMenu {
+            switch state {
+            case .on:
+                Button("Désactiver \(service.displayName)") { pendingDisable = service }
+                    .disabled(vm.busy.contains(service))
+            case .off:
+                Button("Activer \(service.displayName)") { apply(service, enabled: true) }
+                    .disabled(vm.busy.contains(service))
+            case .unknown, .failed:
+                Button("Réessayer") { reloadAll() }
+                    .disabled(vm.busy.contains(service))
+            }
+        }
     }
 
     @ViewBuilder
     private func control(for service: FileService, state: FileServiceState) -> some View {
         let isBusy = vm.busy.contains(service)
         switch state {
-        case .on:
-            Button("Désactiver") { pendingDisable = service }
+        case .on, .off:
+            Toggle(
+                "Activer \(service.displayName)",
+                isOn: Binding(
+                    get: { state == .on },
+                    set: { enabled in
+                        if enabled {
+                            apply(service, enabled: true)
+                        } else {
+                            pendingDisable = service
+                        }
+                    }
+                )
+            )
+                .labelsHidden()
                 .disabled(isBusy)
-                .accessibilityLabel("Désactiver \(service.displayName)")
-        case .off:
-            Button("Activer") { apply(service, enabled: true) }
-                .disabled(isBusy)
-                .accessibilityLabel("Activer \(service.displayName)")
+                .accessibilityLabel(service.displayName)
+                .accessibilityValue(stateText(state))
+                .accessibilityHint("Active ou désactive ce protocole")
         case .unknown, .failed:
             Button("Réessayer") { reloadAll() }
                 .disabled(isBusy)

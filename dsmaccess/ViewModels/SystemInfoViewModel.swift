@@ -63,4 +63,10 @@ final class SystemInfoViewModel {
         let warn = info?.temperatureWarn == true ? String(localized: " (alerte)") : ""
         return base + warn
     }
+
+    var summary: String {
+        if let errorMessage { return errorMessage }
+        guard let info else { return String(localized: "Informations système indisponibles") }
+        return String(localized: "\(info.model), DSM \(info.versionString)")
+    }
 }

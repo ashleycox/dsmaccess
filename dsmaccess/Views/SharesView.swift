@@ -1,27 +1,29 @@
 //
 //  SharesView.swift
 //  dsmaccess
-//
-//  Module « Partages » : liste les dossiers partagés du NAS, permet d'en créer et d'en
-//  supprimer (SYNO.Core.Share). Liste plate d'actions → List SwiftUI (comme ShareLinksView),
-//  pas de navigation drill-in. La suppression exige de retaper le nom (destruction totale).
-//
+//  Administration des dossiers partagés DSM.
 
+import AppKit
 import SwiftUI
 
 struct SharesView: View {
     @State private var vm: SharesViewModel
     @State private var showCreateSheet = false
     @State private var pendingDelete: SharedFolder?
+    @State private var searchText = ""
     @AccessibilityFocusState private var focusContent: Bool
 
+    private let session: SessionStore
+
     init(session: SessionStore) {
+        self.session = session
         _vm = State(initialValue: SharesViewModel(session: session))
     }
 
     var body: some View {
         content
         .navigationTitle("Dossiers partagés")
+        .searchable(text: $searchText, prompt: "Rechercher des dossiers partagés")
         .toolbar {
             ToolbarItemGroup {
                 Button {
@@ -78,8 +80,10 @@ struct SharesView: View {
                 description: "Créez un dossier partagé pour le rendre disponible sur le réseau."
             )
             .accessibilityFocused($focusContent)
+        } else if filteredShares.isEmpty {
+            ContentUnavailableView.search(text: searchText)
         } else {
-            List(vm.shares) { share in
+            List(filteredShares) { share in
                 row(for: share)
             }
             .accessibilityFocused($focusContent)
@@ -94,17 +98,38 @@ struct SharesView: View {
                     Text(sub).font(.caption).foregroundStyle(.secondary)
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(share.accessibilityLabel)
             Spacer()
             Button(role: .destructive) {
                 pendingDelete = share
             } label: {
                 Image(systemName: "trash")
             }
-            .accessibilityLabel("Supprimer")
+            .accessibilityLabel("Supprimer \(share.displayName)")
         }
         .contextMenu {
+            Button("Copier le chemin SMB") { copySMBPath(for: share) }
+            Divider()
             Button("Supprimer…", role: .destructive) { pendingDelete = share }
         }
+    }
+
+    private var filteredShares: [SharedFolder] {
+        guard !searchText.isEmpty else { return vm.shares }
+        return vm.shares.filter {
+            $0.displayName.localizedStandardContains(searchText)
+                || ($0.desc?.localizedStandardContains(searchText) == true)
+                || ($0.volumeText?.localizedStandardContains(searchText) == true)
+        }
+    }
+
+    private func copySMBPath(for share: SharedFolder) {
+        guard let host = session.endpoint?.host else { return }
+        let path = "smb://\(host)/\(share.displayName)"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(path, forType: .string)
+        VoiceOver.announce(String(localized: "Chemin SMB copié"))
     }
 
     private func load() async {
@@ -116,7 +141,6 @@ struct SharesView: View {
     }
 }
 
-/// Feuille de création d'un dossier partagé : nom, volume (si plusieurs), description.
 private struct CreateShareSheet: View {
     let volumes: [String]
     let onConfirm: (_ name: String, _ volumePath: String, _ description: String) -> Void
@@ -191,8 +215,6 @@ private struct CreateShareSheet: View {
     }
 }
 
-/// Confirmation FORTE de suppression : il faut retaper le nom exact (la suppression
-/// efface tout le contenu du partage — irréversible).
 private struct DeleteShareSheet: View {
     let folder: SharedFolder
     let onConfirm: () -> Void
