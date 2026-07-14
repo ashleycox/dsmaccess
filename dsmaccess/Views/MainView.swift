@@ -135,6 +135,8 @@ struct MainView: View {
             VirtualMachinesView(session: session)
         case .surveillance:
             SurveillanceView(session: session)
+        case .controlPanel:
+            ControlPanelView(session: session)
         }
     }
 

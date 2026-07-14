@@ -132,14 +132,50 @@ struct DSMCapabilitiesTests {
         capabilities.merge([
             "SYNO.DSM.Info": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 2),
             "SYNO.Core.FileServ.SMB": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 3),
+            "SYNO.Core.Network": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 2),
         ])
 
         #expect(AppModule.systemInfo.isAvailable(in: capabilities))
         #expect(AppModule.fileServices.isAvailable(in: capabilities))
+        #expect(AppModule.controlPanel.isAvailable(in: capabilities))
         #expect(!AppModule.storage.isAvailable(in: capabilities))
         #expect(!AppModule.files.isAvailable(in: capabilities))
         #expect(!AppModule.shares.isAvailable(in: capabilities))
         #expect(!AppModule.packages.isAvailable(in: capabilities))
+    }
+
+    @Test func decodesNetworkIdentityAndGatewayInterface() throws {
+        let data = Data(
+            #"""
+            {
+              "server_name": "DiskStation",
+              "gateway": "192.168.1.1",
+              "dns_primary": "1.1.1.1",
+              "dns_secondary": "9.9.9.9",
+              "dns_manual": true,
+              "v6gateway": "fe80::1",
+              "enable_windomain": false,
+              "gateway_info": {
+                "ifname": "eth0",
+                "ip": "192.168.1.20",
+                "mask": "255.255.255.0",
+                "status": "connected",
+                "type": "lan",
+                "use_dhcp": false
+              }
+            }
+            """#.utf8
+        )
+
+        let info = try JSONDecoder().decode(NetworkInfo.self, from: data)
+
+        #expect(info.serverName == "DiskStation")
+        #expect(info.gateway == "192.168.1.1")
+        #expect(info.dnsPrimary == "1.1.1.1")
+        #expect(info.dnsManual == true)
+        #expect(info.gatewayInfo?.ifname == "eth0")
+        #expect(info.gatewayInfo?.ip == "192.168.1.20")
+        #expect(info.gatewayInfo?.useDhcp == false)
     }
 
     @Test func mapsExpiredSessionsFromEveryResponsePath() {

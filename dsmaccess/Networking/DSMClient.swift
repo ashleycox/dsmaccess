@@ -89,6 +89,7 @@ protocol DSMClientProtocol: AnyObject {
     func listSystemLogs() async throws -> [SystemLogEntry]
     func listBlockedAddresses() async throws -> [BlockedAddress]
     func unblockAddress(_ address: String) async throws
+    func networkInfo() async throws -> NetworkInfo
     func logout() async throws
 }
 
@@ -108,6 +109,7 @@ final class DSMClient: DSMClientProtocol {
     let containers: DSMContainerService
     let surveillance: DSMSurveillanceService
     let logsSecurity: DSMLogSecurityService
+    let network: DSMNetworkService
 
     init(endpoint: DSMEndpoint) {
         let transport = DSMTransport(endpoint: endpoint)
@@ -125,6 +127,7 @@ final class DSMClient: DSMClientProtocol {
         containers = DSMContainerService(transport: transport)
         surveillance = DSMSurveillanceService(transport: transport)
         logsSecurity = DSMLogSecurityService(transport: transport)
+        network = DSMNetworkService(transport: transport)
     }
 
     var capabilities: DSMCapabilities { transport.capabilities }
@@ -394,6 +397,10 @@ final class DSMClient: DSMClientProtocol {
 
     func unblockAddress(_ address: String) async throws {
         try await logsSecurity.unblock(address)
+    }
+
+    func networkInfo() async throws -> NetworkInfo {
+        try await network.information()
     }
 
     func logout() async throws {

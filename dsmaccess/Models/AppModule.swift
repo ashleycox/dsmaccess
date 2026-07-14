@@ -40,6 +40,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
     case usersGroups
     case fileServices
     case packages
+    case controlPanel
     case containers
     case virtualMachines
     case surveillance
@@ -50,7 +51,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         switch self {
         case .systemInfo, .storage, .logsSecurity: .overview
         case .files, .shares, .downloads: .files
-        case .usersGroups, .fileServices, .packages: .administration
+        case .usersGroups, .fileServices, .packages, .controlPanel: .administration
         case .containers, .virtualMachines, .surveillance: .applications
         }
     }
@@ -66,6 +67,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .usersGroups: "Utilisateurs et groupes"
         case .fileServices: "Services de fichiers"
         case .packages: "Centre de paquets"
+        case .controlPanel: "Panneau de configuration"
         case .containers: "Conteneurs"
         case .virtualMachines: "Machines virtuelles"
         case .surveillance: "Surveillance Station"
@@ -83,6 +85,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .usersGroups: String(localized: "Utilisateurs et groupes")
         case .fileServices: String(localized: "Services de fichiers")
         case .packages: String(localized: "Centre de paquets")
+        case .controlPanel: String(localized: "Panneau de configuration")
         case .containers: String(localized: "Conteneurs")
         case .virtualMachines: String(localized: "Machines virtuelles")
         case .surveillance: String(localized: "Surveillance Station")
@@ -100,6 +103,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .usersGroups: "person.2"
         case .fileServices: "network"
         case .packages: "shippingbox"
+        case .controlPanel: "gearshape"
         case .containers: "shippingbox.fill"
         case .virtualMachines: "desktopcomputer"
         case .surveillance: "video"
@@ -117,9 +121,10 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .usersGroups: AppModuleShortcut(key: "7", modifiers: .command)
         case .fileServices: AppModuleShortcut(key: "8", modifiers: .command)
         case .packages: AppModuleShortcut(key: "9", modifiers: .command)
-        case .containers: AppModuleShortcut(key: "0", modifiers: .command)
-        case .virtualMachines: AppModuleShortcut(key: "1", modifiers: [.command, .shift])
-        case .surveillance: AppModuleShortcut(key: "2", modifiers: [.command, .shift])
+        case .controlPanel: AppModuleShortcut(key: "0", modifiers: .command)
+        case .containers: AppModuleShortcut(key: "1", modifiers: [.command, .shift])
+        case .virtualMachines: AppModuleShortcut(key: "2", modifiers: [.command, .shift])
+        case .surveillance: AppModuleShortcut(key: "3", modifiers: [.command, .shift])
         }
     }
 
@@ -137,6 +142,8 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
             FileService.allCases.contains { capabilities.supports($0.api) }
         case .packages:
             capabilities.supports("SYNO.Core.Package")
+        case .controlPanel:
+            capabilities.supports("SYNO.Core.Network")
         case .logsSecurity:
             capabilities.supports("SYNO.Core.SyslogClient.Log")
                 || capabilities.supports(prefix: "SYNO.Core.Security")

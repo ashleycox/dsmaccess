@@ -14,6 +14,16 @@
         }
       }
     },
+    "%@ (DHCP)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (DHCP)"
+          }
+        }
+      }
+    },
     "%@ (indisponible)" : {
       "localizations" : {
         "en" : {
@@ -937,6 +947,16 @@
         }
       }
     },
+    "Actualiser la configuration réseau" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh network configuration"
+          }
+        }
+      }
+    },
     "Actualiser le dossier" : {
       "localizations" : {
         "en" : {
@@ -1103,6 +1123,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Address"
+          }
+        }
+      }
+    },
+    "Adresse IP" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IP address"
           }
         }
       }
@@ -2067,6 +2097,16 @@
         }
       }
     },
+    "Automatique (DHCP)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic (DHCP)"
+          }
+        }
+      }
+    },
     "Autorisations" : {
       "localizations" : {
         "en" : {
@@ -2313,6 +2353,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading Surveillance Station…"
+          }
+        }
+      }
+    },
+    "Chargement de la configuration réseau…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading network configuration…"
           }
         }
       }
@@ -2773,6 +2823,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Configuration"
+          }
+        }
+      }
+    },
+    "Configuration DNS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS configuration"
+          }
+        }
+      }
+    },
+    "Configuration réseau chargée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network configuration loaded"
+          }
+        }
+      }
+    },
+    "Configuration réseau indisponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network configuration unavailable"
           }
         }
       }
@@ -3486,6 +3566,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Virtual disks"
+          }
+        }
+      }
+    },
+    "Domaine Windows" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Windows domain"
           }
         }
       }
@@ -4621,6 +4711,16 @@
         }
       }
     },
+    "Identité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identity"
+          }
+        }
+      }
+    },
     "Image" : {
       "localizations" : {
         "en" : {
@@ -4871,6 +4971,16 @@
         }
       }
     },
+    "Interface" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface"
+          }
+        }
+      }
+    },
     "Interface %lld" : {
       "localizations" : {
         "en" : {
@@ -5047,6 +5157,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Leave the folder empty to use Download Station’s default destination."
+          }
+        }
+      }
+    },
+    "Le NAS n’a renvoyé aucune information réseau." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The NAS returned no network information."
           }
         }
       }
@@ -5317,6 +5437,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Virtual Machines"
+          }
+        }
+      }
+    },
+    "Manuelle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual"
+          }
+        }
+      }
+    },
+    "Masque de sous-réseau" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subnet mask"
           }
         }
       }
@@ -5851,6 +5991,26 @@
         }
       }
     },
+    "Nom du serveur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server name"
+          }
+        }
+      }
+    },
+    "Nom du serveur, adresse IP, passerelle et DNS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server name, IP address, gateway, and DNS"
+          }
+        }
+      }
+    },
     "Nom d’utilisateur" : {
       "localizations" : {
         "en" : {
@@ -6123,6 +6283,16 @@
         }
       }
     },
+    "Panneau de configuration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control Panel"
+          }
+        }
+      }
+    },
     "Pare-feu" : {
       "localizations" : {
         "en" : {
@@ -6159,6 +6329,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Switch to descending order"
+          }
+        }
+      }
+    },
+    "Passerelle IPv6" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IPv6 gateway"
+          }
+        }
+      }
+    },
+    "Passerelle par défaut" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default gateway"
           }
         }
       }
@@ -6939,6 +7129,16 @@
         }
       }
     },
+    "Réglages système du NAS, regroupés par domaine." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAS system settings, grouped by category."
+          }
+        }
+      }
+    },
     "Réglages, %@" : {
       "localizations" : {
         "en" : {
@@ -6965,6 +7165,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Network"
+          }
+        }
+      }
+    },
+    "Réseau et identité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network & identity"
           }
         }
       }
@@ -7125,6 +7335,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Settings sections"
+          }
+        }
+      }
+    },
+    "Serveur %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server %@"
+          }
+        }
+      }
+    },
+    "Serveur DNS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DNS server"
           }
         }
       }
