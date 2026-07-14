@@ -19,6 +19,12 @@ enum DSMError: Error, LocalizedError, Equatable {
     case invalidResponse
     /// Requête annulée (vue quittée / requête remplacée) — à ignorer, pas un vrai échec.
     case cancelled
+    /// L'API n'est pas exposée par ce NAS ou le paquet correspondant n'est pas installé.
+    case unsupportedAPI(String)
+    /// Les versions exposées par le NAS ne satisfont pas les besoins de cette fonctionnalité.
+    case unsupportedAPIVersion(String)
+    /// La session DSM n'existe plus ou a été invalidée.
+    case sessionExpired
     /// Identifiants incorrects (code 400).
     case invalidCredentials
     /// Compte désactivé (code 401).
@@ -46,6 +52,12 @@ enum DSMError: Error, LocalizedError, Equatable {
             return String(localized: "Réponse inattendue du NAS.")
         case .cancelled:
             return String(localized: "Requête annulée.")
+        case .unsupportedAPI(let name):
+            return String(localized: "Cette fonctionnalité n'est pas disponible sur ce NAS (API \(name)).")
+        case .unsupportedAPIVersion(let name):
+            return String(localized: "La version DSM installée ne prend pas en charge cette fonctionnalité (API \(name)).")
+        case .sessionExpired:
+            return String(localized: "La session a expiré. Reconnectez-vous au NAS.")
         case .invalidCredentials:
             return String(localized: "Nom d'utilisateur ou mot de passe incorrect.")
         case .accountDisabled:

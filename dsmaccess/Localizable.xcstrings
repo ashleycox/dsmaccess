@@ -2552,6 +2552,36 @@
           }
         }
       }
+    },
+    "Cette fonctionnalité n'est pas disponible sur ce NAS (API %@).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This feature is not available on this NAS (API %@)."
+          }
+        }
+      }
+    },
+    "La version DSM installée ne prend pas en charge cette fonctionnalité (API %@).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The installed DSM version does not support this feature (API %@)."
+          }
+        }
+      }
+    },
+    "La session a expiré. Reconnectez-vous au NAS.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The session has expired. Reconnect to the NAS."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
