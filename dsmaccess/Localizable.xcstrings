@@ -64,6 +64,16 @@
         }
       }
     },
+    "%@ par seconde" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ per second"
+          }
+        }
+      }
+    },
     "%@ sur %@" : {
       "localizations" : {
         "en" : {
@@ -80,6 +90,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ used of %@"
+          }
+        }
+      }
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "%@, DSM %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, DSM %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, DSM %2$@"
           }
         }
       }
@@ -136,6 +178,58 @@
         }
       }
     },
+    "%lld caméras activées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld cameras enabled"
+          }
+        }
+      }
+    },
+    "%lld caméras désactivées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld cameras disabled"
+          }
+        }
+      }
+    },
+    "%lld caméras, %lld disponibles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld cameras, %lld available"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld caméras, %2$lld disponibles"
+          }
+        }
+      }
+    },
+    "%lld conteneurs, %lld en fonctionnement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld containers, %lld running"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld conteneurs, %2$lld en fonctionnement"
+          }
+        }
+      }
+    },
     "%lld disques" : {
       "localizations" : {
         "en" : {
@@ -152,6 +246,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld shared folders"
+          }
+        }
+      }
+    },
+    "%lld entrées de journal, %lld adresses bloquées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld log entries, %lld blocked addresses"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld entrées de journal, %2$lld adresses bloquées"
           }
         }
       }
@@ -186,12 +296,48 @@
         }
       }
     },
+    "%lld images par seconde" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld frames per second"
+          }
+        }
+      }
+    },
     "%lld j %lld h %lld min" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld d %lld h %lld min"
+          }
+        }
+      }
+    },
+    "%lld machines virtuelles, %lld en fonctionnement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld virtual machines, %lld running"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld machines virtuelles, %2$lld en fonctionnement"
+          }
+        }
+      }
+    },
+    "%lld membres" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld members"
           }
         }
       }
@@ -226,12 +372,68 @@
         }
       }
     },
+    "%lld processeurs virtuels" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld virtual processors"
+          }
+        }
+      }
+    },
     "%lld secteurs non corrigibles" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld uncorrectable sectors"
+          }
+        }
+      }
+    },
+    "%lld téléchargements mis en pause" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld downloads paused"
+          }
+        }
+      }
+    },
+    "%lld téléchargements repris" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld downloads resumed"
+          }
+        }
+      }
+    },
+    "%lld téléchargements supprimés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld downloads removed"
+          }
+        }
+      }
+    },
+    "%lld téléchargements, %lld actifs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld downloads, %lld active"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld téléchargements, %2$lld actifs"
           }
         }
       }
@@ -248,6 +450,22 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$lld téléchargés, %2$lld en échec. %3$@"
+          }
+        }
+      }
+    },
+    "%lld utilisateurs, %lld groupes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld users, %lld groups"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld utilisateurs, %2$lld groupes"
           }
         }
       }
@@ -401,6 +619,36 @@
         }
       }
     },
+    "Actif" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active"
+          }
+        }
+      }
+    },
+    "Actions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions"
+          }
+        }
+      }
+    },
+    "Active ou désactive ce protocole" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turns this protocol on or off"
+          }
+        }
+      }
+    },
     "Activer" : {
       "localizations" : {
         "en" : {
@@ -431,12 +679,32 @@
         }
       }
     },
+    "Activer les caméras sélectionnées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable selected cameras"
+          }
+        }
+      }
+    },
     "Activer les notifications sur le bureau" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enable desktop notifications"
+          }
+        }
+      }
+    },
+    "Activer l’utilisateur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable user"
           }
         }
       }
@@ -452,6 +720,16 @@
       }
     },
     "Activé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enabled"
+          }
+        }
+      }
+    },
+    "Activée" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -501,6 +779,26 @@
         }
       }
     },
+    "Actualiser les caméras" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh cameras"
+          }
+        }
+      }
+    },
+    "Actualiser les conteneurs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh containers"
+          }
+        }
+      }
+    },
     "Actualiser les dossiers partagés" : {
       "localizations" : {
         "en" : {
@@ -517,6 +815,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Refresh NAS information"
+          }
+        }
+      }
+    },
+    "Actualiser les journaux et protections" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh logs and protections"
+          }
+        }
+      }
+    },
+    "Actualiser les machines virtuelles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh virtual machines"
           }
         }
       }
@@ -541,6 +859,36 @@
         }
       }
     },
+    "Actualiser les téléchargements" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh downloads"
+          }
+        }
+      }
+    },
+    "Actualiser les utilisateurs et groupes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh users and groups"
+          }
+        }
+      }
+    },
+    "Actualiser l’instantané" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh snapshot"
+          }
+        }
+      }
+    },
     "Actualiser l’état des services" : {
       "localizations" : {
         "en" : {
@@ -561,12 +909,32 @@
         }
       }
     },
+    "Actualisez pour demander une image à la caméra." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh to request an image from the camera."
+          }
+        }
+      }
+    },
     "Administration" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Administration"
+          }
+        }
+      }
+    },
+    "Adresse" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address"
           }
         }
       }
@@ -591,12 +959,92 @@
         }
       }
     },
+    "Adresse du fichier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File address"
+          }
+        }
+      }
+    },
+    "Adresse débloquée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Address unblocked: %@"
+          }
+        }
+      }
+    },
+    "Adresse e-mail (facultative)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email address (optional)"
+          }
+        }
+      }
+    },
+    "Adresse inconnue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown address"
+          }
+        }
+      }
+    },
+    "Adresses bloquées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocked addresses"
+          }
+        }
+      }
+    },
+    "Afficher les informations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show information"
+          }
+        }
+      }
+    },
+    "Afficher les informations et journaux" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show information and logs"
+          }
+        }
+      }
+    },
     "Afficher les versions bêta" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show beta versions"
+          }
+        }
+      }
+    },
+    "Afficher l’instantané et les informations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show snapshot and information"
           }
         }
       }
@@ -631,12 +1079,72 @@
         }
       }
     },
+    "Ajouter un téléchargement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add download"
+          }
+        }
+      }
+    },
+    "Ajouter un utilisateur ou un groupe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a user or group"
+          }
+        }
+      }
+    },
+    "Ajoutez une adresse pour démarrer un téléchargement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add an address to start a download."
+          }
+        }
+      }
+    },
+    "Ajoutez une caméra dans Surveillance Station pour la gérer ici." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a camera in Surveillance Station to manage it here."
+          }
+        }
+      }
+    },
+    "Analyse de sécurité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Security scan"
+          }
+        }
+      }
+    },
     "Annuler" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+          }
+        }
+      }
+    },
+    "Applications" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Applications"
           }
         }
       }
@@ -671,6 +1179,36 @@
         }
       }
     },
+    "Arrêt en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopping"
+          }
+        }
+      }
+    },
+    "Arrêt inattendu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unexpected shutdown"
+          }
+        }
+      }
+    },
+    "Arrêt propre demandé pour %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Graceful shutdown requested for %@"
+          }
+        }
+      }
+    },
     "Arrêter" : {
       "localizations" : {
         "en" : {
@@ -691,7 +1229,47 @@
         }
       }
     },
+    "Arrêter le conteneur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop container"
+          }
+        }
+      }
+    },
+    "Arrêter proprement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shut down gracefully"
+          }
+        }
+      }
+    },
     "Arrêté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped"
+          }
+        }
+      }
+    },
+    "Arrêtée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped"
+          }
+        }
+      }
+    },
+    "Arrêtés" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -721,6 +1299,16 @@
         }
       }
     },
+    "Aucun conteneur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No containers"
+          }
+        }
+      }
+    },
     "Aucun dossier partagé" : {
       "localizations" : {
         "en" : {
@@ -741,12 +1329,42 @@
         }
       }
     },
+    "Aucun groupe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No groups"
+          }
+        }
+      }
+    },
+    "Aucun instantané" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No snapshot"
+          }
+        }
+      }
+    },
     "Aucun lien de partage" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No share links"
+          }
+        }
+      }
+    },
+    "Aucun paquet correspondant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No matching packages"
           }
         }
       }
@@ -781,12 +1399,112 @@
         }
       }
     },
+    "Aucun téléchargement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No downloads"
+          }
+        }
+      }
+    },
+    "Aucun téléchargement sélectionné" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No downloads selected"
+          }
+        }
+      }
+    },
+    "Aucun utilisateur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No users"
+          }
+        }
+      }
+    },
     "Aucun élément ne correspond à votre recherche." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "No items match your search."
+          }
+        }
+      }
+    },
+    "Aucune adresse bloquée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No blocked addresses"
+          }
+        }
+      }
+    },
+    "Aucune caméra" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cameras"
+          }
+        }
+      }
+    },
+    "Aucune caméra sélectionnée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No cameras selected"
+          }
+        }
+      }
+    },
+    "Aucune entrée de journal n’est disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No log entries are available."
+          }
+        }
+      }
+    },
+    "Aucune machine virtuelle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No virtual machines"
+          }
+        }
+      }
+    },
+    "Aucune sélection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No selection"
+          }
+        }
+      }
+    },
+    "Aucune vidéo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No video"
           }
         }
       }
@@ -801,6 +1519,16 @@
         }
       }
     },
+    "Autres actions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More actions"
+          }
+        }
+      }
+    },
     "Avertissement" : {
       "localizations" : {
         "en" : {
@@ -811,12 +1539,72 @@
         }
       }
     },
+    "Avertissements" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Warnings"
+          }
+        }
+      }
+    },
     "Basique" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Basic"
+          }
+        }
+      }
+    },
+    "Blocage automatique" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto Block"
+          }
+        }
+      }
+    },
+    "Blocage sans expiration indiquée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocked with no expiration provided"
+          }
+        }
+      }
+    },
+    "Caméra" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera"
+          }
+        }
+      }
+    },
+    "Caméra sans nom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed camera"
+          }
+        }
+      }
+    },
+    "Caméras" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cameras"
           }
         }
       }
@@ -841,12 +1629,32 @@
         }
       }
     },
+    "Ce conteneur n’a produit aucune ligne de journal disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This container has no available log lines."
+          }
+        }
+      }
+    },
     "Ce dossier ne contient aucun élément." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This folder is empty."
+          }
+        }
+      }
+    },
+    "Ce module n’est pas disponible sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This module is not available on this NAS."
           }
         }
       }
@@ -912,6 +1720,46 @@
         }
       }
     },
+    "Chargement de l’instantané…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading snapshot…"
+          }
+        }
+      }
+    },
+    "Chargement des caméras…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading cameras…"
+          }
+        }
+      }
+    },
+    "Chargement des comptes…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading accounts…"
+          }
+        }
+      }
+    },
+    "Chargement des conteneurs…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading containers…"
+          }
+        }
+      }
+    },
     "Chargement des fichiers…" : {
       "localizations" : {
         "en" : {
@@ -932,12 +1780,72 @@
         }
       }
     },
+    "Chargement des journaux et protections…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading logs and protections…"
+          }
+        }
+      }
+    },
+    "Chargement des machines virtuelles…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading virtual machines…"
+          }
+        }
+      }
+    },
+    "Chargement des téléchargements…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading downloads…"
+          }
+        }
+      }
+    },
+    "Chargement du journal…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading log…"
+          }
+        }
+      }
+    },
     "Chargement…" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading…"
+          }
+        }
+      }
+    },
+    "Charger l’instantané" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load snapshot"
+          }
+        }
+      }
+    },
+    "Chemin SMB copié" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMB path copied"
           }
         }
       }
@@ -988,6 +1896,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incorrect verification code. Try again."
+          }
+        }
+      }
+    },
+    "Codec" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codec"
           }
         }
       }
@@ -1063,12 +1981,52 @@
         }
       }
     },
+    "Compte" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        }
+      }
+    },
+    "Configuration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuration"
+          }
+        }
+      }
+    },
+    "Confirmer le mot de passe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm password"
+          }
+        }
+      }
+    },
     "Confirmez la suppression en retapant le nom du dossier partagé." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confirm deletion by retyping the shared folder name."
+          }
+        }
+      }
+    },
+    "Confirmez la suppression en retapant le nom." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirm deletion by retyping the name."
           }
         }
       }
@@ -1113,12 +2071,92 @@
         }
       }
     },
+    "Container Manager n’est pas installé ou son API n’est pas disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container Manager is not installed or its API is unavailable."
+          }
+        }
+      }
+    },
+    "Conteneur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container"
+          }
+        }
+      }
+    },
+    "Conteneur arrêté : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container stopped: %@"
+          }
+        }
+      }
+    },
+    "Conteneur démarré : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container started: %@"
+          }
+        }
+      }
+    },
+    "Conteneur redémarré : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Container restarted: %@"
+          }
+        }
+      }
+    },
+    "Conteneur sans nom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed container"
+          }
+        }
+      }
+    },
+    "Conteneurs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Containers"
+          }
+        }
+      }
+    },
     "Copier" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copy"
+          }
+        }
+      }
+    },
+    "Copier le chemin SMB" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy SMB Path"
           }
         }
       }
@@ -1266,12 +2304,32 @@
         }
       }
     },
+    "Créer un groupe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Group"
+          }
+        }
+      }
+    },
     "Créer un lien de partage" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Create share link"
+          }
+        }
+      }
+    },
+    "Créer un utilisateur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create User"
           }
         }
       }
@@ -1292,6 +2350,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Create a shared folder to make it available on the network."
+          }
+        }
+      }
+    },
+    "Créez un groupe pour gérer les autorisations de plusieurs utilisateurs." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a group to manage permissions for several users."
+          }
+        }
+      }
+    },
+    "Créez un projet dans Container Manager pour gérer ses conteneurs ici." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a project in Container Manager to manage its containers here."
+          }
+        }
+      }
+    },
+    "Créez un utilisateur local pour lui donner accès au NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a local user to give them access to the NAS."
+          }
+        }
+      }
+    },
+    "Créez une machine dans Virtual Machine Manager pour la gérer ici." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a machine in Virtual Machine Manager to manage it here."
           }
         }
       }
@@ -1329,6 +2427,16 @@
         }
       }
     },
+    "Demander un arrêt propre au système invité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request a graceful shutdown from the guest system"
+          }
+        }
+      }
+    },
     "Dernier accès" : {
       "localizations" : {
         "en" : {
@@ -1349,6 +2457,16 @@
         }
       }
     },
+    "Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description"
+          }
+        }
+      }
+    },
     "Description (facultative)" : {
       "localizations" : {
         "en" : {
@@ -1359,12 +2477,32 @@
         }
       }
     },
+    "Disque %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disk %lld"
+          }
+        }
+      }
+    },
     "Disques" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Disks"
+          }
+        }
+      }
+    },
+    "Disques virtuels" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual disks"
           }
         }
       }
@@ -1385,6 +2523,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Folder created: %@"
+          }
+        }
+      }
+    },
+    "Dossier de destination (facultatif)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination folder (optional)"
           }
         }
       }
@@ -1439,6 +2587,26 @@
         }
       }
     },
+    "Download Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Station"
+          }
+        }
+      }
+    },
+    "Download Station n’est pas installé ou son API n’est pas disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download Station is not installed or its API is unavailable."
+          }
+        }
+      }
+    },
     "Durée de vie restante" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1446,6 +2614,66 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remaining life"
+          }
+        }
+      }
+    },
+    "Débit descendant : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download rate: %@"
+          }
+        }
+      }
+    },
+    "Débit montant : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload rate: %@"
+          }
+        }
+      }
+    },
+    "Débloquer %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unblock %@"
+          }
+        }
+      }
+    },
+    "Débloquer cette adresse ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unblock this address?"
+          }
+        }
+      }
+    },
+    "Débloquer…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unblock…"
+          }
+        }
+      }
+    },
+    "Déconnectée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disconnected"
           }
         }
       }
@@ -1480,6 +2708,36 @@
         }
       }
     },
+    "Démarrage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starting"
+          }
+        }
+      }
+    },
+    "Démarrage automatique" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-start"
+          }
+        }
+      }
+    },
+    "Démarrage demandé pour %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start requested for %@"
+          }
+        }
+      }
+    },
     "Démarrer" : {
       "localizations" : {
         "en" : {
@@ -1496,6 +2754,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start %@"
+          }
+        }
+      }
+    },
+    "Démarrer la machine virtuelle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start virtual machine"
+          }
+        }
+      }
+    },
+    "Démarrer le conteneur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start container"
+          }
+        }
+      }
+    },
+    "Démarré" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Started"
+          }
+        }
+      }
+    },
+    "Déplacement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moving"
           }
         }
       }
@@ -1547,6 +2845,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Disable this service?"
+          }
+        }
+      }
+    },
+    "Désactiver les caméras sélectionnées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable selected cameras"
+          }
+        }
+      }
+    },
+    "Désactiver l’utilisateur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disable user"
           }
         }
       }
@@ -1631,12 +2949,52 @@
         }
       }
     },
+    "En attente" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting"
+          }
+        }
+      }
+    },
+    "En attente de l’hébergeur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for host"
+          }
+        }
+      }
+    },
     "En cours" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Running"
+          }
+        }
+      }
+    },
+    "En fonctionnement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Running"
+          }
+        }
+      }
+    },
+    "En pause" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
           }
         }
       }
@@ -1713,12 +3071,52 @@
         }
       }
     },
+    "Erreur : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: %@"
+          }
+        }
+      }
+    },
+    "Erreur : les mots de passe ne correspondent pas." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: passwords do not match."
+          }
+        }
+      }
+    },
+    "Erreur RTSP" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "RTSP error"
+          }
+        }
+      }
+    },
     "Erreur du NAS (code %lld)." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "NAS error (code %lld)."
+          }
+        }
+      }
+    },
+    "Erreurs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errors"
           }
         }
       }
@@ -1753,6 +3151,26 @@
         }
       }
     },
+    "Extinction forcée demandée pour %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forced power off requested for %@"
+          }
+        }
+      }
+    },
+    "Extraction" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extracting"
+          }
+        }
+      }
+    },
     "Extraction en cours…" : {
       "localizations" : {
         "en" : {
@@ -1779,6 +3197,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "FTP"
+          }
+        }
+      }
+    },
+    "Fabricant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manufacturer"
           }
         }
       }
@@ -1905,6 +3333,86 @@
         }
       }
     },
+    "Filtrer le journal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter log"
+          }
+        }
+      }
+    },
+    "Filtrer le journal par niveau" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter log by level"
+          }
+        }
+      }
+    },
+    "Filtrer les paquets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter packages"
+          }
+        }
+      }
+    },
+    "Finalisation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finishing"
+          }
+        }
+      }
+    },
+    "Forcer l’extinction de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Force %@ to power off"
+          }
+        }
+      }
+    },
+    "Forcer l’extinction de cette machine ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Force this machine to power off?"
+          }
+        }
+      }
+    },
+    "Forcer l’extinction…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Force Power Off…"
+          }
+        }
+      }
+    },
+    "Fréquence d’images" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frame rate"
+          }
+        }
+      }
+    },
     "Groupe" : {
       "localizations" : {
         "en" : {
@@ -1915,12 +3423,42 @@
         }
       }
     },
+    "Groupe créé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group created: %@"
+          }
+        }
+      }
+    },
     "Groupe de stockage %lld" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Storage pool %lld"
+          }
+        }
+      }
+    },
+    "Groupe supprimé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group deleted: %@"
+          }
+        }
+      }
+    },
+    "Groupes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groups"
           }
         }
       }
@@ -1967,12 +3505,42 @@
         }
       }
     },
+    "Historique de connexion indisponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection history unavailable"
+          }
+        }
+      }
+    },
     "Identifiant de paquet introuvable." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Package identifier not found."
+          }
+        }
+      }
+    },
+    "Image" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image"
+          }
+        }
+      }
+    },
+    "Importation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing"
           }
         }
       }
@@ -2068,6 +3636,66 @@
         }
       }
     },
+    "Inaccessible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unreachable"
+          }
+        }
+      }
+    },
+    "Indisponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "Information" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information"
+          }
+        }
+      }
+    },
+    "Informations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information"
+          }
+        }
+      }
+    },
+    "Informations et journaux" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information and logs"
+          }
+        }
+      }
+    },
+    "Informations et journaux de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information and logs for %@"
+          }
+        }
+      }
+    },
     "Informations générales" : {
       "localizations" : {
         "en" : {
@@ -2084,6 +3712,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Information for %@"
+          }
+        }
+      }
+    },
+    "Informations système indisponibles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System information unavailable"
           }
         }
       }
@@ -2108,6 +3746,86 @@
         }
       }
     },
+    "Instantané actuel de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current snapshot from %@"
+          }
+        }
+      }
+    },
+    "Instantané chargé pour %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snapshot loaded for %@"
+          }
+        }
+      }
+    },
+    "Instantané et informations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snapshot and information"
+          }
+        }
+      }
+    },
+    "Instantané et informations de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Snapshot and information for %@"
+          }
+        }
+      }
+    },
+    "Interface %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface %lld"
+          }
+        }
+      }
+    },
+    "Interface disponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface available"
+          }
+        }
+      }
+    },
+    "Interfaces de protection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protection interfaces"
+          }
+        }
+      }
+    },
+    "Interfaces réseau" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network interfaces"
+          }
+        }
+      }
+    },
     "Jamais" : {
       "localizations" : {
         "en" : {
@@ -2118,12 +3836,92 @@
         }
       }
     },
+    "Journal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log"
+          }
+        }
+      }
+    },
+    "Journal de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log for %@"
+          }
+        }
+      }
+    },
+    "Journal système" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System log"
+          }
+        }
+      }
+    },
+    "Journal vide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empty log"
+          }
+        }
+      }
+    },
+    "Journaux" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logs"
+          }
+        }
+      }
+    },
+    "Journaux et sécurité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logs and Security"
+          }
+        }
+      }
+    },
     "La double authentification est obligatoire pour ce compte. Activez-la dans DSM." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Two-factor authentication is required for this account. Enable it in DSM."
+          }
+        }
+      }
+    },
+    "La liste de blocage n’est pas exposée par ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The block list is not exposed by this NAS."
+          }
+        }
+      }
+    },
+    "La machine « %@ » sera arrêtée sans laisser son système d’exploitation se fermer proprement. Des données peuvent être perdues." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” will be powered off without allowing its operating system to shut down gracefully. Data may be lost."
           }
         }
       }
@@ -2158,6 +3956,36 @@
         }
       }
     },
+    "Laissez le dossier vide pour utiliser la destination par défaut de Download Station." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave the folder empty to use Download Station’s default destination."
+          }
+        }
+      }
+    },
+    "Le compte « %@ » sera supprimé. Son dossier personnel peut également devenir inaccessible selon les réglages du NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The “%@” account will be deleted. Its home folder may also become inaccessible depending on the NAS settings."
+          }
+        }
+      }
+    },
+    "Le groupe « %@ » sera supprimé. Les autorisations accordées par ce groupe seront retirées." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The “%@” group will be deleted. Permissions granted through this group will be removed."
+          }
+        }
+      }
+    },
     "Le service sera arrêté et les connexions en cours interrompues. Vous pourrez le réactiver ici." : {
       "localizations" : {
         "en" : {
@@ -2174,6 +4002,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Read"
+          }
+        }
+      }
+    },
+    "Les interfaces de journalisation et de sécurité ne sont pas exposées par ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Logging and security interfaces are not exposed by this NAS."
+          }
+        }
+      }
+    },
+    "Les mots de passe ne correspondent pas." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Passwords do not match."
+          }
+        }
+      }
+    },
+    "Les nouvelles connexions provenant de %@ seront à nouveau autorisées par le blocage automatique." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto Block will allow new connections from %@ again."
+          }
+        }
+      }
+    },
+    "Les tâches seront retirées de Download Station. Les fichiers déjà téléchargés seront conservés." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The tasks will be removed from Download Station. Files that have already been downloaded will be kept."
           }
         }
       }
@@ -2258,12 +4126,112 @@
         }
       }
     },
+    "L’administration des utilisateurs et groupes n’est pas exposée par ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User and group administration is not exposed by this NAS."
+          }
+        }
+      }
+    },
+    "Machine virtuelle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual machine"
+          }
+        }
+      }
+    },
+    "Machine virtuelle sans nom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed virtual machine"
+          }
+        }
+      }
+    },
+    "Machines virtuelles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual Machines"
+          }
+        }
+      }
+    },
+    "Masquer les informations" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide information"
+          }
+        }
+      }
+    },
+    "Masquer l’instantané" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hide snapshot"
+          }
+        }
+      }
+    },
     "Met à jour les valeurs toutes les 5 secondes" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Updates the values every 5 seconds"
+          }
+        }
+      }
+    },
+    "Mettre en pause" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
+    },
+    "Mettre les téléchargements sélectionnés en pause" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause selected downloads"
+          }
+        }
+      }
+    },
+    "Migration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Migrating"
+          }
+        }
+      }
+    },
+    "Migration du stockage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Migrating storage"
           }
         }
       }
@@ -2284,6 +4252,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Update available: %@"
+          }
+        }
+      }
+    },
+    "Mises à jour" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates"
           }
         }
       }
@@ -2318,6 +4296,36 @@
         }
       }
     },
+    "Modifiez la recherche ou le filtre de niveau." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the search or level filter."
+          }
+        }
+      }
+    },
+    "Modifiez la recherche ou le filtre." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change the search or filter."
+          }
+        }
+      }
+    },
+    "Modifiez votre recherche et réessayez." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change your search and try again."
+          }
+        }
+      }
+    },
     "Modèle" : {
       "localizations" : {
         "en" : {
@@ -2344,6 +4352,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Password (optional)"
+          }
+        }
+      }
+    },
+    "Mémoire" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memory"
           }
         }
       }
@@ -2384,6 +4402,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Navigation"
+          }
+        }
+      }
+    },
+    "Niveau" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level"
           }
         }
       }
@@ -2448,7 +4476,77 @@
         }
       }
     },
+    "Nom du groupe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group name"
+          }
+        }
+      }
+    },
+    "Nom d’utilisateur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Username"
+          }
+        }
+      }
+    },
+    "Non autorisée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unauthorized"
+          }
+        }
+      }
+    },
+    "Non disponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "Non exposée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not exposed"
+          }
+        }
+      }
+    },
+    "Non reconnue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unrecognized"
+          }
+        }
+      }
+    },
     "Normal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Normal"
+          }
+        }
+      }
+    },
+    "Normale" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2478,12 +4576,32 @@
         }
       }
     },
+    "Nouveau groupe…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New Group…"
+          }
+        }
+      }
+    },
     "Nouveau nom" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "New name"
+          }
+        }
+      }
+    },
+    "Nouvel utilisateur…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New User…"
           }
         }
       }
@@ -2508,12 +4626,32 @@
         }
       }
     },
+    "Options d’actualisation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh options"
+          }
+        }
+      }
+    },
     "Opération" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Operation"
+          }
+        }
+      }
+    },
+    "Opération en cours pour %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Operation in progress for %@"
           }
         }
       }
@@ -2579,6 +4717,26 @@
         }
       }
     },
+    "Pare-feu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firewall"
+          }
+        }
+      }
+    },
+    "Partage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing"
+          }
+        }
+      }
+    },
     "Partages" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2611,12 +4769,21 @@
       }
     },
     "Processeur" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Processor"
+          }
+        }
+      }
+    },
+    "Processeur %@ %%" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processor %@%%"
           }
         }
       }
@@ -2648,6 +4815,26 @@
         }
       }
     },
+    "Processeurs virtuels" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual processors"
+          }
+        }
+      }
+    },
+    "Progression de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ progress"
+          }
+        }
+      }
+    },
     "Propriétaire" : {
       "localizations" : {
         "en" : {
@@ -2658,12 +4845,42 @@
         }
       }
     },
+    "Protection des comptes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account Protection"
+          }
+        }
+      }
+    },
     "Protocoles" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Protocols"
+          }
+        }
+      }
+    },
+    "Préparation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preparing"
+          }
+        }
+      }
+    },
+    "Prête" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready"
           }
         }
       }
@@ -2721,12 +4938,102 @@
         }
       }
     },
+    "Rechercher dans le journal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search log"
+          }
+        }
+      }
+    },
+    "Rechercher des dossiers partagés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search shared folders"
+          }
+        }
+      }
+    },
+    "Rechercher des paquets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search packages"
+          }
+        }
+      }
+    },
     "Rechercher les mises à jour…" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Check for Updates…"
+          }
+        }
+      }
+    },
+    "Rechercher un compte ou un groupe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for an account or group"
+          }
+        }
+      }
+    },
+    "Rechercher un conteneur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search containers"
+          }
+        }
+      }
+    },
+    "Rechercher un téléchargement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search downloads"
+          }
+        }
+      }
+    },
+    "Rechercher une adresse bloquée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search blocked addresses"
+          }
+        }
+      }
+    },
+    "Rechercher une caméra" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search cameras"
+          }
+        }
+      }
+    },
+    "Rechercher une machine virtuelle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search virtual machines"
           }
         }
       }
@@ -2757,6 +5064,36 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rebuilding"
+          }
+        }
+      }
+    },
+    "Redémarrage automatique" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto-restart"
+          }
+        }
+      }
+    },
+    "Redémarrer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart"
+          }
+        }
+      }
+    },
+    "Redémarrer le conteneur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart container"
           }
         }
       }
@@ -2811,12 +5148,42 @@
         }
       }
     },
+    "Reprendre" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        }
+      }
+    },
+    "Reprendre les téléchargements sélectionnés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume selected downloads"
+          }
+        }
+      }
+    },
     "Requête annulée." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Request cancelled."
+          }
+        }
+      }
+    },
+    "Ressources" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resources"
           }
         }
       }
@@ -2847,6 +5214,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retype the folder name to confirm"
+          }
+        }
+      }
+    },
+    "Retapez le nom pour confirmer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retype the name to confirm"
           }
         }
       }
@@ -2963,12 +5340,21 @@
       }
     },
     "Réseau" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Network"
+          }
+        }
+      }
+    },
+    "Résolution" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resolution"
           }
         }
       }
@@ -3043,6 +5429,16 @@
         }
       }
     },
+    "Secours haute disponibilité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High-availability failover"
+          }
+        }
+      }
+    },
     "Secteurs défectueux au-delà du seuil" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3050,6 +5446,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bad sectors above threshold"
+          }
+        }
+      }
+    },
+    "Serveur déconnecté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server disconnected"
           }
         }
       }
@@ -3104,6 +5510,16 @@
         }
       }
     },
+    "Stockage retiré" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage removed"
+          }
+        }
+      }
+    },
     "Suppression" : {
       "localizations" : {
         "en" : {
@@ -3120,6 +5536,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete"
+          }
+        }
+      }
+    },
+    "Supprimer %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete %@"
           }
         }
       }
@@ -3144,6 +5570,26 @@
         }
       }
     },
+    "Supprimer ce groupe ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this group?"
+          }
+        }
+      }
+    },
+    "Supprimer cet utilisateur ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this user?"
+          }
+        }
+      }
+    },
     "Supprimer cet élément ?" : {
       "localizations" : {
         "en" : {
@@ -3160,6 +5606,56 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete permanently"
+          }
+        }
+      }
+    },
+    "Supprimer et marquer comme terminés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove and mark as completed"
+          }
+        }
+      }
+    },
+    "Supprimer le groupe…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Group…"
+          }
+        }
+      }
+    },
+    "Supprimer les téléchargements sélectionnés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove selected downloads"
+          }
+        }
+      }
+    },
+    "Supprimer les téléchargements sélectionnés ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove selected downloads?"
+          }
+        }
+      }
+    },
+    "Supprimer l’utilisateur…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete User…"
           }
         }
       }
@@ -3184,6 +5680,36 @@
         }
       }
     },
+    "Supprimée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deleted"
+          }
+        }
+      }
+    },
+    "Surveillance Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surveillance Station"
+          }
+        }
+      }
+    },
+    "Surveillance Station n’est pas installé ou son API n’est pas disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Surveillance Station is not installed or its API is unavailable."
+          }
+        }
+      }
+    },
     "Système" : {
       "localizations" : {
         "en" : {
@@ -3204,6 +5730,26 @@
         }
       }
     },
+    "Sécurité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Security"
+          }
+        }
+      }
+    },
+    "Sélectionnez un conteneur pour lire ses informations." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a container to view its information."
+          }
+        }
+      }
+    },
     "Sélectionnez un module" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3215,12 +5761,42 @@
         }
       }
     },
+    "Sélectionnez une caméra pour afficher son instantané." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a camera to view its snapshot."
+          }
+        }
+      }
+    },
+    "Sélectionnez une machine virtuelle pour lire ses informations." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a virtual machine to view its information."
+          }
+        }
+      }
+    },
     "Taille" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Size"
+          }
+        }
+      }
+    },
+    "Taille inconnue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown size"
           }
         }
       }
@@ -3251,6 +5827,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Done"
+          }
+        }
+      }
+    },
+    "Tous" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        }
+      }
+    },
+    "Tous les niveaux" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All levels"
           }
         }
       }
@@ -3295,6 +5891,26 @@
         }
       }
     },
+    "Téléchargement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download"
+          }
+        }
+      }
+    },
+    "Téléchargement ajouté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download added"
+          }
+        }
+      }
+    },
     "Téléchargement en cours…" : {
       "localizations" : {
         "en" : {
@@ -3305,12 +5921,32 @@
         }
       }
     },
+    "Téléchargement sans nom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed download"
+          }
+        }
+      }
+    },
     "Téléchargement terminé : %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Download complete: %@"
+          }
+        }
+      }
+    },
+    "Téléchargements" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads"
           }
         }
       }
@@ -3403,6 +6039,66 @@
         }
       }
     },
+    "Utilisateur activé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User enabled: %@"
+          }
+        }
+      }
+    },
+    "Utilisateur créé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User created: %@"
+          }
+        }
+      }
+    },
+    "Utilisateur désactivé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User disabled: %@"
+          }
+        }
+      }
+    },
+    "Utilisateur supprimé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User deleted: %@"
+          }
+        }
+      }
+    },
+    "Utilisateurs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Users"
+          }
+        }
+      }
+    },
+    "Utilisateurs et groupes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Users and Groups"
+          }
+        }
+      }
+    },
     "Utilisation" : {
       "localizations" : {
         "en" : {
@@ -3483,6 +6179,26 @@
         }
       }
     },
+    "Vidéo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Video"
+          }
+        }
+      }
+    },
+    "Virtual Machine Manager n’est pas installé ou son API n’est pas disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual Machine Manager is not installed or its API is unavailable."
+          }
+        }
+      }
+    },
     "Volume" : {
       "localizations" : {
         "en" : {
@@ -3534,6 +6250,16 @@
         }
       }
     },
+    "Vérification" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking"
+          }
+        }
+      }
+    },
     "Vérification en cours…" : {
       "localizations" : {
         "en" : {
@@ -3554,12 +6280,92 @@
         }
       }
     },
+    "actif" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "active"
+          }
+        }
+      }
+    },
+    "administrateur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "administrator"
+          }
+        }
+      }
+    },
+    "arrêté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "stopped"
+          }
+        }
+      }
+    },
     "dossier" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "folder"
+          }
+        }
+      }
+    },
+    "downloads" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "downloads"
+          }
+        }
+      }
+    },
+    "désactivé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "disabled"
+          }
+        }
+      }
+    },
+    "en fonctionnement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "running"
+          }
+        }
+      }
+    },
+    "envoi %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "upload %@"
+          }
+        }
+      }
+    },
+    "expiration %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "expires %@"
           }
         }
       }
@@ -3574,6 +6380,46 @@
         }
       }
     },
+    "https://exemple.com/fichier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "https://example.com/file"
+          }
+        }
+      }
+    },
+    "image %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "image %@"
+          }
+        }
+      }
+    },
+    "le mot de passe ne respecte pas la stratégie du NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "the password does not meet the NAS policy"
+          }
+        }
+      }
+    },
+    "le nom est invalide ou existe déjà" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "the name is invalid or already exists"
+          }
+        }
+      }
+    },
     "le nombre maximum de dossiers partagés est atteint" : {
       "localizations" : {
         "en" : {
@@ -3584,12 +6430,42 @@
         }
       }
     },
+    "permission refusée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "permission denied"
+          }
+        }
+      }
+    },
+    "processeur %@ pour cent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "processor %@ percent"
+          }
+        }
+      }
+    },
     "rsync (sauvegarde réseau)" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "rsync (network backup)"
+          }
+        }
+      }
+    },
+    "réception %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "download %@"
           }
         }
       }
@@ -3735,6 +6611,16 @@
         }
       }
     },
+    "Échec du déblocage : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unblock failed: %@"
+          }
+        }
+      }
+    },
     "Échec du renommage : %@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3782,6 +6668,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Status"
+          }
+        }
+      }
+    },
+    "État inconnu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown status"
           }
         }
       }
