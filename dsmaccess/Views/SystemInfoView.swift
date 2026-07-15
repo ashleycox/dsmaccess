@@ -43,6 +43,8 @@ struct SystemInfoView: View {
                 }
                 .formStyle(.grouped)
                 .accessibilityFocused($focusContent)
+            } else {
+                ModuleLoadingView("Chargement des informations…")
             }
         }
         .navigationTitle("Votre NAS")
@@ -60,10 +62,19 @@ struct SystemInfoView: View {
     }
 
     private func load() async {
-        focusContent = true
+        VoiceOver.announce(
+            String(localized: "Chargement des informations…"),
+            category: .progress,
+            priority: .low
+        )
         await vm.load()
         guard !Task.isCancelled else { return }
-        focusContent = true
-        VoiceOver.announce(vm.summary)
+        if let modelName = vm.info?.model {
+            session.updateActiveProfileDefaultName(to: modelName)
+        }
+        VoiceOver.announce(
+            vm.summary,
+            category: vm.errorMessage == nil ? .result : .error
+        )
     }
 }

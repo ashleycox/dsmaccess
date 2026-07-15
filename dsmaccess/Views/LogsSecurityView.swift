@@ -275,11 +275,17 @@ struct LogsSecurityView: View {
     }
 
     private func load() async {
-        contentFocused = true
+        VoiceOver.announce(
+            String(localized: "Chargement des journaux et de la sécurité…"),
+            category: .progress,
+            priority: .low
+        )
         await viewModel.load()
         guard !Task.isCancelled else { return }
-        contentFocused = true
-        VoiceOver.announce(viewModel.summary)
+        VoiceOver.announce(
+            viewModel.summary,
+            category: viewModel.errorMessage == nil ? .result : .error
+        )
     }
 
     private func unblock(_ blockedAddress: BlockedAddress) async {

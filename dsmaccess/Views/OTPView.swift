@@ -62,12 +62,15 @@ struct OTPView: View {
         .frame(maxWidth: 460)
         .onAppear {
             focusCode = true
-            AccessibilityNotification.Announcement(String(localized: "Saisissez le code de vérification à six chiffres")).post()
+            VoiceOver.announce(
+                String(localized: "Saisissez le code de vérification à six chiffres"),
+                category: .navigation
+            )
         }
         .onChange(of: vm.errorMessage) { _, newValue in
             if let newValue {
                 focusError = true
-                VoiceOver.announce(newValue, priority: .high)
+                VoiceOver.announce(newValue, category: .error, priority: .high)
             }
         }
     }

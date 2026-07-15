@@ -4,6 +4,536 @@
     "" : {
       "shouldTranslate" : false
     },
+    "%@ (indisponible)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (unavailable)"
+          }
+        }
+      }
+    },
+    "%@ indisponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ unavailable"
+          }
+        }
+      }
+    },
+    "%@ n’est pas disponible sur ce NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ is not available on this NAS"
+          }
+        }
+      }
+    },
+    "%@ — %@:%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — %@:%lld"
+          }
+        }
+      }
+    },
+    "%@, position %lld sur %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, position %lld of %lld"
+          }
+        }
+      }
+    },
+    "Actions sur la sélection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected Item Actions"
+          }
+        }
+      }
+    },
+    "Actions sur les éléments sélectionnés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actions for selected items"
+          }
+        }
+      }
+    },
+    "Afficher ou masquer la barre latérale" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show or hide the sidebar"
+          }
+        }
+      }
+    },
+    "Ajoutez un NAS depuis cette fenêtre ou depuis le menu NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a NAS from this window or from the NAS menu."
+          }
+        }
+      }
+    },
+    "Ajouter un NAS…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add NAS…"
+          }
+        }
+      }
+    },
+    "Annonce la connexion, le module sélectionné et les changements de dossier." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Announces sign-in, the selected module, and folder changes."
+          }
+        }
+      }
+    },
+    "Annonce le début des chargements, recherches et opérations longues." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Announces the start of loading, searches, and long operations."
+          }
+        }
+      }
+    },
+    "Annonce les erreurs de connexion, de chargement et d’opération." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Announces connection, loading, and operation errors."
+          }
+        }
+      }
+    },
+    "Annonce les résumés de contenu et le résultat des actions." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Announces content summaries and action results."
+          }
+        }
+      }
+    },
+    "Annonce l’activation ou la désactivation des actualisations automatiques." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Announces when automatic refresh is enabled or disabled."
+          }
+        }
+      }
+    },
+    "Annonces" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Announcements"
+          }
+        }
+      }
+    },
+    "Annonces VoiceOver" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VoiceOver announcements"
+          }
+        }
+      }
+    },
+    "Aucun NAS enregistré" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No saved NAS devices"
+          }
+        }
+      }
+    },
+    "Barre latérale" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sidebar"
+          }
+        }
+      }
+    },
+    "Changer de NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch NAS"
+          }
+        }
+      }
+    },
+    "Chargement de Surveillance Station…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading Surveillance Station…"
+          }
+        }
+      }
+    },
+    "Chargement des dossiers partagés…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading shared folders…"
+          }
+        }
+      }
+    },
+    "Chargement des journaux et de la sécurité…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading logs and security…"
+          }
+        }
+      }
+    },
+    "Chargement des paquets…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading packages…"
+          }
+        }
+      }
+    },
+    "Chargement des services de fichiers…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading file services…"
+          }
+        }
+      }
+    },
+    "Chargement des utilisateurs et groupes…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading users and groups…"
+          }
+        }
+      }
+    },
+    "Chargement du stockage…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading storage…"
+          }
+        }
+      }
+    },
+    "Chargements et opérations en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading and operations in progress"
+          }
+        }
+      }
+    },
+    "Ces réglages affectent les annonces supplémentaires de DSM Access. Les libellés et états standards des contrôles restent toujours disponibles à VoiceOver." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These settings affect additional DSM Access announcements. Standard control labels and states always remain available to VoiceOver."
+          }
+        }
+      }
+    },
+    "Choisissez le nom affiché dans DSM Access." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the name shown in DSM Access."
+          }
+        }
+      }
+    },
+    "Cochez les modules à afficher. Faites-les glisser pour les réordonner dans leur section, ou sélectionnez-en un puis utilisez Commande + Flèche vers le haut ou Commande + Flèche vers le bas." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select the modules to show. Drag them to reorder them within their section, or select one and use Command + Up Arrow or Command + Down Arrow."
+          }
+        }
+      }
+    },
+    "Déconnectez-vous avant de supprimer ce NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign out before deleting this NAS"
+          }
+        }
+      }
+    },
+    "Descendre" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Down"
+          }
+        }
+      }
+    },
+    "Gérer les NAS…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage NAS Devices…"
+          }
+        }
+      }
+    },
+    "Masquer automatiquement les fonctionnalités indisponibles sur le NAS connecté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatically hide features unavailable on the connected NAS"
+          }
+        }
+      }
+    },
+    "Modifier la barre latérale…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Sidebar…"
+          }
+        }
+      }
+    },
+    "Monter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move Up"
+          }
+        }
+      }
+    },
+    "NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAS"
+          }
+        }
+      }
+    },
+    "NAS connecté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected NAS"
+          }
+        }
+      }
+    },
+    "NAS enregistrés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved NAS Devices"
+          }
+        }
+      }
+    },
+    "NAS renommé %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAS renamed %@"
+          }
+        }
+      }
+    },
+    "Navigation et changements d’écran" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigation and screen changes"
+          }
+        }
+      }
+    },
+    "Nom du NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NAS name"
+          }
+        }
+      }
+    },
+    "Ordre décroissant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descending order"
+          }
+        }
+      }
+    },
+    "Plus d’options" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More Options"
+          }
+        }
+      }
+    },
+    "Plus d’options pour ce dossier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More options for this folder"
+          }
+        }
+      }
+    },
+    "Réglages de la barre latérale" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sidebar settings"
+          }
+        }
+      }
+    },
+    "Réglages des annonces VoiceOver" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VoiceOver announcement settings"
+          }
+        }
+      }
+    },
+    "Réglages des NAS enregistrés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved NAS settings"
+          }
+        }
+      }
+    },
+    "Renommer le NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename NAS"
+          }
+        }
+      }
+    },
+    "Renommer le NAS…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename NAS…"
+          }
+        }
+      }
+    },
+    "Résultats et opérations terminées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Results and completed operations"
+          }
+        }
+      }
+    },
+    "Supprimer ce NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this NAS"
+          }
+        }
+      }
+    },
     " (alerte)" : {
       "localizations" : {
         "en" : {

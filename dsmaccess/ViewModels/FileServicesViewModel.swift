@@ -66,6 +66,12 @@ final class FileServicesViewModel {
         return String(localized: "Services de fichiers : \(on) activés sur \(services.count)")
     }
 
+    var hasFailures: Bool {
+        states.values.contains {
+            if case .failed = $0 { true } else { false }
+        }
+    }
+
     private func fetch(_ service: FileService) async -> FileServiceState {
         do {
             switch try await session.withClient({ try await $0.fileServiceEnabled(service) }) {

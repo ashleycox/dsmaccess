@@ -73,7 +73,10 @@ struct ShareLinksView: View {
         } else {
             focusStatus = true
         }
-        VoiceOver.announce(shareLinksAnnouncement)
+        VoiceOver.announce(
+            shareLinksAnnouncement,
+            category: vm.shareLinksError == nil ? .result : .error
+        )
     }
 
     private func row(for link: SharingLink) -> some View {

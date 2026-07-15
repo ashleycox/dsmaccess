@@ -19,7 +19,12 @@ enum VoiceOver {
 
     /// Poste une annonce VoiceOver après un court délai, avec la priorité demandée.
     @MainActor
-    static func announce(_ message: String, priority: Priority = .normal) {
+    static func announce(
+        _ message: String,
+        category: AnnouncementCategory = .result,
+        priority: Priority = .normal
+    ) {
+        guard Preferences.enabledAnnouncementCategories.contains(category) else { return }
         pendingAnnouncement?.cancel()
         var text = AttributedString(message)
         switch priority {

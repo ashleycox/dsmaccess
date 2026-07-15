@@ -5,12 +5,16 @@
 //  Fenêtre d'administration principale.
 //
 
+import AppKit
 import SwiftUI
 
 struct MainView: View {
     let session: SessionStore
 
+    @Environment(AppSettings.self) private var settings
     @State private var selection = AppModule.systemInfo
+    @State private var isRenamingNAS = false
+    @State private var proposedNASName = ""
 
     init(session: SessionStore) {
         self.session = session
@@ -25,16 +29,22 @@ struct MainView: View {
         NavigationSplitView {
             List(selection: $selection) {
                 ForEach(AppModuleSection.allCases) { section in
-                    Section(section.title) {
-                        ForEach(section.modules) { module in
-                            let available = module.isAvailable(in: session.capabilities)
-                            Label(module.title, systemImage: module.systemImage)
+                    let modules = visibleModules(in: section)
+                    if !modules.isEmpty {
+                        Section(section.title) {
+                            ForEach(modules) { module in
+                                let available = module.isAvailable(in: session.capabilities)
+                                Label {
+                                    Text(module.title)
+                                } icon: {
+                                    Image(systemName: module.systemImage)
+                                }
                                 .tag(module)
-                                .disabled(!available)
                                 .foregroundStyle(available ? .primary : .secondary)
                                 .help(available ? Text(module.title) : Text(module.unavailableHelp))
-                                .accessibilityValue(available ? "" : String(localized: "Non disponible"))
+                                .accessibilityLabel(sidebarLabel(for: module, available: available))
                                 .accessibilityHint(available ? Text("") : Text(module.unavailableHelp))
+                            }
                         }
                     }
                 }
@@ -44,21 +54,52 @@ struct MainView: View {
             .navigationSplitViewColumnWidth(min: 190, ideal: 220, max: 300)
         } detail: {
             moduleView
-                .toolbar { accountToolbar }
+                .toolbar { commonToolbar }
         }
         .focusedSceneValue(\.selectedModule, $selection)
-        .focusedSceneValue(\.availableModules, availableModules)
+        .focusedSceneValue(\.availableModules, Set(visibleModules))
         .focusedSceneValue(
             \.sessionCommandActions,
-            SessionCommandActions { Task { await logout() } }
+            SessionCommandActions(
+                profiles: session.profiles,
+                activeProfileID: session.activeProfileID,
+                logout: { Task { await logout() } },
+                addNAS: addNAS,
+                renameNAS: beginRenamingNAS,
+                selectNAS: switchNAS
+            )
         )
         .task {
-            VoiceOver.announce(String(localized: "Connecté"))
+            normalizeSelection()
+            VoiceOver.announce(String(localized: "Connecté"), category: .navigation)
+        }
+        .onChange(of: visibleModules) { _, _ in
+            normalizeSelection()
+        }
+        .onChange(of: selection) { _, module in
+            VoiceOver.announce(module.localizedTitle, category: .navigation)
+        }
+        .alert("Renommer le NAS", isPresented: $isRenamingNAS) {
+            TextField("Nom du NAS", text: $proposedNASName)
+            Button("Renommer", action: renameNAS)
+                .disabled(proposedNASName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            Button("Annuler", role: .cancel) { }
+        } message: {
+            Text("Choisissez le nom affiché dans DSM Access.")
         }
     }
 
     @ViewBuilder
     private var moduleView: some View {
+        if !selection.isAvailable(in: session.capabilities) {
+            UnavailableModuleView(module: selection)
+        } else {
+            availableModuleView
+        }
+    }
+
+    @ViewBuilder
+    private var availableModuleView: some View {
         switch selection {
         case .systemInfo:
             SystemInfoView(session: session)
@@ -87,33 +128,108 @@ struct MainView: View {
         }
     }
 
-    private var availableModules: Set<AppModule> {
-        Set(AppModule.allCases.filter { $0.isAvailable(in: session.capabilities) })
+    private var visibleModules: [AppModule] {
+        settings.sidebarOrder.filter { module in
+            settings.enabledSidebarModules.contains(module)
+                && (!settings.automaticallyHideUnavailableModules
+                    || module.isAvailable(in: session.capabilities))
+        }
+    }
+
+    private func visibleModules(in section: AppModuleSection) -> [AppModule] {
+        visibleModules.filter { $0.section == section }
+    }
+
+    private func sidebarLabel(for module: AppModule, available: Bool) -> String {
+        available
+            ? module.localizedTitle
+            : String(localized: "\(module.localizedTitle) (indisponible)")
     }
 
     @ToolbarContentBuilder
-    private var accountToolbar: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
-            Menu {
-                if let endpoint = session.endpoint {
-                    Text("\(endpoint.host):\(endpoint.port)")
-                }
-                Divider()
-                Button("Déconnexion", role: .destructive) {
-                    Task { await logout() }
-                }
-            } label: {
-                Label("Session", systemImage: "person.crop.circle")
+    private var commonToolbar: some ToolbarContent {
+        ToolbarItem(placement: .navigation) {
+            Button("Afficher ou masquer la barre latérale", systemImage: "sidebar.left", action: toggleSidebar)
+                .help("Afficher ou masquer la barre latérale")
+        }
+
+        if session.profiles.count > 1 {
+            ToolbarItem(placement: .primaryAction) {
+                nasSelectionMenu
             }
-            .help("Gérer la session DSM")
         }
     }
 
-    private func logout() async {
-        let endpoint = session.endpoint
-        await session.logout()
-        if let endpoint {
-            CredentialStore.forget(account: Preferences.lastAccount, endpoint: endpoint)
+    private var nasSelectionMenu: some View {
+        Menu {
+            ForEach(session.profiles) { profile in
+                Button {
+                    switchNAS(profile.id)
+                } label: {
+                    if profile.id == session.activeProfileID {
+                        Label(profile.displayName, systemImage: "checkmark")
+                    } else {
+                        Text(profile.displayName)
+                    }
+                }
+            }
+
+            Divider()
+            Button("Ajouter un NAS…", systemImage: "plus", action: addNAS)
+            Button("Renommer le NAS…", action: beginRenamingNAS)
+            Divider()
+            Button("Déconnexion", role: .destructive) {
+                Task { await logout() }
+            }
+        } label: {
+            Label(
+                session.activeProfile?.displayName ?? String(localized: "NAS"),
+                systemImage: "externaldrive.connected.to.line.below"
+            )
         }
+        .help("Changer de NAS")
+    }
+
+    private func normalizeSelection() {
+        guard !visibleModules.contains(selection), let first = visibleModules.first else { return }
+        selection = first
+    }
+
+    private func toggleSidebar() {
+        NSApp.keyWindow?.firstResponder?.tryToPerform(
+            #selector(NSSplitViewController.toggleSidebar(_:)),
+            with: nil
+        )
+    }
+
+    private func addNAS() {
+        session.prepareNewNAS()
+        Task { await session.logout() }
+    }
+
+    private func switchNAS(_ profileID: UUID) {
+        guard profileID != session.activeProfileID else { return }
+        session.prepareConnection(to: profileID)
+        Task { await session.logout() }
+    }
+
+    private func beginRenamingNAS() {
+        guard let profile = session.activeProfile else { return }
+        proposedNASName = profile.displayName
+        isRenamingNAS = true
+    }
+
+    private func renameNAS() {
+        guard let profileID = session.activeProfileID else { return }
+        session.renameProfile(profileID, to: proposedNASName)
+        VoiceOver.announce(
+            String(localized: "NAS renommé \(proposedNASName)"),
+            category: .result
+        )
+    }
+
+    private func logout() async {
+        session.forgetActiveCredentials()
+        await session.logout()
     }
 }

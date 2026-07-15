@@ -18,7 +18,8 @@ struct FileBrowserView: View {
     @State private var shareItem: FileStationItem?
     @State private var infoItem: FileStationItem?
     @State private var showingShareLinks = false
-    @AccessibilityFocusState private var focusBreadcrumb: Bool
+    @State private var tableFocusRequestID = 0
+    @AccessibilityFocusState private var focusEmptyState: Bool
 
     private enum WriteSheet: Identifiable {
         case createFolder
@@ -45,11 +46,14 @@ struct FileBrowserView: View {
             .toolbar { fileToolbar }
             .focusedSceneValue(\.fileCommandActions, commandActions)
             .task {
-                VoiceOver.announce(String(localized: "Chargement des fichiers…"), priority: .low)
+                VoiceOver.announce(
+                    String(localized: "Chargement des fichiers…"),
+                    category: .progress,
+                    priority: .low
+                )
                 await vm.loadCurrent()
                 guard !Task.isCancelled else { return }
                 await vm.loadFavorites()
-                focusBreadcrumb = true
                 announceSummary()
             }
             .task(id: searchText) {
@@ -59,7 +63,11 @@ struct FileBrowserView: View {
                     }
                     try Task.checkCancellation()
                     if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        VoiceOver.announce(String(localized: "Recherche en cours…"), priority: .low)
+                        VoiceOver.announce(
+                            String(localized: "Recherche en cours…"),
+                            category: .progress,
+                            priority: .low
+                        )
                     }
                     await vm.search(searchText)
                     try Task.checkCancellation()
@@ -68,7 +76,11 @@ struct FileBrowserView: View {
                 } catch is CancellationError {
                     return
                 } catch {
-                    VoiceOver.announce(error.localizedDescription, priority: .high)
+                    VoiceOver.announce(
+                        error.localizedDescription,
+                        category: .error,
+                        priority: .high
+                    )
                 }
             }
             .sheet(item: $activeSheet, content: writeSheet)
@@ -117,6 +129,7 @@ struct FileBrowserView: View {
             ModuleErrorView(message: error) {
                 Task { await refresh() }
             }
+            .accessibilityFocused($focusEmptyState)
         } else if vm.sortedItems.isEmpty {
             EmptyModuleView(
                 title: vm.isShowingSearchResults ? "Aucun résultat" : "Dossier vide",
@@ -125,10 +138,12 @@ struct FileBrowserView: View {
                     ? "Aucun élément ne correspond à votre recherche."
                     : "Ce dossier ne contient aucun élément."
             )
+            .accessibilityFocused($focusEmptyState)
         } else {
             FileTableView(
                 items: vm.sortedItems,
                 selection: $selection,
+                focusRequestID: tableFocusRequestID,
                 canWrite: vm.canWrite && !vm.isWorking,
                 showsPath: vm.isShowingSearchResults,
                 canExtract: vm.canExtract,
@@ -166,15 +181,6 @@ struct FileBrowserView: View {
             .accessibilityHint("Remonte au dossier parent")
         }
 
-        ToolbarItem(placement: .principal) {
-            Text(vm.breadcrumb)
-                .font(.headline)
-                .lineLimit(1)
-                .truncationMode(.head)
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityFocused($focusBreadcrumb)
-        }
-
         ToolbarItemGroup(placement: .primaryAction) {
             Menu {
                 Button("Nouveau dossier", systemImage: "folder.badge.plus") {
@@ -189,24 +195,91 @@ struct FileBrowserView: View {
             .disabled(!vm.canWrite || vm.isWorking)
             .help("Ajouter des éléments")
 
-            Button {
-                paste()
-            } label: {
-                Label("Coller", systemImage: "doc.on.clipboard")
+            selectedItemActionsMenu
+            moreOptionsMenu
+        }
+    }
+
+    private var selectedItemActionsMenu: some View {
+        Menu("Actions sur la sélection", systemImage: "slider.horizontal.3") {
+            Button("Ouvrir", systemImage: "arrow.forward", action: activateSelection)
+                .disabled(singleSelectedItem == nil)
+            Button("Télécharger…", systemImage: "square.and.arrow.down") {
+                startDownload(selectedItems)
             }
-            .disabled(!vm.canPaste || vm.isWorking)
-            .help("Coller dans ce dossier")
+            Divider()
+            Button("Copier", systemImage: "doc.on.doc") {
+                VoiceOver.announce(vm.copy(selectedItems), category: .result)
+            }
+            .disabled(!vm.canWrite)
+            Button("Déplacer (couper)", systemImage: "scissors") {
+                VoiceOver.announce(vm.cut(selectedItems), category: .result)
+            }
+            .disabled(!vm.canWrite)
+            Button("Créer un lien de partage", systemImage: "link") {
+                shareItem = singleSelectedItem
+            }
+            .disabled(singleSelectedItem == nil || !vm.canWrite)
+            Button("Renommer…", systemImage: "pencil") {
+                if let item = singleSelectedItem { activeSheet = .rename(item) }
+            }
+            .disabled(singleSelectedItem == nil || !vm.canWrite)
+            Divider()
+            Button("Compresser…", systemImage: "archivebox") {
+                activeSheet = .compress(selectedItems)
+            }
+            .disabled(!vm.canWrite)
+            Button("Extraire", systemImage: "archivebox.fill") {
+                if let item = singleSelectedItem { extract(item) }
+            }
+            .disabled(singleSelectedItem.map(vm.canExtract) != true || !vm.canWrite)
+            Button("Supprimer…", systemImage: "trash", role: .destructive) {
+                pendingDeleteItems = selectedItems
+            }
+            .disabled(!vm.canWrite)
+            Divider()
+            Button("Lire les informations", systemImage: "info.circle") {
+                infoItem = singleSelectedItem
+            }
+            .disabled(singleSelectedItem == nil)
+        }
+        .disabled(selectedItems.isEmpty || vm.isWorking)
+        .help("Actions sur les éléments sélectionnés")
+    }
+
+    private var moreOptionsMenu: some View {
+        Menu("Plus d’options", systemImage: "ellipsis.circle") {
+            Button("Coller", systemImage: "doc.on.clipboard", action: paste)
+                .disabled(!vm.canPaste || vm.isWorking)
 
             favoritesMenu
-            sortMenu
 
-            Button {
+            Button("Liens de partage", systemImage: "link") {
                 showingShareLinks = true
-            } label: {
-                Label("Liens de partage", systemImage: "link")
             }
-            .help("Gérer les liens de partage")
+
+            Divider()
+            Section("Trier par") {
+                ForEach(FileBrowserViewModel.SortMode.allCases) { mode in
+                    Button {
+                        vm.sortMode = mode
+                    } label: {
+                        if vm.sortMode == mode {
+                            Label(mode.title, systemImage: "checkmark")
+                        } else {
+                            Text(mode.title)
+                        }
+                    }
+                }
+            }
+            Button(
+                vm.sortAscending ? "Ordre décroissant" : "Ordre croissant",
+                systemImage: vm.sortAscending ? "arrow.down" : "arrow.up"
+            ) {
+                vm.sortAscending.toggle()
+            }
         }
+        .help("Plus d’options pour ce dossier")
     }
 
     private var favoritesMenu: some View {
@@ -247,21 +320,6 @@ struct FileBrowserView: View {
         .help("Favoris File Station")
     }
 
-    private var sortMenu: some View {
-        Menu {
-            Picker("Trier par", selection: sortModeBinding) {
-                ForEach(FileBrowserViewModel.SortMode.allCases) { mode in
-                    Text(mode.title).tag(mode)
-                }
-            }
-            Divider()
-            Toggle("Ordre croissant", isOn: sortAscendingBinding)
-        } label: {
-            Label("Trier", systemImage: "arrow.up.arrow.down")
-        }
-        .help("Options de tri")
-    }
-
     @ViewBuilder
     private func writeSheet(_ sheet: WriteSheet) -> some View {
         switch sheet {
@@ -272,7 +330,11 @@ struct FileBrowserView: View {
                 confirmLabel: "Créer",
                 announcement: String(localized: "Créer un dossier")
             ) { name in
-                VoiceOver.announce(String(localized: "Création du dossier en cours…"), priority: .low)
+                VoiceOver.announce(
+                    String(localized: "Création du dossier en cours…"),
+                    category: .progress,
+                    priority: .low
+                )
                 Task {
                     let message = await vm.createFolder(named: name)
                     VoiceOver.announce(message, priority: .high)
@@ -286,7 +348,11 @@ struct FileBrowserView: View {
                 announcement: String(localized: "Renommer « \(item.name) »"),
                 initialName: item.name
             ) { name in
-                VoiceOver.announce(String(localized: "Modification du nom en cours…"), priority: .low)
+                VoiceOver.announce(
+                    String(localized: "Modification du nom en cours…"),
+                    category: .progress,
+                    priority: .low
+                )
                 Task {
                     let message = await vm.rename(item, to: name)
                     selection = [item.path.deletingLastNASPathComponent.appendingNASPathComponent(name)]
@@ -301,7 +367,11 @@ struct FileBrowserView: View {
                 announcement: String(localized: "Créer une archive"),
                 initialName: suggestedArchiveName(for: items)
             ) { name in
-                VoiceOver.announce(String(localized: "Compression en cours…"), priority: .low)
+                VoiceOver.announce(
+                    String(localized: "Compression en cours…"),
+                    category: .progress,
+                    priority: .low
+                )
                 Task {
                     let message = await vm.compress(items, archiveName: name)
                     selection.removeAll()
@@ -342,14 +412,6 @@ struct FileBrowserView: View {
 
     private var singleSelectedItem: FileStationItem? {
         selectedItems.count == 1 ? selectedItems[0] : nil
-    }
-
-    private var sortModeBinding: Binding<FileBrowserViewModel.SortMode> {
-        Binding(get: { vm.sortMode }, set: { vm.sortMode = $0 })
-    }
-
-    private var sortAscendingBinding: Binding<Bool> {
-        Binding(get: { vm.sortAscending }, set: { vm.sortAscending = $0 })
     }
 
     private var progressLabel: String {
@@ -406,7 +468,11 @@ struct FileBrowserView: View {
     }
 
     private func paste() {
-        VoiceOver.announce(String(localized: "Collage en cours…"), priority: .low)
+        VoiceOver.announce(
+            String(localized: "Collage en cours…"),
+            category: .progress,
+            priority: .low
+        )
         Task {
             let message = await vm.paste()
             selection.removeAll()
@@ -415,7 +481,11 @@ struct FileBrowserView: View {
     }
 
     private func extract(_ item: FileStationItem) {
-        VoiceOver.announce(String(localized: "Extraction en cours…"), priority: .low)
+        VoiceOver.announce(
+            String(localized: "Extraction en cours…"),
+            category: .progress,
+            priority: .low
+        )
         Task {
             let message = await vm.extract(item)
             selection.removeAll()
@@ -430,7 +500,11 @@ struct FileBrowserView: View {
             panel.nameFieldStringValue = vm.suggestedFilename(for: item)
             panel.canCreateDirectories = true
             guard panel.runModal() == .OK, let url = panel.url else { return }
-            VoiceOver.announce(String(localized: "Téléchargement en cours…"), priority: .low)
+            VoiceOver.announce(
+                String(localized: "Téléchargement en cours…"),
+                category: .progress,
+                priority: .low
+            )
             Task {
                 let message = await vm.download(item, to: url)
                 VoiceOver.announce(message, priority: .high)
@@ -446,7 +520,11 @@ struct FileBrowserView: View {
         panel.prompt = String(localized: "Choisir")
         panel.message = String(localized: "Choisissez le dossier de destination des téléchargements.")
         guard panel.runModal() == .OK, let directory = panel.url else { return }
-        VoiceOver.announce(String(localized: "Téléchargements en cours…"), priority: .low)
+        VoiceOver.announce(
+            String(localized: "Téléchargements en cours…"),
+            category: .progress,
+            priority: .low
+        )
         Task {
             let message = await vm.download(items, to: directory)
             VoiceOver.announce(message, priority: .high)
@@ -461,7 +539,11 @@ struct FileBrowserView: View {
         panel.allowsMultipleSelection = true
         panel.prompt = String(localized: "Envoyer")
         guard panel.runModal() == .OK, !panel.urls.isEmpty else { return }
-        VoiceOver.announce(String(localized: "Envoi en cours…"), priority: .low)
+        VoiceOver.announce(
+            String(localized: "Envoi en cours…"),
+            category: .progress,
+            priority: .low
+        )
         Task {
             let message = await vm.upload(fileURLs: panel.urls)
             VoiceOver.announce(message, priority: .high)
@@ -476,13 +558,25 @@ struct FileBrowserView: View {
     }
 
     private func settleAfterNavigation() {
-        selection.removeAll()
-        focusBreadcrumb = true
+        if vm.errorMessage != nil {
+            selection.removeAll()
+            focusEmptyState = true
+        } else if let firstItem = vm.sortedItems.first {
+            focusEmptyState = false
+            selection = [firstItem.path]
+            tableFocusRequestID += 1
+        } else {
+            selection.removeAll()
+            focusEmptyState = true
+        }
         announceSummary()
     }
 
     private func announceSummary() {
-        VoiceOver.announce(vm.summary)
+        VoiceOver.announce(
+            vm.summary,
+            category: vm.errorMessage == nil ? .result : .error
+        )
     }
 }
 

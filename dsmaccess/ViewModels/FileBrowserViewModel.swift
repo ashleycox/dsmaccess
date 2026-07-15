@@ -176,8 +176,6 @@ final class FileBrowserViewModel {
         guard item.isdir else { return }
         searchQuery = ""
         stack.append(Level(name: item.name, path: item.path))
-        directoryItems = []
-        items = []
         await loadCurrent()
     }
 
@@ -188,8 +186,6 @@ final class FileBrowserViewModel {
             Level(name: String(localized: "Fichiers"), path: nil),
             Level(name: favorite.name, path: favorite.path),
         ]
-        directoryItems = []
-        items = []
         await loadCurrent()
     }
 
@@ -197,8 +193,6 @@ final class FileBrowserViewModel {
         guard canGoUp else { return }
         searchQuery = ""
         stack.removeLast()
-        directoryItems = []
-        items = []
         await loadCurrent()
     }
 

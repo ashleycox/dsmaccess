@@ -65,7 +65,10 @@ struct LoginView: View {
         .padding(28)
         .task {
             focusRestoring = true
-            VoiceOver.announce(String(localized: "Reconnexion en cours"))
+            VoiceOver.announce(
+                String(localized: "Reconnexion en cours"),
+                category: .progress
+            )
         }
     }
 
@@ -144,19 +147,22 @@ struct LoginView: View {
         }
         .onChange(of: vm.state) { _, newValue in
             if newValue == .connecting {
-                AccessibilityNotification.Announcement(String(localized: "Connexion en cours")).post()
+                VoiceOver.announce(
+                    String(localized: "Connexion en cours"),
+                    category: .progress
+                )
             }
         }
         .onChange(of: vm.errorMessage) { _, newValue in
             if let newValue {
-                AccessibilityNotification.Announcement(newValue).post()
+                VoiceOver.announce(newValue, category: .error, priority: .high)
                 focusError = true
             }
         }
         .task {
             if let error = vm.errorMessage {
                 focusError = true
-                VoiceOver.announce(error)
+                VoiceOver.announce(error, category: .error, priority: .high)
             } else {
                 hostFocused = true
                 focusHost = true

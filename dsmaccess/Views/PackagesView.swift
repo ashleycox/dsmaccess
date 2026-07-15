@@ -196,11 +196,17 @@ struct PackagesView: View {
     }
 
     private func load() async {
-        focusContent = true
+        VoiceOver.announce(
+            String(localized: "Chargement des paquets…"),
+            category: .progress,
+            priority: .low
+        )
         await vm.load()
         guard !Task.isCancelled else { return }
-        focusContent = true
-        VoiceOver.announce(vm.summary)
+        VoiceOver.announce(
+            vm.summary,
+            category: vm.errorMessage == nil ? .result : .error
+        )
     }
 
     private func uninstallWarning(for package: PackageInfo) -> String {

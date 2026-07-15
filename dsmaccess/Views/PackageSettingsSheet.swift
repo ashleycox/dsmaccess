@@ -144,6 +144,9 @@ struct PackageSettingsSheet: View {
         await vm.load()
         guard !Task.isCancelled else { return }
         if vm.errorMessage != nil { focusStatus = true }
-        VoiceOver.announce(loadAnnouncement)
+        VoiceOver.announce(
+            loadAnnouncement,
+            category: vm.errorMessage == nil ? .result : .error
+        )
     }
 }

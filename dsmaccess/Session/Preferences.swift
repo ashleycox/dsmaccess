@@ -20,6 +20,12 @@ enum Preferences {
         static let lastUseHTTPS = "lastUseHTTPS"
         static let lastAccount = "lastAccount"
         static let rememberPassword = "rememberPassword"
+        static let nasProfiles = "nasProfiles"
+        static let selectedNASProfileID = "selectedNASProfileID"
+        static let enabledAnnouncementCategories = "enabledAnnouncementCategories"
+        static let sidebarOrder = "sidebarOrder"
+        static let enabledSidebarModules = "enabledSidebarModules"
+        static let automaticallyHideUnavailableModules = "automaticallyHideUnavailableModules"
     }
 
     /// Dernière adresse (hôte) du NAS saisie au login.
@@ -56,5 +62,65 @@ enum Preferences {
     static var rememberPassword: Bool {
         get { defaults.bool(forKey: Key.rememberPassword) }
         set { defaults.set(newValue, forKey: Key.rememberPassword) }
+    }
+
+    static var nasProfiles: [NASProfile] {
+        get {
+            guard let data = defaults.data(forKey: Key.nasProfiles),
+                  let profiles = try? JSONDecoder().decode([NASProfile].self, from: data) else {
+                return []
+            }
+            return profiles
+        }
+        set {
+            guard let data = try? JSONEncoder().encode(newValue) else { return }
+            defaults.set(data, forKey: Key.nasProfiles)
+        }
+    }
+
+    static var selectedNASProfileID: UUID? {
+        get {
+            defaults.string(forKey: Key.selectedNASProfileID).flatMap(UUID.init(uuidString:))
+        }
+        set { defaults.set(newValue?.uuidString, forKey: Key.selectedNASProfileID) }
+    }
+
+    static var enabledAnnouncementCategories: Set<AnnouncementCategory> {
+        get {
+            guard let values = defaults.stringArray(forKey: Key.enabledAnnouncementCategories) else {
+                return Set(AnnouncementCategory.allCases)
+            }
+            return Set(values.compactMap(AnnouncementCategory.init(rawValue:)))
+        }
+        set { defaults.set(newValue.map(\.rawValue).sorted(), forKey: Key.enabledAnnouncementCategories) }
+    }
+
+    static var sidebarOrder: [AppModule] {
+        get {
+            let saved = defaults.stringArray(forKey: Key.sidebarOrder) ?? []
+            let restored = saved.compactMap(AppModule.init(rawValue:))
+            return restored + AppModule.allCases.filter { !restored.contains($0) }
+        }
+        set { defaults.set(newValue.map(\.rawValue), forKey: Key.sidebarOrder) }
+    }
+
+    static var enabledSidebarModules: Set<AppModule> {
+        get {
+            guard let values = defaults.stringArray(forKey: Key.enabledSidebarModules) else {
+                return Set(AppModule.allCases)
+            }
+            return Set(values.compactMap(AppModule.init(rawValue:)))
+        }
+        set { defaults.set(newValue.map(\.rawValue).sorted(), forKey: Key.enabledSidebarModules) }
+    }
+
+    static var automaticallyHideUnavailableModules: Bool {
+        get {
+            guard defaults.object(forKey: Key.automaticallyHideUnavailableModules) != nil else {
+                return true
+            }
+            return defaults.bool(forKey: Key.automaticallyHideUnavailableModules)
+        }
+        set { defaults.set(newValue, forKey: Key.automaticallyHideUnavailableModules) }
     }
 }

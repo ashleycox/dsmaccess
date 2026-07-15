@@ -232,11 +232,17 @@ struct DownloadStationView: View {
     private var selectionIsBusy: Bool { !viewModel.busyIDs.isDisjoint(with: selection) }
 
     private func load() async {
-        contentFocused = true
+        VoiceOver.announce(
+            String(localized: "Chargement des téléchargements…"),
+            category: .progress,
+            priority: .low
+        )
         await viewModel.load()
         guard !Task.isCancelled else { return }
-        contentFocused = true
-        VoiceOver.announce(viewModel.summary)
+        VoiceOver.announce(
+            viewModel.summary,
+            category: viewModel.errorMessage == nil ? .result : .error
+        )
     }
 
     private func refreshPeriodically() async {
@@ -371,7 +377,10 @@ private struct CreateDownloadSheet: View {
         .onAppear {
             uriFocused = true
             accessibilityFocused = true
-            VoiceOver.announce(String(localized: "Ajouter un téléchargement"))
+            VoiceOver.announce(
+                String(localized: "Ajouter un téléchargement"),
+                category: .navigation
+            )
         }
     }
 

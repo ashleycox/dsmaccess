@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct SessionCommandActions {
+    let profiles: [NASProfile]
+    let activeProfileID: UUID?
     let logout: () -> Void
+    let addNAS: () -> Void
+    let renameNAS: () -> Void
+    let selectNAS: (UUID) -> Void
 }
 
 struct FileCommandActions {
@@ -80,6 +85,42 @@ struct DSMCommands: Commands {
     @FocusedValue(\.fileCommandActions) private var fileActions
 
     var body: some Commands {
+        CommandMenu("NAS") {
+            if let sessionActions {
+                ForEach(sessionActions.profiles) { profile in
+                    Button {
+                        sessionActions.selectNAS(profile.id)
+                    } label: {
+                        if profile.id == sessionActions.activeProfileID {
+                            Label(profile.displayName, systemImage: "checkmark")
+                        } else {
+                            Text(profile.displayName)
+                        }
+                    }
+                }
+
+                if !sessionActions.profiles.isEmpty {
+                    Divider()
+                }
+                Button("Ajouter un NAS…", action: sessionActions.addNAS)
+                Button("Renommer le NAS…", action: sessionActions.renameNAS)
+                    .disabled(sessionActions.activeProfileID == nil)
+                SettingsLink {
+                    Text("Gérer les NAS…")
+                }
+                Divider()
+                Button("Déconnexion", role: .destructive, action: sessionActions.logout)
+            } else {
+                Button("Ajouter un NAS…") { }
+                    .disabled(true)
+                SettingsLink {
+                    Text("Gérer les NAS…")
+                }
+                Button("Déconnexion", role: .destructive) { }
+                    .disabled(true)
+            }
+        }
+
         CommandMenu("Navigation") {
             ForEach(AppModuleSection.allCases) { section in
                 Section(section.title) {
@@ -97,13 +138,6 @@ struct DSMCommands: Commands {
                     }
                 }
             }
-        }
-
-        CommandGroup(before: .appTermination) {
-            Button("Déconnexion") {
-                sessionActions?.logout()
-            }
-            .disabled(sessionActions == nil)
         }
 
         CommandMenu("Fichiers") {

@@ -271,11 +271,17 @@ struct UsersGroupsView: View {
     }
 
     private func load() async {
-        contentFocused = true
+        VoiceOver.announce(
+            String(localized: "Chargement des utilisateurs et groupes…"),
+            category: .progress,
+            priority: .low
+        )
         await viewModel.load()
         guard !Task.isCancelled else { return }
-        contentFocused = true
-        VoiceOver.announce(viewModel.summary)
+        VoiceOver.announce(
+            viewModel.summary,
+            category: viewModel.errorMessage == nil ? .result : .error
+        )
     }
 
     private func announce(_ message: String) async {
@@ -344,7 +350,10 @@ private struct CreateUserSheet: View {
         .onAppear {
             nameFocused = true
             accessibilityFocused = true
-            VoiceOver.announce(String(localized: "Créer un utilisateur"))
+            VoiceOver.announce(
+                String(localized: "Créer un utilisateur"),
+                category: .navigation
+            )
         }
     }
 
@@ -412,7 +421,10 @@ private struct CreateGroupSheet: View {
         .onAppear {
             nameFocused = true
             accessibilityFocused = true
-            VoiceOver.announce(String(localized: "Créer un groupe"))
+            VoiceOver.announce(
+                String(localized: "Créer un groupe"),
+                category: .navigation
+            )
         }
     }
 }
@@ -461,7 +473,10 @@ private struct AccountDeletionSheet: View {
         .onAppear {
             fieldFocused = true
             accessibilityFocused = true
-            VoiceOver.announce(String(localized: "Confirmez la suppression en retapant le nom."))
+            VoiceOver.announce(
+                String(localized: "Confirmez la suppression en retapant le nom."),
+                category: .navigation
+            )
         }
     }
 

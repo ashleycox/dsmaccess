@@ -94,7 +94,10 @@ struct FileInfoSheet: View {
         .frame(minHeight: 430)
         .onAppear {
             focusTitle = true
-            VoiceOver.announce(String(localized: "Informations sur \(item.name)"))
+            VoiceOver.announce(
+                String(localized: "Informations sur \(item.name)"),
+                category: .navigation
+            )
         }
     }
 

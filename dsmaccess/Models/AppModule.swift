@@ -30,7 +30,7 @@ struct AppModuleShortcut {
     let modifiers: EventModifiers
 }
 
-enum AppModule: String, CaseIterable, Identifiable {
+enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
     case systemInfo
     case storage
     case logsSecurity
@@ -69,6 +69,23 @@ enum AppModule: String, CaseIterable, Identifiable {
         case .containers: "Conteneurs"
         case .virtualMachines: "Machines virtuelles"
         case .surveillance: "Surveillance Station"
+        }
+    }
+
+    var localizedTitle: String {
+        switch self {
+        case .systemInfo: String(localized: "Votre NAS")
+        case .storage: String(localized: "Stockage")
+        case .logsSecurity: String(localized: "Journaux et sécurité")
+        case .files: String(localized: "Fichiers")
+        case .shares: String(localized: "Dossiers partagés")
+        case .downloads: String(localized: "Download Station")
+        case .usersGroups: String(localized: "Utilisateurs et groupes")
+        case .fileServices: String(localized: "Services de fichiers")
+        case .packages: String(localized: "Centre de paquets")
+        case .containers: String(localized: "Conteneurs")
+        case .virtualMachines: String(localized: "Machines virtuelles")
+        case .surveillance: String(localized: "Surveillance Station")
         }
     }
 

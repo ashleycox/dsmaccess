@@ -51,14 +51,17 @@ final class SystemResourcesViewModel {
             }
         }
         if announce, generation == loadGeneration {
-            VoiceOver.announce(summary, priority: .low)
+            VoiceOver.announce(summary, category: .result, priority: .low)
         }
     }
 
     // MARK: - Actualisation automatique
 
     private func startAutoRefresh() {
-        VoiceOver.announce(String(localized: "Actualisation automatique activée"))
+        VoiceOver.announce(
+            String(localized: "Actualisation automatique activée"),
+            category: .automaticRefresh
+        )
         refreshTask?.cancel()
         refreshTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -73,7 +76,10 @@ final class SystemResourcesViewModel {
         refreshTask?.cancel()
         refreshTask = nil
         if announce {
-            VoiceOver.announce(String(localized: "Actualisation automatique désactivée"))
+            VoiceOver.announce(
+                String(localized: "Actualisation automatique désactivée"),
+                category: .automaticRefresh
+            )
         }
     }
 

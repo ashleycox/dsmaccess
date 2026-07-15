@@ -47,15 +47,18 @@ final class ConnectionViewModel {
 
     init(session: SessionStore) {
         self.session = session
-        let https = Preferences.lastUseHTTPS
-        let host = Preferences.lastHost
-        let account = Preferences.lastAccount
-        let effectivePort = Preferences.lastPort ?? DSMEndpoint.defaultPort(useHTTPS: https)
+        let profile = session.connectionProfile
+        let https = profile?.useHTTPS ?? Preferences.lastUseHTTPS
+        let host = profile?.host ?? Preferences.lastHost
+        let account = profile?.account ?? Preferences.lastAccount
+        let effectivePort = profile?.port
+            ?? Preferences.lastPort
+            ?? DSMEndpoint.defaultPort(useHTTPS: https)
         self.host = host
         self.account = account
         self.useHTTPS = https
         self.portText = String(effectivePort)
-        self.rememberPassword = Preferences.rememberPassword
+        self.rememberPassword = profile?.remembersPassword ?? Preferences.rememberPassword
         self.errorMessage = session.consumeDisconnectionMessage()
         // Reconnexion possible au lancement si un mot de passe est mémorisé pour ce NAS.
         if Preferences.rememberPassword, !host.isEmpty, !account.isEmpty {
@@ -260,7 +263,9 @@ final class ConnectionViewModel {
         session.establish(
             endpoint: endpoint,
             client: client,
-            capabilities: capabilities
+            capabilities: capabilities,
+            account: account,
+            remembersPassword: rememberPassword
         )
         // RootView bascule automatiquement vers l'écran de contenu.
         state = .editing

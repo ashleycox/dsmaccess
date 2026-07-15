@@ -13,6 +13,7 @@ import SwiftUI
 struct FileTableView: NSViewRepresentable {
     var items: [FileStationItem]
     @Binding var selection: Set<String>
+    var focusRequestID: Int
     var canWrite: Bool
     var showsPath: Bool
     var canExtract: (FileStationItem) -> Bool
@@ -82,6 +83,14 @@ struct FileTableView: NSViewRepresentable {
         }
         let selectedRows = IndexSet(items.indices.filter { selection.contains(items[$0].path) })
         table.selectRowIndexes(selectedRows, byExtendingSelection: false)
+        if context.coordinator.lastFocusRequestID != focusRequestID {
+            context.coordinator.lastFocusRequestID = focusRequestID
+            if let row = selectedRows.first,
+               let cell = table.view(atColumn: 0, row: row, makeIfNecessary: true) {
+                table.window?.makeFirstResponder(table)
+                NSAccessibility.post(element: cell, notification: .focusedUIElementChanged)
+            }
+        }
         context.coordinator.isApplyingSelection = false
     }
 
@@ -90,6 +99,7 @@ struct FileTableView: NSViewRepresentable {
         weak var tableView: NSTableView?
         var isApplyingSelection = false
         var rowPresentationKeys = [String]()
+        var lastFocusRequestID = 0
 
         init(_ parent: FileTableView) { self.parent = parent }
 

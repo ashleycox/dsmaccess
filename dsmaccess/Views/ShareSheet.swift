@@ -96,7 +96,10 @@ struct ShareSheet: View {
         }
         .onAppear {
             passwordFocused = true
-            VoiceOver.announce(String(localized: "Créer un lien de partage"))
+            VoiceOver.announce(
+                String(localized: "Créer un lien de partage"),
+                category: .navigation
+            )
         }
     }
 
@@ -124,7 +127,10 @@ struct ShareSheet: View {
         .onAppear {
             copyToClipboard(url, announce: false)
             focusURL = true
-            VoiceOver.announce(String(localized: "Lien de partage créé et copié"))
+            VoiceOver.announce(
+                String(localized: "Lien de partage créé et copié"),
+                category: .result
+            )
         }
     }
 
@@ -137,7 +143,7 @@ struct ShareSheet: View {
         case .failure(let message):
             errorMessage = message
             focusError = true
-            VoiceOver.announce(message, priority: .high)
+            VoiceOver.announce(message, category: .error, priority: .high)
         }
         isCreating = false
     }
@@ -145,7 +151,7 @@ struct ShareSheet: View {
     /// Convertit l'expiration choisie en date « AAAA-MM-JJ » (nil = jamais).
     private func expiryDate(for expiry: Expiry) -> String? {
         guard let days = expiry.days,
-              let date = Calendar.current.date(byAdding: .day, value: days, to: Date()) else { return nil }
+              let date = Calendar.current.date(byAdding: .day, value: days, to: .now) else { return nil }
         return date.formatted(.iso8601.year().month().day().dateSeparator(.dash))
     }
 

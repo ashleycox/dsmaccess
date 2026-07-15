@@ -133,11 +133,17 @@ struct SharesView: View {
     }
 
     private func load() async {
-        focusContent = true
+        VoiceOver.announce(
+            String(localized: "Chargement des dossiers partagés…"),
+            category: .progress,
+            priority: .low
+        )
         await vm.load()
         guard !Task.isCancelled else { return }
-        focusContent = true
-        VoiceOver.announce(vm.summary)
+        VoiceOver.announce(
+            vm.summary,
+            category: vm.errorMessage == nil ? .result : .error
+        )
     }
 }
 
@@ -203,7 +209,10 @@ private struct CreateShareSheet: View {
         .onAppear {
             nameFocused = true
             a11yFocused = true
-            VoiceOver.announce(String(localized: "Créer un dossier partagé"))
+            VoiceOver.announce(
+                String(localized: "Créer un dossier partagé"),
+                category: .navigation
+            )
         }
     }
 
@@ -259,7 +268,10 @@ private struct DeleteShareSheet: View {
         .onAppear {
             fieldFocused = true
             a11yFocused = true
-            VoiceOver.announce(String(localized: "Confirmez la suppression en retapant le nom du dossier partagé."))
+            VoiceOver.announce(
+                String(localized: "Confirmez la suppression en retapant le nom du dossier partagé."),
+                category: .navigation
+            )
         }
     }
 }

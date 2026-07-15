@@ -19,23 +19,56 @@ final class SessionStore {
     private var generation = 0
     /// API réellement exposées par le DSM et ses paquets installés.
     private(set) var capabilities = DSMCapabilities()
+    /// NAS enregistrés. Les mots de passe restent exclusivement dans le Trousseau.
+    private(set) var profiles: [NASProfile]
+    private(set) var activeProfileID: UUID?
+    private var requestedProfileID: UUID?
+    private var requestsBlankConnection = false
 
     /// Motif d'une déconnexion imposée, consommé par l'écran de connexion.
     private(set) var disconnectionMessage: String?
 
     var isLoggedIn: Bool { client != nil }
 
+    var activeProfile: NASProfile? {
+        guard let activeProfileID else { return nil }
+        return profiles.first { $0.id == activeProfileID }
+    }
+
+    var connectionProfile: NASProfile? {
+        guard !requestsBlankConnection else { return nil }
+        let profileID = requestedProfileID ?? Preferences.selectedNASProfileID
+        guard let profileID else { return nil }
+        return profiles.first { $0.id == profileID }
+    }
+
+    init() {
+        profiles = Preferences.nasProfiles
+        activeProfileID = nil
+        requestedProfileID = Preferences.selectedNASProfileID
+        if let profile = profiles.first(where: { $0.id == requestedProfileID }) {
+            persistLegacyConnectionPreferences(for: profile)
+        }
+    }
+
     /// Enregistre une session ouverte après un login réussi.
     func establish(
         endpoint: DSMEndpoint,
         client: DSMClientProtocol,
-        capabilities: DSMCapabilities
+        capabilities: DSMCapabilities,
+        account: String,
+        remembersPassword: Bool
     ) {
         self.endpoint = endpoint
         self.client = client
         self.capabilities = capabilities
         generation += 1
         disconnectionMessage = nil
+        registerProfile(
+            endpoint: endpoint,
+            account: account,
+            remembersPassword: remembersPassword
+        )
     }
 
     /// Exécute toute opération avec le client de la session et invalide l'ensemble de
@@ -71,6 +104,68 @@ final class SessionStore {
         try? await activeClient?.logout()
     }
 
+    func prepareConnection(to profileID: UUID) {
+        guard let profile = profiles.first(where: { $0.id == profileID }) else { return }
+        requestedProfileID = profileID
+        requestsBlankConnection = false
+        persistLegacyConnectionPreferences(for: profile)
+        Preferences.selectedNASProfileID = profileID
+    }
+
+    func prepareNewNAS() {
+        requestedProfileID = nil
+        requestsBlankConnection = true
+        Preferences.lastHost = ""
+        Preferences.lastPort = nil
+        Preferences.lastUseHTTPS = true
+        Preferences.lastAccount = ""
+        Preferences.rememberPassword = false
+    }
+
+    func renameProfile(_ profileID: UUID, to proposedName: String) {
+        let name = proposedName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty, let index = profiles.firstIndex(where: { $0.id == profileID }) else {
+            return
+        }
+        profiles[index].name = name
+        persistProfiles()
+    }
+
+    func updateActiveProfileDefaultName(to modelName: String) {
+        let name = modelName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty,
+              let activeProfileID,
+              let index = profiles.firstIndex(where: { $0.id == activeProfileID }),
+              profiles[index].name == profiles[index].host else { return }
+        profiles[index].name = name
+        persistProfiles()
+    }
+
+    func removeProfile(_ profileID: UUID) {
+        guard profileID != activeProfileID,
+              let profile = profiles.first(where: { $0.id == profileID }) else { return }
+        CredentialStore.forget(account: profile.account, endpoint: profile.endpoint)
+        profiles.removeAll { $0.id == profileID }
+        if requestedProfileID == profileID { requestedProfileID = nil }
+        if Preferences.selectedNASProfileID == profileID {
+            Preferences.selectedNASProfileID = profiles.first?.id
+        }
+        persistProfiles()
+        Preferences.rememberPassword = activeProfile?.remembersPassword
+            ?? connectionProfile?.remembersPassword
+            ?? false
+    }
+
+    func forgetActiveCredentials() {
+        guard let activeProfileID,
+              let index = profiles.firstIndex(where: { $0.id == activeProfileID }) else { return }
+        let profile = profiles[index]
+        CredentialStore.forget(account: profile.account, endpoint: profile.endpoint)
+        profiles[index].remembersPassword = false
+        Preferences.rememberPassword = false
+        persistProfiles()
+    }
+
     func consumeDisconnectionMessage() -> String? {
         defer { disconnectionMessage = nil }
         return disconnectionMessage
@@ -82,10 +177,62 @@ final class SessionStore {
         self.endpoint = nil
         self.client = nil
         capabilities = DSMCapabilities()
+        activeProfileID = nil
     }
 
     private func expireSession() {
         disconnectionMessage = DSMError.sessionExpired.errorDescription
         clear()
+    }
+
+    private func registerProfile(
+        endpoint: DSMEndpoint,
+        account: String,
+        remembersPassword: Bool
+    ) {
+        let existingID = requestedProfileID ?? profiles.first {
+            $0.endpoint == endpoint && $0.account == account
+        }?.id
+
+        if let existingID,
+           let index = profiles.firstIndex(where: { $0.id == existingID }) {
+            profiles[index].host = endpoint.host
+            profiles[index].port = endpoint.port
+            profiles[index].useHTTPS = endpoint.useHTTPS
+            profiles[index].account = account
+            profiles[index].remembersPassword = remembersPassword
+            activeProfileID = existingID
+        } else {
+            let profile = NASProfile(
+                name: endpoint.host,
+                host: endpoint.host,
+                port: endpoint.port,
+                useHTTPS: endpoint.useHTTPS,
+                account: account,
+                remembersPassword: remembersPassword
+            )
+            profiles.append(profile)
+            activeProfileID = profile.id
+        }
+
+        requestedProfileID = nil
+        requestsBlankConnection = false
+        Preferences.selectedNASProfileID = activeProfileID
+        persistProfiles()
+    }
+
+    private func persistProfiles() {
+        profiles.sort {
+            $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending
+        }
+        Preferences.nasProfiles = profiles
+    }
+
+    private func persistLegacyConnectionPreferences(for profile: NASProfile) {
+        Preferences.lastHost = profile.host
+        Preferences.lastPort = profile.port
+        Preferences.lastUseHTTPS = profile.useHTTPS
+        Preferences.lastAccount = profile.account
+        Preferences.rememberPassword = profile.remembersPassword
     }
 }

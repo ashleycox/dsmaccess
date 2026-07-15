@@ -67,7 +67,7 @@ struct NameEntrySheet: View {
         .onAppear {
             fieldFocused = true
             a11yFocused = true
-            VoiceOver.announce(announcement)
+            VoiceOver.announce(announcement, category: .navigation)
         }
     }
 

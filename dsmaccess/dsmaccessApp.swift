@@ -11,6 +11,7 @@ import SwiftUI
 struct dsmaccessApp: App {
     /// État de session partagé pour toute l'app (SID courant, hôte, connecté ou non).
     @State private var session = SessionStore()
+    @State private var settings = AppSettings()
     /// Updater Sparkle, propriété de l'app pour toute sa durée de vie.
     @StateObject private var updater = UpdaterViewModel()
 
@@ -18,6 +19,7 @@ struct dsmaccessApp: App {
         WindowGroup {
             RootView()
                 .environment(session)
+                .environment(settings)
                 .frame(minWidth: 800, idealWidth: 960, minHeight: 520, idealHeight: 640)
         }
         .defaultSize(width: 1_100, height: 720)
@@ -27,6 +29,12 @@ struct dsmaccessApp: App {
             CommandGroup(after: .appInfo) {
                 CheckForUpdatesView(updater: updater)
             }
+        }
+
+        Settings {
+            AppSettingsView(settings: settings, session: session)
+                .environment(settings)
+                .environment(session)
         }
     }
 }

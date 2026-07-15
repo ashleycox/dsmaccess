@@ -80,7 +80,9 @@ final class dsmaccessUITests: XCTestCase {
             "-lastHost", "",
             "-lastAccount", "",
             "-lastUseHTTPS", "YES",
-            "-rememberPassword", "NO"
+            "-rememberPassword", "NO",
+            "-nasProfiles", "",
+            "-selectedNASProfileID", ""
         ]
         return application
     }
