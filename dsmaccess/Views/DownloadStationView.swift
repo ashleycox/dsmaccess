@@ -26,7 +26,7 @@ struct DownloadStationView: View {
             .searchable(text: $searchText, prompt: "Rechercher un téléchargement")
             .toolbar { toolbar }
             .safeAreaInset(edge: .bottom) { statusBar }
-            .task { await load() }
+            .task { await load(restoresInitialFocus: true) }
             .task(id: autoRefresh) { await refreshPeriodically() }
             .sheet(isPresented: $showCreateSheet) {
                 CreateDownloadSheet { uri, destination in
@@ -251,7 +251,7 @@ struct DownloadStationView: View {
     private var selectionCanResume: Bool { selectedTasks.contains(where: \.canResume) }
     private var selectionIsBusy: Bool { !viewModel.busyIDs.isDisjoint(with: selection) }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des téléchargements…"),
             category: .progress,
@@ -259,6 +259,9 @@ struct DownloadStationView: View {
         )
         await viewModel.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { contentFocused = true }
+        }
         VoiceOver.announce(
             viewModel.summary,
             category: viewModel.errorMessage == nil ? .result : .error

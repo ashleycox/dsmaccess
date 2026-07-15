@@ -26,7 +26,7 @@ struct VirtualMachinesView: View {
             .searchable(text: $searchText, prompt: "Rechercher une machine virtuelle")
             .toolbar { toolbar }
             .safeAreaInset(edge: .bottom) { statusBar }
-            .task { await load() }
+            .task { await load(restoresInitialFocus: true) }
             .task(id: autoRefresh) { await refreshPeriodically() }
             .inspector(isPresented: $showInspector) { inspector }
             .confirmationDialog(
@@ -292,7 +292,7 @@ struct VirtualMachinesView: View {
         return viewModel.busyIDs.contains(selection)
     }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des machines virtuelles…"),
             category: .progress,
@@ -300,6 +300,9 @@ struct VirtualMachinesView: View {
         )
         await viewModel.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { contentFocused = true }
+        }
         VoiceOver.announce(
             viewModel.summary,
             category: viewModel.errorMessage == nil ? .result : .error

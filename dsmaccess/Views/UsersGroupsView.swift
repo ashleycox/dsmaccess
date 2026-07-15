@@ -33,7 +33,7 @@ struct UsersGroupsView: View {
             .navigationTitle("Utilisateurs et groupes")
             .searchable(text: $searchText, prompt: "Rechercher un compte ou un groupe")
             .toolbar { toolbar }
-            .task { await load() }
+            .task { await load(restoresInitialFocus: true) }
             .sheet(isPresented: $showCreateUser) {
                 CreateUserSheet(groups: viewModel.groups) { draft in
                     Task { await announce(viewModel.createUser(draft)) }
@@ -282,7 +282,7 @@ struct UsersGroupsView: View {
         return parts.joined(separator: ", ")
     }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des utilisateurs et groupes…"),
             category: .progress,
@@ -290,6 +290,9 @@ struct UsersGroupsView: View {
         )
         await viewModel.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { contentFocused = true }
+        }
         VoiceOver.announce(
             viewModel.summary,
             category: viewModel.errorMessage == nil ? .result : .error

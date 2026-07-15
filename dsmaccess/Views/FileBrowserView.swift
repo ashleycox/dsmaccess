@@ -54,6 +54,7 @@ struct FileBrowserView: View {
                 await vm.loadCurrent()
                 guard !Task.isCancelled else { return }
                 await vm.loadFavorites()
+                VoiceOver.restoreContentFocusIfNeeded(restoreInitialContentFocus)
                 announceSummary()
             }
             .task(id: searchText) {
@@ -597,6 +598,16 @@ struct FileBrowserView: View {
             focusEmptyState = true
         }
         announceSummary()
+    }
+
+    private func restoreInitialContentFocus() {
+        if vm.errorMessage != nil || vm.sortedItems.isEmpty {
+            focusEmptyState = true
+        } else if let firstItem = vm.sortedItems.first {
+            focusEmptyState = false
+            selection = [firstItem.path]
+            tableFocusRequestID += 1
+        }
     }
 
     private func announceSummary() {

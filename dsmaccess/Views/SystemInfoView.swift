@@ -58,10 +58,10 @@ struct SystemInfoView: View {
                 .help("Actualiser les informations du NAS")
             }
         }
-        .task { await load() }
+        .task { await load(restoresInitialFocus: true) }
     }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des informations…"),
             category: .progress,
@@ -71,6 +71,9 @@ struct SystemInfoView: View {
         guard !Task.isCancelled else { return }
         if let modelName = vm.info?.model {
             session.updateActiveProfileDefaultName(to: modelName)
+        }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { focusContent = true }
         }
         VoiceOver.announce(
             vm.summary,

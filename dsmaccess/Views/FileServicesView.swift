@@ -28,17 +28,7 @@ struct FileServicesView: View {
             }
         }
         .task {
-            VoiceOver.announce(
-                String(localized: "Chargement des services de fichiers…"),
-                category: .progress,
-                priority: .low
-            )
-            await vm.load()
-            guard !Task.isCancelled else { return }
-            VoiceOver.announce(
-                vm.summary,
-                category: vm.hasFailures ? .error : .result
-            )
+            await load(restoresInitialFocus: true)
         }
         .confirmationDialog(
             "Désactiver ce service ?",
@@ -152,19 +142,24 @@ struct FileServicesView: View {
     }
 
     private func reloadAll() {
-        Task {
-            VoiceOver.announce(
-                String(localized: "Chargement des services de fichiers…"),
-                category: .progress,
-                priority: .low
-            )
-            await vm.load()
-            guard !Task.isCancelled else { return }
-            VoiceOver.announce(
-                vm.summary,
-                category: vm.hasFailures ? .error : .result
-            )
+        Task { await load() }
+    }
+
+    private func load(restoresInitialFocus: Bool = false) async {
+        VoiceOver.announce(
+            String(localized: "Chargement des services de fichiers…"),
+            category: .progress,
+            priority: .low
+        )
+        await vm.load()
+        guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { focusContent = true }
         }
+        VoiceOver.announce(
+            vm.summary,
+            category: vm.hasFailures ? .error : .result
+        )
     }
 
     // MARK: - Présentation

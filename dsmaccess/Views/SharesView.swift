@@ -45,7 +45,7 @@ struct SharesView: View {
             }
         }
         .task {
-            await load()
+            await load(restoresInitialFocus: true)
         }
         .sheet(isPresented: $showCreateSheet) {
             CreateShareSheet(volumes: vm.volumes) { name, volume, description in
@@ -137,7 +137,7 @@ struct SharesView: View {
         VoiceOver.announce(String(localized: "Chemin SMB copié"))
     }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des dossiers partagés…"),
             category: .progress,
@@ -145,6 +145,9 @@ struct SharesView: View {
         )
         await vm.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { focusContent = true }
+        }
         VoiceOver.announce(
             vm.summary,
             category: vm.errorMessage == nil ? .result : .error

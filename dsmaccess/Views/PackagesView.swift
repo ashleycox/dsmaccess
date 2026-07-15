@@ -54,7 +54,7 @@ struct PackagesView: View {
             }
         }
         .task {
-            await load()
+            await load(restoresInitialFocus: true)
         }
         .confirmationDialog(
             "Désinstaller ce paquet ?",
@@ -206,7 +206,7 @@ struct PackagesView: View {
         }
     }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des paquets…"),
             category: .progress,
@@ -214,6 +214,9 @@ struct PackagesView: View {
         )
         await vm.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { focusContent = true }
+        }
         VoiceOver.announce(
             vm.summary,
             category: vm.errorMessage == nil ? .result : .error

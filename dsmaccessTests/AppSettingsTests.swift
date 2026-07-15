@@ -24,6 +24,15 @@ struct AppSettingsTests {
         #expect(!Preferences.queueAnnouncements)
     }
 
+    @Test func combinesRapidQueuedAnnouncementsIntoOneUtterance() {
+        let message = VoiceOver.combinedQueuedMessage([
+            "Loading shared folders…",
+            "3 shared folders"
+        ])
+
+        #expect(message == "Loading shared folders… 3 shared folders")
+    }
+
     @Test func reordersSidebarModulesWithinASection() {
         let previousOrder = Preferences.sidebarOrder
         defer { Preferences.sidebarOrder = previousOrder }

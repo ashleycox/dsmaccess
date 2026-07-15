@@ -52,7 +52,7 @@ struct StorageView: View {
                 .help("Actualiser l’état du stockage")
             }
         }
-        .task { await load() }
+        .task { await load(restoresInitialFocus: true) }
     }
 
     private func poolSection(_ pool: StoragePool) -> some View {
@@ -106,7 +106,7 @@ struct StorageView: View {
         }
     }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement du stockage…"),
             category: .progress,
@@ -114,6 +114,9 @@ struct StorageView: View {
         )
         await vm.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { focusContent = true }
+        }
         VoiceOver.announce(
             vm.summary,
             category: vm.errorMessage == nil ? .result : .error

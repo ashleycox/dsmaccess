@@ -83,6 +83,7 @@ final class dsmaccessUITests: XCTestCase {
         XCTAssertTrue(announcementsPane.exists)
         XCTAssertTrue(sidebarPane.exists)
         XCTAssertTrue(nasPane.exists)
+        XCTAssertFalse(app.buttons["Masquer la barre latérale"].exists)
 
         sidebarPane.click()
         XCTAssertTrue(app.checkBoxes["Masquer automatiquement les fonctionnalités indisponibles sur le NAS connecté"].waitForExistence(timeout: 2))

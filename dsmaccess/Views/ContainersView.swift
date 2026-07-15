@@ -25,7 +25,7 @@ struct ContainersView: View {
             .searchable(text: $searchText, prompt: "Rechercher un conteneur")
             .toolbar { toolbar }
             .safeAreaInset(edge: .bottom) { statusBar }
-            .task { await load() }
+            .task { await load(restoresInitialFocus: true) }
             .task(id: autoRefresh) { await refreshPeriodically() }
             .inspector(isPresented: $showInspector) { inspector }
             .onChange(of: selection) {
@@ -305,7 +305,7 @@ struct ContainersView: View {
         return viewModel.busyNames.contains(selectedContainer.name)
     }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des conteneurs…"),
             category: .progress,
@@ -313,6 +313,9 @@ struct ContainersView: View {
         )
         await viewModel.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { contentFocused = true }
+        }
         VoiceOver.announce(
             viewModel.summary,
             category: viewModel.errorMessage == nil ? .result : .error

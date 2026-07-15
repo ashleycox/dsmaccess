@@ -26,7 +26,7 @@ struct SurveillanceView: View {
             .searchable(text: $searchText, prompt: "Rechercher une caméra")
             .toolbar { toolbar }
             .safeAreaInset(edge: .bottom) { statusBar }
-            .task { await load() }
+            .task { await load(restoresInitialFocus: true) }
             .task(id: autoRefresh) { await refreshPeriodically() }
             .inspector(isPresented: $showInspector) { inspector }
             .onChange(of: selection) {
@@ -284,7 +284,7 @@ struct SurveillanceView: View {
     private var selectionCanDisable: Bool { selectedCameras.contains { $0.enabled } }
     private var selectionIsBusy: Bool { !viewModel.busyIDs.isDisjoint(with: selection) }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement de Surveillance Station…"),
             category: .progress,
@@ -292,6 +292,9 @@ struct SurveillanceView: View {
         )
         await viewModel.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { contentFocused = true }
+        }
         VoiceOver.announce(
             viewModel.summary,
             category: viewModel.errorMessage == nil ? .result : .error

@@ -35,7 +35,7 @@ struct LogsSecurityView: View {
             .searchable(text: $searchText, prompt: searchPrompt)
             .toolbar { toolbar }
             .safeAreaInset(edge: .bottom) { statusBar }
-            .task { await load() }
+            .task { await load(restoresInitialFocus: true) }
             .confirmationDialog(
                 "Débloquer cette adresse ?",
                 isPresented: Binding(
@@ -281,7 +281,7 @@ struct LogsSecurityView: View {
             || (entry.category?.localizedStandardContains(searchText) == true)
     }
 
-    private func load() async {
+    private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des journaux et de la sécurité…"),
             category: .progress,
@@ -289,6 +289,9 @@ struct LogsSecurityView: View {
         )
         await viewModel.load()
         guard !Task.isCancelled else { return }
+        if restoresInitialFocus {
+            VoiceOver.restoreContentFocusIfNeeded { contentFocused = true }
+        }
         VoiceOver.announce(
             viewModel.summary,
             category: viewModel.errorMessage == nil ? .result : .error

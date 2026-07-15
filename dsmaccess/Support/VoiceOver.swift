@@ -2,17 +2,17 @@
 //  VoiceOver.swift
 //  dsmaccess
 //
-//  Annonces VoiceOver centralisées. Deux raffinements par rapport à un `.post()` direct :
-//  un léger délai qui évite que l'annonce soit « avalée » quand l'écran change au même
-//  instant, et une priorité de parole (file d'attente vs interruption).
+//  Annonces VoiceOver centralisées. Les annonces rapides sont regroupées en une seule
+//  demande de parole ; les demandes suivantes utilisent la priorité basse native de
+//  macOS pour attendre la fin de la parole en cours.
 //
 
-import SwiftUI
+import AppKit
 
 enum VoiceOver {
     @MainActor private static var pendingAnnouncement: Task<Void, Never>?
-    @MainActor private static var queuedAnnouncements = [AttributedString]()
-    @MainActor private static var queueTask: Task<Void, Never>?
+    @MainActor private static var queuedMessages = [String]()
+    @MainActor private static var queuedBatchTask: Task<Void, Never>?
 
     /// Priorité de l'annonce : `.low` s'insère dans la file, `.high` interrompt la parole en cours.
     enum Priority {
@@ -27,27 +27,18 @@ enum VoiceOver {
         priority: Priority = .normal
     ) {
         guard Preferences.enabledAnnouncementCategories.contains(category) else { return }
-        var text = AttributedString(message)
         if Preferences.queueAnnouncements {
-            // Une priorité basse demande au système de lire cette annonce après celles
-            // déjà en cours, plutôt que d'interrompre la parole VoiceOver.
-            text.accessibilitySpeechAnnouncementPriority = .low
             pendingAnnouncement?.cancel()
             pendingAnnouncement = nil
-            queuedAnnouncements.append(text)
-            startQueueIfNeeded()
+            queuedMessages.append(message)
+            scheduleQueuedBatch()
             return
         }
 
-        queueTask?.cancel()
-        queueTask = nil
-        queuedAnnouncements.removeAll()
+        queuedBatchTask?.cancel()
+        queuedBatchTask = nil
+        queuedMessages.removeAll()
         pendingAnnouncement?.cancel()
-        switch priority {
-        case .low: text.accessibilitySpeechAnnouncementPriority = .low
-        case .normal: text.accessibilitySpeechAnnouncementPriority = .default
-        case .high: text.accessibilitySpeechAnnouncementPriority = .high
-        }
         pendingAnnouncement = Task {
             do {
                 try await Task.sleep(for: .milliseconds(100))
@@ -55,26 +46,75 @@ enum VoiceOver {
                 return
             }
             guard !Task.isCancelled else { return }
-            AccessibilityNotification.Announcement(text).post()
+            post(message, priority: priority)
             pendingAnnouncement = nil
         }
     }
 
     @MainActor
-    private static func startQueueIfNeeded() {
-        guard queueTask == nil else { return }
-        queueTask = Task {
-            while !queuedAnnouncements.isEmpty {
-                do {
-                    try await Task.sleep(for: .milliseconds(100))
-                } catch {
-                    return
-                }
-                guard !Task.isCancelled else { return }
-                let next = queuedAnnouncements.removeFirst()
-                AccessibilityNotification.Announcement(next).post()
+    private static func scheduleQueuedBatch() {
+        queuedBatchTask?.cancel()
+        queuedBatchTask = Task {
+            do {
+                try await Task.sleep(for: .milliseconds(250))
+            } catch {
+                return
             }
-            queueTask = nil
+            guard !Task.isCancelled, !queuedMessages.isEmpty else { return }
+            let message = combinedQueuedMessage(queuedMessages)
+            queuedMessages.removeAll()
+            post(message, priority: .low)
+            queuedBatchTask = nil
+        }
+    }
+
+    /// Une seule notification ne peut pas interrompre l'une de ses propres phrases.
+    /// Le regroupement protège donc les paires rapides « chargement » puis « résultat ».
+    static func combinedQueuedMessage(_ messages: [String]) -> String {
+        messages.joined(separator: " ")
+    }
+
+    /// SwiftUI peut perdre la cible VoiceOver quand un état de chargement est remplacé.
+    /// On ne corrige le focus que si son repli est réellement situé dans la barre d'outils.
+    @MainActor
+    static func restoreContentFocusIfNeeded(_ restore: () -> Void) {
+        guard focusedElementIsInsideToolbar else { return }
+        restore()
+    }
+
+    @MainActor
+    private static func post(_ message: String, priority: Priority) {
+        NSAccessibility.post(
+            element: NSApplication.shared,
+            notification: .announcementRequested,
+            userInfo: [
+                .announcement: message,
+                .priority: priority.accessibilityPriority.rawValue
+            ]
+        )
+    }
+
+    @MainActor
+    private static var focusedElementIsInsideToolbar: Bool {
+        var element: Any? = NSApp.accessibilityFocusedUIElement
+        for _ in 0..<12 {
+            guard let object = element as? NSObject else { return false }
+            if object.value(forKey: "accessibilityRole") as? NSAccessibility.Role == .toolbar {
+                return true
+            }
+            guard let accessibleElement = object as? NSAccessibilityElement else { return false }
+            element = accessibleElement.accessibilityParent()
+        }
+        return false
+    }
+}
+
+private extension VoiceOver.Priority {
+    var accessibilityPriority: NSAccessibilityPriorityLevel {
+        switch self {
+        case .low: .low
+        case .normal: .medium
+        case .high: .high
         }
     }
 }
