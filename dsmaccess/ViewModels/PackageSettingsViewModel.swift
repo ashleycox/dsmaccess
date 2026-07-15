@@ -20,20 +20,26 @@ final class PackageSettingsViewModel {
     var errorMessage: String?
 
     private let session: SessionStore
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
     }
 
     func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         isLoading = true
         errorMessage = nil
+        defer { if generation == loadGeneration { isLoading = false } }
         do {
-            settings = try await session.withClient { try await $0.packageSettings() }
+            let result = try await session.withClient { try await $0.packageSettings() }
+            guard generation == loadGeneration else { return }
+            settings = result
         } catch {
+            guard generation == loadGeneration, !DSMError.isCancellation(error) else { return }
             errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
         }
-        isLoading = false
     }
 
     func setAutoUpdateMode(_ mode: AutoUpdateMode) async -> String {

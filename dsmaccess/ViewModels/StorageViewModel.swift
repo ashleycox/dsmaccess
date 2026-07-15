@@ -16,6 +16,7 @@ final class StorageViewModel {
     var errorMessage: String?
 
     private let session: SessionStore
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
@@ -35,18 +36,19 @@ final class StorageViewModel {
     }
 
     func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         isLoading = true
         errorMessage = nil
+        defer { if generation == loadGeneration { isLoading = false } }
         do {
-            info = try await session.withClient { try await $0.storageInfo() }
+            let result = try await session.withClient { try await $0.storageInfo() }
+            guard generation == loadGeneration else { return }
+            info = result
         } catch {
-            // Une annulation (vue quittée / requête remplacée) n'est pas un échec : on l'ignore,
-            // sinon un faux « impossible de joindre le NAS » s'affiche alors que les données arrivent.
-            if !DSMError.isCancellation(error) {
-                errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            }
+            guard generation == loadGeneration, !DSMError.isCancellation(error) else { return }
+            errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
         }
-        isLoading = false
     }
 
     /// Résumé annoncé à VoiceOver une fois chargé.

@@ -18,15 +18,18 @@ final class UsersGroupsViewModel {
     var errorMessage: String?
 
     private let session: SessionStore
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
     }
 
     func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         isLoading = true
         errorMessage = nil
-        defer { isLoading = false }
+        defer { if generation == loadGeneration { isLoading = false } }
 
         do {
             let result = try await session.withClient { client in
@@ -38,10 +41,11 @@ final class UsersGroupsViewModel {
                 }
                 return (users, groups)
             }
+            guard generation == loadGeneration else { return }
             users = result.0
             groups = result.1
         } catch {
-            guard !DSMError.isCancellation(error) else { return }
+            guard generation == loadGeneration, !DSMError.isCancellation(error) else { return }
             errorMessage = reason(for: error)
         }
     }

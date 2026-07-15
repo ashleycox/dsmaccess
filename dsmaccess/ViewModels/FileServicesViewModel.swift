@@ -2,7 +2,7 @@
 //  FileServicesViewModel.swift
 //  dsmaccess
 //
-//  Charge l'état des services de fichiers (SMB, NFS, FTP) et pilote leur
+//  Charge l'état des services de fichiers (SMB, NFS, FTP et rsync) et pilote leur
 //  activation/désactivation. Chaque service est interrogé indépendamment : si l'un
 //  échoue, les autres restent utilisables. Les actions renvoient un message déjà
 //  localisé à annoncer à VoiceOver.
@@ -30,17 +30,23 @@ final class FileServicesViewModel {
     private(set) var busy: Set<FileService> = []
 
     private let session: SessionStore
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
     }
 
     func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         isLoading = true
+        defer { if generation == loadGeneration { isLoading = false } }
+        var loadedStates: [FileService: FileServiceState] = [:]
         for service in services {
-            states[service] = await fetch(service)
+            loadedStates[service] = await fetch(service)
         }
-        isLoading = false
+        guard generation == loadGeneration else { return }
+        states = loadedStates
     }
 
     /// Bascule un service. Renvoie le message à annoncer à VoiceOver.

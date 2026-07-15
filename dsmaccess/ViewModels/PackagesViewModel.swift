@@ -4,7 +4,8 @@
 //
 //  Charge la liste des paquets installés (SYNO.Core.Package) et croise leur version avec
 //  le catalogue (SYNO.Core.Package.Server) pour signaler les mises à jour disponibles.
-//  Lecture seule : on détecte les mises à jour, on ne les applique pas.
+//  Les mises à jour sont détectées sans être appliquées ; le cycle de vie des paquets
+//  installés reste administrable depuis l'application.
 //
 
 import Foundation
@@ -22,14 +23,18 @@ final class PackagesViewModel {
     private(set) var busy: Set<String> = []
 
     private let session: SessionStore
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
     }
 
     func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         isLoading = true
         errorMessage = nil
+        defer { if generation == loadGeneration { isLoading = false } }
         do {
             let result = try await session.withClient { client in
                 let packages = try await client.listPackages().sorted {
@@ -45,12 +50,13 @@ final class PackagesViewModel {
                 }
                 return (packages, versions)
             }
+            guard generation == loadGeneration else { return }
             packages = result.0
             availableVersions = result.1
         } catch {
+            guard generation == loadGeneration, !DSMError.isCancellation(error) else { return }
             errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
         }
-        isLoading = false
     }
 
     /// Démarre ou arrête un paquet. Renvoie le message à annoncer à VoiceOver.

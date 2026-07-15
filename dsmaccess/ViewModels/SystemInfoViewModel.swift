@@ -16,22 +16,26 @@ final class SystemInfoViewModel {
     var errorMessage: String?
 
     private let session: SessionStore
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
     }
 
     func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         isLoading = true
         errorMessage = nil
+        defer { if generation == loadGeneration { isLoading = false } }
         do {
-            info = try await session.withClient { try await $0.systemInfo() }
+            let result = try await session.withClient { try await $0.systemInfo() }
+            guard generation == loadGeneration else { return }
+            info = result
         } catch {
-            if !DSMError.isCancellation(error) {
-                errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            }
+            guard generation == loadGeneration, !DSMError.isCancellation(error) else { return }
+            errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
         }
-        isLoading = false
     }
 
     // MARK: - Affichage formaté

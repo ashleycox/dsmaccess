@@ -19,14 +19,18 @@ final class SharesViewModel {
     var errorMessage: String?
 
     private let session: SessionStore
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
     }
 
     func load() async {
+        loadGeneration += 1
+        let generation = loadGeneration
         isLoading = true
         errorMessage = nil
+        defer { if generation == loadGeneration { isLoading = false } }
         do {
             let result = try await session.withClient { client in
                 let shares = try await client.listSharedFolders().sorted {
@@ -42,16 +46,15 @@ final class SharesViewModel {
                 }
                 return (shares, info)
             }
+            guard generation == loadGeneration else { return }
             shares = result.0
-            if let info = result.1 {
-                volumes = (info.volumes ?? [])
-                    .compactMap { $0.numId.map { "/volume\($0)" } }
-                    .sorted { $0.localizedStandardCompare($1) == .orderedAscending }
-            }
+            volumes = (result.1?.volumes ?? [])
+                .compactMap { $0.numId.map { "/volume\($0)" } }
+                .sorted { $0.localizedStandardCompare($1) == .orderedAscending }
         } catch {
+            guard generation == loadGeneration, !DSMError.isCancellation(error) else { return }
             errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
         }
-        isLoading = false
     }
 
     /// Crée un dossier partagé. Renvoie le message à annoncer.
