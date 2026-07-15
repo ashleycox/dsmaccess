@@ -83,7 +83,8 @@ struct ContainerLogEntry: nonisolated Decodable, Identifiable, Hashable, Sendabl
 
     nonisolated init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(String.self) {
-            id = UUID().uuidString
+            let position = decoder.codingPath.last?.intValue ?? 0
+            id = "fallback:\(position):\(value.hashValue)"
             timestamp = nil
             stream = nil
             message = value
@@ -94,7 +95,8 @@ struct ContainerLogEntry: nonisolated Decodable, Identifiable, Hashable, Sendabl
         timestamp = values.flexInt64(.timestamp) ?? values.flexInt64(.alternateTimestamp)
         stream = values.flexString(.stream)
         message = values.flexString(.message) ?? values.flexString(.alternateMessage) ?? ""
-        id = "\(timestamp ?? 0):\(message.hashValue)"
+        let position = decoder.codingPath.last?.intValue ?? 0
+        id = "fallback:\(position):\(timestamp ?? 0):\(message.hashValue)"
     }
 }
 

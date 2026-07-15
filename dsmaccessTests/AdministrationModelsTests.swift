@@ -171,6 +171,20 @@ struct AdministrationModelsTests {
         }
     }
 
+    @Test func givesDuplicateLogEntriesDistinctIdentities() throws {
+        let systemLogs = try JSONDecoder().decode(
+            SystemLogList.self,
+            from: Data(#"{"logs":[{"time":1,"message":"same"},{"time":1,"message":"same"}]}"#.utf8)
+        )
+        #expect(Set(systemLogs.logs.map(\.id)).count == 2)
+
+        let containerLogs = try JSONDecoder().decode(
+            ContainerLogList.self,
+            from: Data(#"{"logs":[{"time":1,"log":"same"},{"time":1,"log":"same"}]}"#.utf8)
+        )
+        #expect(Set(containerLogs.logs.map(\.id)).count == 2)
+    }
+
     @Test func handlesNumericValuesOutsideIntegerRange() throws {
         let oversizedInteger = Data(
             #"{"enable_autoupdate":true,"autoupdateall":false,"autoupdateimportant":true,"enable_dsm":true,"enable_email":false,"default_vol":"volume1","trust_level":1e300,"update_channel":"stable"}"#.utf8
