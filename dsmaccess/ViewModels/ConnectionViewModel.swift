@@ -76,8 +76,8 @@ final class ConnectionViewModel {
     }
 
     var canSubmit: Bool {
-        !host.trimmingCharacters(in: .whitespaces).isEmpty
-            && !account.trimmingCharacters(in: .whitespaces).isEmpty
+        !host.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !account.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && !password.isEmpty
             && port != nil
             && state != .connecting
@@ -102,8 +102,8 @@ final class ConnectionViewModel {
 
     /// Première tentative : identifiants seuls (+ jeton d'appareil mémorisé si présent).
     func connect() async {
-        let cleanedHost = host.trimmingCharacters(in: .whitespaces)
-        let cleanedAccount = account.trimmingCharacters(in: .whitespaces)
+        let cleanedHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanedAccount = account.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanedHost.isEmpty, !cleanedAccount.isEmpty, !password.isEmpty else {
             errorMessage = String(localized: "Veuillez renseigner l'adresse, le nom d'utilisateur et le mot de passe.")
             return
@@ -151,8 +151,8 @@ final class ConnectionViewModel {
         guard isRestoring, !hasRunStartup else { return }
         hasRunStartup = true
 
-        let cleanedHost = host.trimmingCharacters(in: .whitespaces)
-        let cleanedAccount = account.trimmingCharacters(in: .whitespaces)
+        let cleanedHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanedAccount = account.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let port else {
             isRestoring = false
             errorMessage = String(localized: "Le port doit être un nombre compris entre 1 et 65535.")
@@ -190,8 +190,8 @@ final class ConnectionViewModel {
     /// Soumission du code de vérification après un 403.
     func submitOTP() async {
         guard let client, let endpoint = pendingEndpoint else { return }
-        let cleanedAccount = account.trimmingCharacters(in: .whitespaces)
-        guard !otpCode.trimmingCharacters(in: .whitespaces).isEmpty else {
+        let cleanedAccount = account.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !otpCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = String(localized: "Saisissez le code de vérification.")
             return
         }
@@ -202,7 +202,7 @@ final class ConnectionViewModel {
         do {
             let result = try await client.login(
                 account: cleanedAccount, password: password,
-                otpCode: otpCode.trimmingCharacters(in: .whitespaces),
+                otpCode: otpCode.trimmingCharacters(in: .whitespacesAndNewlines),
                 deviceID: nil, rememberDevice: rememberDevice
             )
             try await finish(with: result, account: cleanedAccount, endpoint: endpoint)
