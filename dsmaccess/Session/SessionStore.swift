@@ -44,8 +44,10 @@ final class SessionStore {
         _ operation: (DSMClientProtocol) async throws -> Value
     ) async throws -> Value {
         guard let client else {
-            expireSession()
-            throw DSMError.sessionExpired
+            // Une tâche appartenant à une vue disparue peut arriver ici après une
+            // déconnexion volontaire. Elle ne doit pas transformer ce logout en
+            // fausse expiration de session sur l'écran de connexion.
+            throw DSMError.cancelled
         }
         let operationGeneration = generation
         do {

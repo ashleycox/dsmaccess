@@ -141,4 +141,16 @@ struct DSMCapabilitiesTests {
         #expect(!AppModule.shares.isAvailable(in: capabilities))
         #expect(!AppModule.packages.isAvailable(in: capabilities))
     }
+
+    @Test func mapsExpiredSessionsFromEveryResponsePath() {
+        let transport = DSMTransport(
+            endpoint: DSMEndpoint(useHTTPS: true, host: "nas.local", port: 5001),
+            session: .shared
+        )
+
+        #expect(transport.error(from: DSMErrorBody(code: 106)) == .sessionExpired)
+        #expect(transport.error(from: DSMErrorBody(code: 107)) == .sessionExpired)
+        #expect(transport.error(from: DSMErrorBody(code: 119)) == .sessionExpired)
+        #expect(transport.error(from: DSMErrorBody(code: 105)) == .permissionDenied)
+    }
 }

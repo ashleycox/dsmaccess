@@ -65,12 +65,10 @@ final class DSMFileStationService {
             throw DSMError.invalidResponse
         }
         if let mimeType = response.mimeType, mimeType.contains("json") {
-            let data = (try? await MultipartBodyFile.readData(at: temporaryURL)) ?? Data()
-            if let response = try? JSONDecoder().decode(DSMResponse<EmptyData>.self, from: data),
-               !response.success {
-                throw DSMError.apiError(code: response.error?.code ?? -1)
-            }
-            throw DSMError.invalidResponse
+            let data = try await MultipartBodyFile.readData(at: temporaryURL)
+            let response = try await DSMTransport.decodeResponse(EmptyData.self, from: data)
+            guard !response.success else { throw DSMError.invalidResponse }
+            throw transport.error(from: response.error)
         }
 
         let fileManager = FileManager.default
@@ -154,14 +152,9 @@ final class DSMFileStationService {
               (200..<300).contains(httpResponse.statusCode) else {
             throw DSMError.invalidResponse
         }
-        let result: DSMResponse<EmptyData>
-        do {
-            result = try JSONDecoder().decode(DSMResponse<EmptyData>.self, from: data)
-        } catch {
-            throw DSMError.decoding
-        }
+        let result = try await DSMTransport.decodeResponse(EmptyData.self, from: data)
         guard result.success else {
-            throw DSMError.apiError(code: result.error?.code ?? -1)
+            throw transport.error(from: result.error)
         }
     }
 

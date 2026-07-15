@@ -45,4 +45,27 @@ struct FileStationModelsTests {
         #expect(item.additional?.permission?.acl?.delete == false)
         #expect(item.additional?.realPath == "/volume1/documents/rapport.pdf")
     }
+
+    @Test func streamsMultipartBodiesAndSanitizesFilenames() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("dsmaccess-multipart-test-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let source = directory.appendingPathComponent("rapport\"\r\nX-Injected: oui.txt")
+        try Data("contenu".utf8).write(to: source)
+        let bodyURL = try await MultipartBodyFile.create(
+            fields: ["path": "/volume1/documents"],
+            fileURL: source,
+            fileFieldName: "file",
+            boundary: "test-boundary"
+        )
+        defer { try? FileManager.default.removeItem(at: bodyURL) }
+
+        let data = try await MultipartBodyFile.readData(at: bodyURL)
+        let body = try #require(String(data: data, encoding: .utf8))
+        #expect(body.contains("filename=\"rapport___X-Injected: oui.txt\""))
+        #expect(!body.contains("\r\nX-Injected: oui.txt"))
+        #expect(body.contains("\r\n\r\ncontenu\r\n--test-boundary--\r\n"))
+    }
 }

@@ -215,14 +215,6 @@ final class DSMTransport {
         }
     }
 
-    func upload(for request: URLRequest, from body: Data) async throws -> (Data, URLResponse) {
-        do {
-            return try await session.upload(for: request, from: body)
-        } catch let error as URLError {
-            throw mappedNetworkError(error)
-        }
-    }
-
     func upload(for request: URLRequest, fromFile fileURL: URL) async throws -> (Data, URLResponse) {
         do {
             return try await session.upload(for: request, fromFile: fileURL)
@@ -278,7 +270,7 @@ final class DSMTransport {
     }
 
     @concurrent
-    private static func decodeResponse<Value: Decodable & Sendable>(
+    static func decodeResponse<Value: Decodable & Sendable>(
         _ type: Value.Type,
         from data: Data
     ) async throws -> sending DSMResponse<Value> {
@@ -298,7 +290,7 @@ final class DSMTransport {
             : .network(error.localizedDescription)
     }
 
-    private func error(from body: DSMErrorBody?) -> DSMError {
+    func error(from body: DSMErrorBody?) -> DSMError {
         switch body?.code {
         case 105: .permissionDenied
         case 106, 107, 119: .sessionExpired
