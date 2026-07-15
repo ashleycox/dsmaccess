@@ -32,8 +32,8 @@ final class dsmaccessUITests: XCTestCase {
         XCTAssertTrue(app.checkBoxes["login.https"].exists)
         XCTAssertTrue(app.checkBoxes["login.remember-password"].exists)
 
-        // LoginView place explicitement le focus clavier initial sur l'hôte.
-        app.typeText("nas.local")
+        host.click()
+        host.typeText("nas.local")
         XCTAssertEqual(host.value as? String, "nas.local")
 
         account.click()
