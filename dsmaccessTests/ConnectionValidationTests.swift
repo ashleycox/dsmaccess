@@ -19,4 +19,13 @@ struct ConnectionValidationTests {
             #expect(!model.canSubmit)
         }
     }
+
+    @Test func separatesCredentialsBySchemeAndNormalizesHostCase() {
+        let https = DSMEndpoint(useHTTPS: true, host: "NAS.Local", port: 5001)
+        let http = DSMEndpoint(useHTTPS: false, host: "nas.local", port: 5001)
+
+        #expect(https.credentialStoreKey(account: "alex") == "alex@https://nas.local:5001")
+        #expect(http.credentialStoreKey(account: "alex") == "alex@http://nas.local:5001")
+        #expect(https.credentialStoreKey(account: "alex") != http.credentialStoreKey(account: "alex"))
+    }
 }

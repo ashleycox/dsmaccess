@@ -13,9 +13,13 @@ struct DSMEndpoint: Equatable, Sendable {
     var host: String
     var port: Int
 
-    var scheme: String { useHTTPS ? "https" : "http" }
+    nonisolated var scheme: String { useHTTPS ? "https" : "http" }
 
     nonisolated var trustStoreKey: String { "\(host.lowercased()):\(port)" }
+
+    nonisolated func credentialStoreKey(account: String) -> String {
+        "\(account)@\(scheme)://\(host.lowercased()):\(port)"
+    }
 
     /// Port par défaut de DSM selon le schéma (5000 en HTTP, 5001 en HTTPS).
     static func defaultPort(useHTTPS: Bool) -> Int { useHTTPS ? 5001 : 5000 }

@@ -122,7 +122,7 @@ final class ConnectionViewModel {
         errorMessage = nil
         lastError = nil
 
-        let deviceID = KeychainStore.load(service: KeychainStore.deviceTokenService, account: keychainKey(cleanedAccount, endpoint))
+        let deviceID = CredentialStore.deviceID(account: cleanedAccount, endpoint: endpoint)
 
         do {
             let result = try await client.login(
@@ -263,13 +263,20 @@ final class ConnectionViewModel {
             throw error
         }
         if rememberDevice, let did = result.did, !did.isEmpty {
-            KeychainStore.save(did, service: KeychainStore.deviceTokenService, account: keychainKey(account, endpoint))
+            CredentialStore.remember(deviceID: did, account: account, endpoint: endpoint)
         }
         // Mémoriser (ou oublier) le mot de passe selon le choix « Rester connecté ».
+        let remembersPassword: Bool
         if rememberPassword {
-            CredentialStore.remember(password: password, account: account, endpoint: endpoint)
+            remembersPassword = CredentialStore.remember(
+                password: password,
+                account: account,
+                endpoint: endpoint
+            )
+            rememberPassword = remembersPassword
         } else {
             CredentialStore.forget(account: account, endpoint: endpoint)
+            remembersPassword = false
         }
         persistPreferences(account: account, endpoint: endpoint)
         session.establish(
@@ -277,7 +284,7 @@ final class ConnectionViewModel {
             client: client,
             capabilities: capabilities,
             account: account,
-            remembersPassword: rememberPassword
+            remembersPassword: remembersPassword
         )
         // RootView bascule automatiquement vers l'écran de contenu.
         state = .editing
@@ -285,10 +292,6 @@ final class ConnectionViewModel {
         lastError = nil
         password = ""
         otpCode = ""
-    }
-
-    private func keychainKey(_ account: String, _ endpoint: DSMEndpoint) -> String {
-        "\(account)@\(endpoint.host):\(endpoint.port)"
     }
 
     private var hasTransientNetworkFailure: Bool {
