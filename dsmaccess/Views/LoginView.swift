@@ -12,6 +12,8 @@ struct LoginView: View {
     @State private var vm: ConnectionViewModel
     @AccessibilityFocusState private var focusError: Bool
     @AccessibilityFocusState private var focusRestoring: Bool
+    @AccessibilityFocusState private var focusHost: Bool
+    @FocusState private var hostFocused: Bool
 
     init(session: SessionStore) {
         _vm = State(initialValue: ConnectionViewModel(session: session))
@@ -53,6 +55,7 @@ struct LoginView: View {
     private var restoringView: some View {
         VStack(spacing: 16) {
             ProgressView()
+                .accessibilityLabel("Reconnexion en cours")
             Text("Reconnexion à \(vm.host)…")
                 .font(.title2.bold())
                 .accessibilityAddTraits(.isHeader)
@@ -74,27 +77,42 @@ struct LoginView: View {
                 Text("Connexion au NAS")
                     .font(.largeTitle.bold())
                     .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("login.title")
 
                 VStack(alignment: .leading, spacing: 12) {
                     LabeledField(label: "Adresse du NAS (IP ou nom)") {
                         TextField("192.168.1.10", text: $vm.host)
                             .textContentType(.URL)
+                            .focused($hostFocused)
+                            .accessibilityFocused($focusHost)
+                            .accessibilityIdentifier("login.host")
                     }
                     Toggle("Utiliser HTTPS (connexion sécurisée)", isOn: $vm.useHTTPS)
                         .onChange(of: vm.useHTTPS) { _, _ in vm.syncDefaultPortIfNeeded() }
+                        .accessibilityIdentifier("login.https")
                     LabeledField(label: "Port") {
                         TextField("5000", text: $vm.portText)
+                            .accessibilityIdentifier("login.port")
+                    }
+                    if let portError = vm.portValidationMessage {
+                        Text(portError)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .accessibilityIdentifier("login.port-error")
                     }
                     LabeledField(label: "Nom d'utilisateur") {
                         TextField("", text: $vm.account)
                             .textContentType(.username)
+                            .accessibilityIdentifier("login.account")
                     }
                     LabeledField(label: "Mot de passe") {
                         SecureField("", text: $vm.password)
                             .textContentType(.password)
+                            .accessibilityIdentifier("login.password")
                     }
                     Toggle("Rester connecté", isOn: $vm.rememberPassword)
                         .accessibilityHint("Mémorise le mot de passe pour la prochaine ouverture de l'app")
+                        .accessibilityIdentifier("login.remember-password")
                 }
 
                 if let error = vm.errorMessage {
@@ -107,8 +125,10 @@ struct LoginView: View {
                     if vm.state == .connecting {
                         ProgressView()
                             .controlSize(.small)
+                            .accessibilityLabel("Connexion en cours")
                         Text("Connexion en cours…")
                             .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
                     }
                     Spacer()
                     Button("Se connecter") {
@@ -116,6 +136,7 @@ struct LoginView: View {
                     }
                     .keyboardShortcut(.defaultAction)
                     .disabled(!vm.canSubmit)
+                    .accessibilityIdentifier("login.submit")
                 }
             }
             .padding(28)
@@ -136,6 +157,9 @@ struct LoginView: View {
             if let error = vm.errorMessage {
                 focusError = true
                 VoiceOver.announce(error)
+            } else {
+                hostFocused = true
+                focusHost = true
             }
         }
     }

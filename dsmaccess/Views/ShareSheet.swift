@@ -23,6 +23,7 @@ struct ShareSheet: View {
     @State private var errorMessage: String?
     @FocusState private var passwordFocused: Bool
     @AccessibilityFocusState private var focusURL: Bool
+    @AccessibilityFocusState private var focusError: Bool
     @Environment(\.dismiss) private var dismiss
 
     private enum Phase: Equatable {
@@ -80,7 +81,9 @@ struct ShareSheet: View {
         }
 
         if let errorMessage {
-            Text(errorMessage).foregroundStyle(.red)
+            Text(errorMessage)
+                .foregroundStyle(.red)
+                .accessibilityFocused($focusError)
         }
 
         HStack {
@@ -133,6 +136,7 @@ struct ShareSheet: View {
             phase = .created(url)
         case .failure(let message):
             errorMessage = message
+            focusError = true
             VoiceOver.announce(message, priority: .high)
         }
         isCreating = false

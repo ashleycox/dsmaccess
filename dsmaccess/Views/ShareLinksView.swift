@@ -13,6 +13,7 @@ import SwiftUI
 struct ShareLinksView: View {
     let vm: FileBrowserViewModel
     @AccessibilityFocusState private var focusTitle: Bool
+    @AccessibilityFocusState private var focusStatus: Bool
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -32,20 +33,22 @@ struct ShareLinksView: View {
         .frame(width: 480, height: 360)
         .task {
             focusTitle = true
-            await vm.loadShareLinks()
+            await loadShareLinks()
         }
     }
 
     @ViewBuilder
     private var content: some View {
         if vm.isLoadingShareLinks && vm.shareLinks.isEmpty {
-            ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+            ModuleLoadingView("Chargement des liens de partage…")
+                .accessibilityFocused($focusStatus)
         } else if let error = vm.shareLinksError {
             VStack(spacing: 12) {
                 Text(error).foregroundStyle(.red).multilineTextAlignment(.center)
-                Button("Réessayer") { Task { await vm.loadShareLinks() } }
+                Button("Réessayer") { Task { await loadShareLinks() } }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .accessibilityFocused($focusStatus)
         } else if vm.shareLinks.isEmpty {
             Text("Aucun lien de partage")
                 .foregroundStyle(.secondary)
@@ -55,6 +58,22 @@ struct ShareLinksView: View {
                 row(for: link)
             }
         }
+    }
+
+    private var shareLinksAnnouncement: String {
+        if let error = vm.shareLinksError { return error }
+        return String(localized: "\(vm.shareLinks.count) liens de partage")
+    }
+
+    private func loadShareLinks() async {
+        await vm.loadShareLinks()
+        guard !Task.isCancelled else { return }
+        if vm.shareLinksError == nil {
+            focusTitle = true
+        } else {
+            focusStatus = true
+        }
+        VoiceOver.announce(shareLinksAnnouncement)
     }
 
     private func row(for link: SharingLink) -> some View {

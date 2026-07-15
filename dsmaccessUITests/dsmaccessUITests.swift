@@ -2,42 +2,86 @@
 //  dsmaccessUITests.swift
 //  dsmaccessUITests
 //
-//  Created by Mathieu Martin on 09/07/2026.
+//  Vérifications du formulaire de connexion sans accès à un NAS réel.
 //
 
 import XCTest
 
 final class dsmaccessUITests: XCTestCase {
+    private var app: XCUIApplication!
 
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-    }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        app = makeApplication(language: "fr", locale: "fr_FR")
+        app.launch()
+        XCTAssertTrue(app.staticTexts["login.title"].waitForExistence(timeout: 5))
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
+    func testLoginFormSupportsKeyboardEntryAndValidatesPort() throws {
+        let host = app.textFields["login.host"]
+        let port = app.textFields["login.port"]
+        let account = app.textFields["login.account"]
+        let password = app.secureTextFields["login.password"]
+        let submit = app.buttons["login.submit"]
+
+        XCTAssertTrue(host.exists)
+        XCTAssertTrue(port.exists)
+        XCTAssertTrue(account.exists)
+        XCTAssertTrue(password.exists)
+        XCTAssertTrue(app.checkBoxes["login.https"].exists)
+        XCTAssertTrue(app.checkBoxes["login.remember-password"].exists)
+
+        // LoginView place explicitement le focus clavier initial sur l'hôte.
+        app.typeText("nas.local")
+        XCTAssertEqual(host.value as? String, "nas.local")
+
+        account.click()
+        account.typeText("tester")
+        password.click()
+        password.typeText("not-a-real-password")
+
+        port.click()
+        port.typeKey("a", modifierFlags: .command)
+        port.typeText("0")
+        XCTAssertTrue(app.staticTexts["login.port-error"].waitForExistence(timeout: 2))
+        XCTAssertFalse(submit.isEnabled)
+
+        port.typeKey("a", modifierFlags: .command)
+        port.typeText("5001")
+        XCTAssertFalse(app.staticTexts["login.port-error"].exists)
+        XCTAssertTrue(submit.isEnabled)
+    }
+
+    @MainActor
+    func testLoginScreenPassesAccessibilityAudit() throws {
+        try app.performAccessibilityAudit()
+    }
+
+    @MainActor
+    func testEnglishLoginLocalization() throws {
+        app.terminate()
+        app = makeApplication(language: "en", locale: "en_GB")
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // XCUIAutomation Documentation
-        // https://developer.apple.com/documentation/xcuiautomation
+        let title = app.staticTexts["login.title"]
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        XCTAssertEqual(title.label, "Connect to your NAS")
+        XCTAssertEqual(app.buttons["login.submit"].label, "Connect")
     }
 
-    @MainActor
-    func testLaunchPerformance() throws {
-        // This measures how long it takes to launch your application.
-        measure(metrics: [XCTApplicationLaunchMetric()]) {
-            XCUIApplication().launch()
-        }
+    private func makeApplication(language: String, locale: String) -> XCUIApplication {
+        let application = XCUIApplication()
+        application.launchArguments = [
+            "-AppleLanguages", "(\(language))",
+            "-AppleLocale", locale,
+            "-ApplePersistenceIgnoreState", "YES",
+            "-NSQuitAlwaysKeepsWindows", "NO",
+            "-lastHost", "",
+            "-lastAccount", "",
+            "-lastUseHTTPS", "YES",
+            "-rememberPassword", "NO"
+        ]
+        return application
     }
 }

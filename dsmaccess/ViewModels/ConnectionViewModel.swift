@@ -80,6 +80,11 @@ final class ConnectionViewModel {
             && state != .connecting
     }
 
+    var portValidationMessage: String? {
+        guard port == nil else { return nil }
+        return String(localized: "Le port doit être un nombre compris entre 1 et 65535.")
+    }
+
     /// Ajuste le port par défaut quand on bascule HTTP/HTTPS, si l'utilisateur n'a pas
     /// saisi un port personnalisé.
     func syncDefaultPortIfNeeded() {

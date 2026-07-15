@@ -12,6 +12,7 @@ import SwiftUI
 struct PackageSettingsSheet: View {
     @State private var vm: PackageSettingsViewModel
     @AccessibilityFocusState private var focusTitle: Bool
+    @AccessibilityFocusState private var focusStatus: Bool
     @Environment(\.dismiss) private var dismiss
 
     init(session: SessionStore) {
@@ -37,8 +38,7 @@ struct PackageSettingsSheet: View {
         .frame(width: 460)
         .task {
             focusTitle = true
-            await vm.load()
-            AccessibilityNotification.Announcement(loadAnnouncement).post()
+            await load()
         }
     }
 
@@ -49,11 +49,14 @@ struct PackageSettingsSheet: View {
                 ProgressView().controlSize(.small)
                 Text("Chargement…").foregroundStyle(.secondary)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityFocused($focusStatus)
         } else if let error = vm.errorMessage, vm.settings == nil {
             VStack(alignment: .leading, spacing: 12) {
                 Text(error).foregroundStyle(.red)
-                Button("Réessayer") { Task { await vm.load() } }
+                Button("Réessayer") { Task { await load() } }
             }
+            .accessibilityFocused($focusStatus)
         } else if vm.settings != nil {
             controls
         }
@@ -135,5 +138,12 @@ struct PackageSettingsSheet: View {
     private var loadAnnouncement: String {
         if let error = vm.errorMessage { return error }
         return String(localized: "Réglages du Centre de paquets chargés")
+    }
+
+    private func load() async {
+        await vm.load()
+        guard !Task.isCancelled else { return }
+        if vm.errorMessage != nil { focusStatus = true }
+        VoiceOver.announce(loadAnnouncement)
     }
 }

@@ -14,6 +14,7 @@ import SwiftUI
 struct OTPView: View {
     @Bindable var vm: ConnectionViewModel
     @AccessibilityFocusState private var focusCode: Bool
+    @AccessibilityFocusState private var focusError: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -36,14 +37,17 @@ struct OTPView: View {
             if let error = vm.errorMessage {
                 Text(error)
                     .foregroundStyle(.red)
+                    .accessibilityFocused($focusError)
             }
 
             HStack(spacing: 12) {
                 if vm.state == .connecting {
                     ProgressView()
                         .controlSize(.small)
+                        .accessibilityLabel("Vérification en cours")
                     Text("Vérification en cours…")
                         .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                 }
                 Spacer()
                 Button("Annuler") { vm.cancelOTP() }
@@ -62,7 +66,8 @@ struct OTPView: View {
         }
         .onChange(of: vm.errorMessage) { _, newValue in
             if let newValue {
-                AccessibilityNotification.Announcement(newValue).post()
+                focusError = true
+                VoiceOver.announce(newValue, priority: .high)
             }
         }
     }

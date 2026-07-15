@@ -147,17 +147,6 @@
       },
       "shouldTranslate" : false
     },
-    "%lld %" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld %"
-          }
-        }
-      }
-    },
     "%lld %%" : {
       "localizations" : {
         "en" : {
@@ -312,6 +301,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld d %lld h %lld min"
+          }
+        }
+      }
+    },
+    "%lld liens de partage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld share links"
           }
         }
       }
@@ -1149,6 +1148,16 @@
         }
       }
     },
+    "Approuver et se connecter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trust and Connect"
+          }
+        }
+      }
+    },
     "Archive créée : %@" : {
       "localizations" : {
         "en" : {
@@ -1689,23 +1698,22 @@
         }
       }
     },
+    "Certificat non approuvé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Untrusted Certificate"
+          }
+        }
+      }
+    },
     "Cette fonctionnalité n'est pas disponible sur ce NAS (API %@)." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This feature is not available on this NAS (API %@)."
-          }
-        }
-      }
-    },
-    "Charge" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Load"
           }
         }
       }
@@ -1786,6 +1794,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading logs and protections…"
+          }
+        }
+      }
+    },
+    "Chargement des liens de partage…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading share links…"
           }
         }
       }
@@ -1916,17 +1934,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pasting…"
-          }
-        }
-      }
-    },
-    "Colle l'élément copié ou coupé dans ce dossier" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pastes the copied or cut item into this folder"
           }
         }
       }
@@ -2121,16 +2128,6 @@
         }
       }
     },
-    "Conteneur sans nom" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unnamed container"
-          }
-        }
-      }
-    },
     "Conteneurs" : {
       "localizations" : {
         "en" : {
@@ -2181,17 +2178,6 @@
         }
       }
     },
-    "Copié ici : %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copied here: %@"
-          }
-        }
-      }
-    },
     "Coupé : %@. Ouvrez la destination puis Coller pour déplacer." : {
       "localizations" : {
         "en" : {
@@ -2228,28 +2214,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Creating folder…"
-          }
-        }
-      }
-    },
-    "Crée un dossier dans le dossier courant" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Creates a folder in the current folder"
-          }
-        }
-      }
-    },
-    "Crée un nouveau dossier partagé sur le NAS" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Creates a new shared folder on the NAS"
           }
         }
       }
@@ -2403,6 +2367,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DSM did not return any volumes or drives."
+          }
+        }
+      }
+    },
+    "DSM utilise un certificat qui n'est pas reconnu par macOS. Vérifiez cette empreinte SHA-256 avant de l'approuver : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DSM is using a certificate that macOS doesn't recognize. Verify this SHA-256 fingerprint before trusting it: %@"
           }
         }
       }
@@ -2607,17 +2581,6 @@
         }
       }
     },
-    "Durée de vie restante" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remaining life"
-          }
-        }
-      }
-    },
     "Débit descendant : %@" : {
       "localizations" : {
         "en" : {
@@ -2808,17 +2771,6 @@
         }
       }
     },
-    "Déplacé ici : %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moved here: %@"
-          }
-        }
-      }
-    },
     "Désactiver" : {
       "localizations" : {
         "en" : {
@@ -2999,17 +2951,6 @@
         }
       }
     },
-    "Envoi" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sent"
-          }
-        }
-      }
-    },
     "Envoi en cours…" : {
       "localizations" : {
         "en" : {
@@ -3026,17 +2967,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Network upload"
-          }
-        }
-      }
-    },
-    "Envoie des fichiers depuis votre Mac vers ce dossier" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uploads files from your Mac to this folder"
           }
         }
       }
@@ -3251,17 +3181,6 @@
         }
       }
     },
-    "Ferme la session sur le NAS" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ends the session on the NAS"
-          }
-        }
-      }
-    },
     "Fermer" : {
       "localizations" : {
         "en" : {
@@ -3278,17 +3197,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "File"
-          }
-        }
-      }
-    },
-    "Fichier d'échange" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Swap file"
           }
         }
       }
@@ -3463,28 +3371,6 @@
         }
       }
     },
-    "Groupes de stockage" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Storage pools"
-          }
-        }
-      }
-    },
-    "Gère les liens de partage existants" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manages existing share links"
-          }
-        }
-      }
-    },
     "Gérer la session DSM" : {
       "localizations" : {
         "en" : {
@@ -3515,16 +3401,6 @@
         }
       }
     },
-    "Identifiant de paquet introuvable." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Package identifier not found."
-          }
-        }
-      }
-    },
     "Image" : {
       "localizations" : {
         "en" : {
@@ -3541,17 +3417,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Importing"
-          }
-        }
-      }
-    },
-    "Impossible d'envoyer ici." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cannot upload here."
           }
         }
       }
@@ -3966,6 +3831,26 @@
         }
       }
     },
+    "Le certificat de sécurité de ce NAS n'est pas approuvé." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This NAS's security certificate isn't trusted."
+          }
+        }
+      }
+    },
+    "Le certificat n'a pas pu être enregistré dans le trousseau." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The certificate couldn't be saved to the Keychain."
+          }
+        }
+      }
+    },
     "Le compte « %@ » sera supprimé. Son dossier personnel peut également devenir inaccessible selon les réglages du NAS." : {
       "localizations" : {
         "en" : {
@@ -3982,6 +3867,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The “%@” group will be deleted. Permissions granted through this group will be removed."
+          }
+        }
+      }
+    },
+    "Le port doit être un nombre compris entre 1 et 65535." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The port must be a number between 1 and 65535."
           }
         }
       }
@@ -4676,17 +4571,6 @@
         }
       }
     },
-    "Ouvre les réglages du Centre de paquets" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opens Package Center settings"
-          }
-        }
-      }
-    },
     "Ouvrez l'app Synology Secure SignIn et saisissez le code à 6 chiffres affiché." : {
       "localizations" : {
         "en" : {
@@ -4707,16 +4591,6 @@
         }
       }
     },
-    "Paquet inconnu" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unknown package"
-          }
-        }
-      }
-    },
     "Pare-feu" : {
       "localizations" : {
         "en" : {
@@ -4733,17 +4607,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sharing"
-          }
-        }
-      }
-    },
-    "Partages" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shares"
           }
         }
       }
@@ -4800,17 +4663,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Processeur %1$@ %%, mémoire %2$@ %%"
-          }
-        }
-      }
-    },
-    "Processeur %@ %, mémoire %@ %" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Processor %@ %, memory %@ %"
           }
         }
       }
@@ -4881,39 +4733,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ready"
-          }
-        }
-      }
-    },
-    "Recharge l'état des services" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reloads the services' status"
-          }
-        }
-      }
-    },
-    "Recharge la liste des paquets" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reloads the package list"
-          }
-        }
-      }
-    },
-    "Recharge les valeurs et les annonce" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reloads the values and announces them"
           }
         }
       }
@@ -5248,17 +5067,6 @@
         }
       }
     },
-    "Réception" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Received"
-          }
-        }
-      }
-    },
     "Réception réseau" : {
       "localizations" : {
         "en" : {
@@ -5439,17 +5247,6 @@
         }
       }
     },
-    "Secteurs défectueux au-delà du seuil" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bad sectors above threshold"
-          }
-        }
-      }
-    },
     "Serveur déconnecté" : {
       "localizations" : {
         "en" : {
@@ -5486,16 +5283,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Session"
-          }
-        }
-      }
-    },
-    "Session expirée." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Session expired."
           }
         }
       }
@@ -5750,17 +5537,6 @@
         }
       }
     },
-    "Sélectionnez un module" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a module"
-          }
-        }
-      }
-    },
     "Sélectionnez une caméra pour afficher son instantané." : {
       "localizations" : {
         "en" : {
@@ -5991,17 +5767,6 @@
         }
       }
     },
-    "Usure élevée" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "High wear"
-          }
-        }
-      }
-    },
     "Utilisateur" : {
       "localizations" : {
         "en" : {
@@ -6024,17 +5789,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Utilisateur %1$lld %%, système %2$lld %%"
-          }
-        }
-      }
-    },
-    "Utilisateur %lld %, système %lld %" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "User %lld %, system %lld %"
           }
         }
       }
@@ -6219,17 +5973,6 @@
         }
       }
     },
-    "Volumes" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Volumes"
-          }
-        }
-      }
-    },
     "Votre NAS" : {
       "localizations" : {
         "en" : {
@@ -6256,6 +5999,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Checking"
+          }
+        }
+      }
+    },
+    "Vérification en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verification in progress"
           }
         }
       }
@@ -6600,34 +6353,12 @@
         }
       }
     },
-    "Échec du collage : %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paste failed: %@"
-          }
-        }
-      }
-    },
     "Échec du déblocage : %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unblock failed: %@"
-          }
-        }
-      }
-    },
-    "Échec du renommage : %@" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rename failed: %@"
           }
         }
       }

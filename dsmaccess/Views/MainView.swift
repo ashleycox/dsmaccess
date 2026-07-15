@@ -12,6 +12,15 @@ struct MainView: View {
 
     @State private var selection = AppModule.systemInfo
 
+    init(session: SessionStore) {
+        self.session = session
+        _selection = State(
+            initialValue: AppModule.allCases.first {
+                $0.isAvailable(in: session.capabilities)
+            } ?? .systemInfo
+        )
+    }
+
     var body: some View {
         NavigationSplitView {
             List(selection: $selection) {
