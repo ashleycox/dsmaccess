@@ -10,7 +10,8 @@ import Foundation
 @MainActor
 final class DSMTransport {
     private static let infoAPI = DSMAPI("SYNO.API.Info", preferredVersion: 1)
-    private static let infoPath = "entry.cgi"
+    /// Point d'amorçage stable ; toutes les autres routes proviennent de cette découverte.
+    private static let discoveryPath = "query.cgi"
 
     let endpoint: DSMEndpoint
     private let session: URLSession
@@ -66,7 +67,7 @@ final class DSMTransport {
             "query": requestedNames.joined(separator: ","),
         ]
         let response: DSMResponse<[String: APIInfoEntry]> = try await send(
-            path: Self.infoPath,
+            path: Self.discoveryPath,
             parameters: parameters
         )
         guard response.success, let data = response.data else {
@@ -85,7 +86,7 @@ final class DSMTransport {
             "query": "all",
         ]
         let response: DSMResponse<[String: APIInfoEntry]> = try await send(
-            path: Self.infoPath,
+            path: Self.discoveryPath,
             parameters: parameters
         )
         guard response.success, let data = response.data else {
