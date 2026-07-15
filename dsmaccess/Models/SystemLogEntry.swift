@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SystemLogEntry: Decodable, Identifiable, Hashable, Sendable {
+struct SystemLogEntry: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let id: String
     let timestamp: String?
     let level: String
@@ -32,7 +32,7 @@ struct SystemLogEntry: Decodable, Identifiable, Hashable, Sendable {
         case event
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         timestamp = values.flexString(.timestamp) ?? values.flexString(.alternateTimestamp)
         level = values.flexString(.level) ?? values.flexString(.priority) ?? "info"
@@ -44,20 +44,18 @@ struct SystemLogEntry: Decodable, Identifiable, Hashable, Sendable {
     }
 }
 
-struct SystemLogList: Decodable, Sendable {
+struct SystemLogList: nonisolated Decodable, Sendable {
     let logs: [SystemLogEntry]
 
     enum CodingKeys: String, CodingKey { case logs, items }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        logs = (try? values.decode([SystemLogEntry].self, forKey: .logs))
-            ?? (try? values.decode([SystemLogEntry].self, forKey: .items))
-            ?? []
+        logs = try values.decodeArray(SystemLogEntry.self, forFirstPresent: [.logs, .items])
     }
 }
 
-struct BlockedAddress: Decodable, Identifiable, Hashable, Sendable {
+struct BlockedAddress: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let address: String
     let createdAt: String?
     let expiresAt: String?
@@ -76,19 +74,25 @@ struct BlockedAddress: Decodable, Identifiable, Hashable, Sendable {
         case reason
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        address = values.flexString(.address)
+        guard let decodedAddress = values.flexString(.address)
             ?? values.flexString(.alternateAddress)
-            ?? values.flexString(.host)
-            ?? ""
+            ?? values.flexString(.host) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .address,
+                in: values,
+                debugDescription: "Required blocked address is missing or malformed."
+            )
+        }
+        address = decodedAddress
         createdAt = values.flexString(.createdAt) ?? values.flexString(.alternateCreatedAt)
         expiresAt = values.flexString(.expiresAt) ?? values.flexString(.alternateExpiresAt)
         reason = values.flexString(.reason)
     }
 }
 
-struct BlockedAddressList: Decodable, Sendable {
+struct BlockedAddressList: nonisolated Decodable, Sendable {
     let addresses: [BlockedAddress]
 
     enum CodingKeys: String, CodingKey {
@@ -98,12 +102,11 @@ struct BlockedAddressList: Decodable, Sendable {
         case data
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        addresses = (try? values.decode([BlockedAddress].self, forKey: .addresses))
-            ?? (try? values.decode([BlockedAddress].self, forKey: .items))
-            ?? (try? values.decode([BlockedAddress].self, forKey: .hosts))
-            ?? (try? values.decode([BlockedAddress].self, forKey: .data))
-            ?? []
+        addresses = try values.decodeArray(
+            BlockedAddress.self,
+            forFirstPresent: [.addresses, .items, .hosts, .data]
+        )
     }
 }

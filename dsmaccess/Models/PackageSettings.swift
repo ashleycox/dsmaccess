@@ -11,7 +11,7 @@
 
 import Foundation
 
-struct PackageSettings: Decodable {
+struct PackageSettings: nonisolated Decodable, Equatable, Sendable {
     var enableAutoupdate: Bool
     var autoupdateAll: Bool
     var autoupdateImportant: Bool
@@ -33,28 +33,32 @@ struct PackageSettings: Decodable {
         case updateChannelBeta = "update_channel"
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        enableAutoupdate = (try? c.decode(Bool.self, forKey: .enableAutoupdate)) ?? false
-        autoupdateAll = (try? c.decode(Bool.self, forKey: .autoupdateAll)) ?? false
-        autoupdateImportant = (try? c.decode(Bool.self, forKey: .autoupdateImportant)) ?? false
-        enableDsm = (try? c.decode(Bool.self, forKey: .enableDsm)) ?? false
-        enableEmail = (try? c.decode(Bool.self, forKey: .enableEmail)) ?? false
-        defaultVol = (try? c.decode(String.self, forKey: .defaultVol)) ?? "no_default_vol"
-        trustLevel = (try? c.decode(Int.self, forKey: .trustLevel)) ?? 0
+        enableAutoupdate = try c.requiredFlexBool(.enableAutoupdate)
+        autoupdateAll = try c.requiredFlexBool(.autoupdateAll)
+        autoupdateImportant = try c.requiredFlexBool(.autoupdateImportant)
+        enableDsm = try c.requiredFlexBool(.enableDsm)
+        enableEmail = try c.requiredFlexBool(.enableEmail)
+        defaultVol = try c.requiredFlexString(.defaultVol)
+        trustLevel = try c.requiredFlexInt(.trustLevel)
         // update_channel : booléen en lecture, mais on tolère une chaîne ("beta"/"stable").
         if let b = try? c.decode(Bool.self, forKey: .updateChannelBeta) {
             updateChannelBeta = b
         } else if let s = try? c.decode(String.self, forKey: .updateChannelBeta) {
             updateChannelBeta = s.lowercased() == "beta"
         } else {
-            updateChannelBeta = false
+            throw DecodingError.dataCorruptedError(
+                forKey: .updateChannelBeta,
+                in: c,
+                debugDescription: "Required package update channel is missing or malformed."
+            )
         }
     }
 }
 
 /// Stratégie de mise à jour automatique, dérivée des trois champs bruts de l'API.
-enum AutoUpdateMode: CaseIterable, Identifiable {
+enum AutoUpdateMode: CaseIterable, Identifiable, Sendable {
     case off        // désactivée
     case important  // versions importantes (sécurité)
     case latest     // dernières versions

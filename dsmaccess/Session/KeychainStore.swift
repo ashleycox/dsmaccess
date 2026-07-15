@@ -12,15 +12,15 @@ import Security
 
 enum KeychainStore {
     /// Service utilisé pour les jetons d'appareil DSM.
-    static let deviceTokenService = "math65.dsmaccess.deviceToken"
+    nonisolated static let deviceTokenService = "math65.dsmaccess.deviceToken"
     /// Service utilisé pour les mots de passe mémorisés (reconnexion automatique).
-    static let passwordService = "math65.dsmaccess.password"
+    nonisolated static let passwordService = "math65.dsmaccess.password"
     /// Service utilisé pour les empreintes des certificats explicitement approuvés.
-    static let serverTrustService = "math65.dsmaccess.serverTrust"
+    nonisolated static let serverTrustService = "math65.dsmaccess.serverTrust"
 
     /// Enregistre (ou remplace) une valeur pour un couple service/compte.
     @discardableResult
-    static func save(_ value: String, service: String, account: String) -> Bool {
+    nonisolated static func save(_ value: String, service: String, account: String) -> Bool {
         guard let data = value.data(using: .utf8) else { return false }
         let base: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -36,7 +36,7 @@ enum KeychainStore {
     }
 
     /// Lit une valeur pour un couple service/compte, ou nil si absente.
-    static func load(service: String, account: String) -> String? {
+    nonisolated static func load(service: String, account: String) -> String? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
@@ -54,7 +54,7 @@ enum KeychainStore {
     }
 
     /// Supprime une valeur pour un couple service/compte.
-    static func delete(service: String, account: String) {
+    nonisolated static func delete(service: String, account: String) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,

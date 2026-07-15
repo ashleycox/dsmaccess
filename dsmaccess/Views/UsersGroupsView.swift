@@ -217,19 +217,19 @@ struct UsersGroupsView: View {
     private var filteredUsers: [DSMUser] {
         guard !searchText.isEmpty else { return viewModel.users }
         return viewModel.users.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
-                || ($0.email?.localizedCaseInsensitiveContains(searchText) == true)
-                || ($0.description?.localizedCaseInsensitiveContains(searchText) == true)
-                || $0.groups.contains { $0.localizedCaseInsensitiveContains(searchText) }
+            $0.name.localizedStandardContains(searchText)
+                || ($0.email?.localizedStandardContains(searchText) == true)
+                || ($0.description?.localizedStandardContains(searchText) == true)
+                || $0.groups.contains { $0.localizedStandardContains(searchText) }
         }
     }
 
     private var filteredGroups: [DSMGroup] {
         guard !searchText.isEmpty else { return viewModel.groups }
         return viewModel.groups.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
-                || ($0.description?.localizedCaseInsensitiveContains(searchText) == true)
-                || $0.members.contains { $0.localizedCaseInsensitiveContains(searchText) }
+            $0.name.localizedStandardContains(searchText)
+                || ($0.description?.localizedStandardContains(searchText) == true)
+                || $0.members.contains { $0.localizedStandardContains(searchText) }
         }
     }
 

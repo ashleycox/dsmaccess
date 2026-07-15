@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct DSMUser: Decodable, Identifiable, Hashable, Sendable {
+struct DSMUser: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let name: String
     let description: String?
     let email: String?
@@ -35,19 +35,19 @@ struct DSMUser: Decodable, Identifiable, Hashable, Sendable {
         case isAdmin = "is_admin"
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        name = values.flexString(.name) ?? ""
+        name = try values.requiredFlexString(.name)
         description = values.flexString(.description) ?? values.flexString(.alternateDescription)
         email = values.flexString(.email)
         uid = values.flexInt(.uid)
         expiration = values.flexString(.expiration)
-        groups = (try? values.decode([String].self, forKey: .groups)) ?? []
+        groups = try values.decodeIfPresent([String].self, forKey: .groups) ?? []
         isAdministrator = values.flexBool(.admin) ?? values.flexBool(.isAdmin) ?? groups.contains("administrators")
     }
 }
 
-struct DSMGroup: Decodable, Identifiable, Hashable, Sendable {
+struct DSMGroup: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let name: String
     let description: String?
     let gid: Int?
@@ -64,36 +64,34 @@ struct DSMGroup: Decodable, Identifiable, Hashable, Sendable {
         case members
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        name = values.flexString(.name) ?? ""
+        name = try values.requiredFlexString(.name)
         description = values.flexString(.description) ?? values.flexString(.alternateDescription)
         gid = values.flexInt(.gid)
-        members = (try? values.decode([String].self, forKey: .users))
-            ?? (try? values.decode([String].self, forKey: .members))
-            ?? []
+        members = try values.decodeArray(String.self, forFirstPresent: [.users, .members])
     }
 }
 
-struct DSMUserList: Decodable, Sendable {
+struct DSMUserList: nonisolated Decodable, Sendable {
     let users: [DSMUser]
 
     enum CodingKeys: String, CodingKey { case users }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        users = (try? values.decode([DSMUser].self, forKey: .users)) ?? []
+        users = try values.decodeIfPresent([DSMUser].self, forKey: .users) ?? []
     }
 }
 
-struct DSMGroupList: Decodable, Sendable {
+struct DSMGroupList: nonisolated Decodable, Sendable {
     let groups: [DSMGroup]
 
     enum CodingKeys: String, CodingKey { case groups }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        groups = (try? values.decode([DSMGroup].self, forKey: .groups)) ?? []
+        groups = try values.decodeIfPresent([DSMGroup].self, forKey: .groups) ?? []
     }
 }
 

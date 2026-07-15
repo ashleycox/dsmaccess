@@ -30,7 +30,7 @@ final class SharesViewModel {
         do {
             let result = try await session.withClient { client in
                 let shares = try await client.listSharedFolders().sorted {
-                    ($0.name ?? "").localizedStandardCompare($1.name ?? "") == .orderedAscending
+                    $0.name.localizedStandardCompare($1.name) == .orderedAscending
                 }
                 let info: StorageInfo?
                 do {
@@ -73,9 +73,7 @@ final class SharesViewModel {
 
     /// Supprime un dossier partagé. Renvoie le message à annoncer.
     func delete(_ folder: SharedFolder) async -> String {
-        guard let name = folder.name else {
-            return String(localized: "Identifiant du dossier partagé introuvable.")
-        }
+        let name = folder.name
         do {
             try await session.withClient { try await $0.deleteSharedFolder(name: name) }
             await load()

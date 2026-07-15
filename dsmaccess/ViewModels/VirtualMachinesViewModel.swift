@@ -17,22 +17,27 @@ final class VirtualMachinesViewModel {
     var errorMessage: String?
 
     private let session: SessionStore
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
     }
 
     func load(silently: Bool = false) async {
-        if !silently { isLoading = true }
+        loadGeneration += 1
+        let generation = loadGeneration
+        isLoading = !silently
         errorMessage = nil
-        defer { isLoading = false }
+        defer { if generation == loadGeneration { isLoading = false } }
 
         do {
-            machines = try await session.withClient { try await $0.listVirtualMachines() }.sorted {
+            let result = try await session.withClient { try await $0.listVirtualMachines() }.sorted {
                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
             }
+            guard generation == loadGeneration else { return }
+            machines = result
         } catch {
-            guard !DSMError.isCancellation(error) else { return }
+            guard generation == loadGeneration, !DSMError.isCancellation(error) else { return }
             errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
         }
     }

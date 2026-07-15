@@ -272,9 +272,9 @@ struct ContainersView: View {
     private var filteredContainers: [ContainerItem] {
         guard !searchText.isEmpty else { return viewModel.containers }
         return viewModel.containers.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
-                || $0.status.localizedCaseInsensitiveContains(searchText)
-                || ($0.image?.localizedCaseInsensitiveContains(searchText) == true)
+            $0.name.localizedStandardContains(searchText)
+                || $0.status.localizedStandardContains(searchText)
+                || ($0.image?.localizedStandardContains(searchText) == true)
         }
     }
 

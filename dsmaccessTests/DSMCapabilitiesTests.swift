@@ -126,4 +126,19 @@ struct DSMCapabilitiesTests {
         #expect(components.path == "/webapi/FileStation/file_share.cgi")
         #expect(components.queryItems?.contains(URLQueryItem(name: "path", value: "/Photos/Été 2026")) == true)
     }
+
+    @Test func gatesEveryModuleByDiscoveredCapabilities() {
+        var capabilities = DSMCapabilities()
+        capabilities.merge([
+            "SYNO.DSM.Info": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 2),
+            "SYNO.Core.FileServ.SMB": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 3),
+        ])
+
+        #expect(AppModule.systemInfo.isAvailable(in: capabilities))
+        #expect(AppModule.fileServices.isAvailable(in: capabilities))
+        #expect(!AppModule.storage.isAvailable(in: capabilities))
+        #expect(!AppModule.files.isAvailable(in: capabilities))
+        #expect(!AppModule.shares.isAvailable(in: capabilities))
+        #expect(!AppModule.packages.isAvailable(in: capabilities))
+    }
 }

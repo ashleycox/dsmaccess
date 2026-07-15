@@ -108,8 +108,18 @@ enum AppModule: String, CaseIterable, Identifiable {
 
     func isAvailable(in capabilities: DSMCapabilities) -> Bool {
         switch self {
-        case .systemInfo, .storage, .files, .shares, .fileServices, .packages:
-            true
+        case .systemInfo:
+            capabilities.supports("SYNO.DSM.Info")
+        case .storage:
+            capabilities.supports("SYNO.Storage.CGI.Storage")
+        case .files:
+            capabilities.supports("SYNO.FileStation.List")
+        case .shares:
+            capabilities.supports("SYNO.Core.Share")
+        case .fileServices:
+            FileService.allCases.contains { capabilities.supports($0.api) }
+        case .packages:
+            capabilities.supports("SYNO.Core.Package")
         case .logsSecurity:
             capabilities.supports("SYNO.Core.SyslogClient.Log")
                 || capabilities.supports(prefix: "SYNO.Core.Security")

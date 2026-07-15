@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct VirtualMachine: Decodable, Identifiable, Hashable, Sendable {
+struct VirtualMachine: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let guestID: String
     let name: String
     let status: String
@@ -41,9 +41,9 @@ struct VirtualMachine: Decodable, Identifiable, Hashable, Sendable {
         case networkInterfaces = "vnics"
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        guestID = values.flexString(.guestID) ?? UUID().uuidString
+        guestID = try values.requiredFlexString(.guestID)
         name = values.flexString(.name) ?? String(localized: "Machine virtuelle sans nom")
         status = values.flexString(.status) ?? "unknown"
         description = values.flexString(.description)
@@ -52,12 +52,12 @@ struct VirtualMachine: Decodable, Identifiable, Hashable, Sendable {
         vCPUCount = values.flexInt(.vCPUCount) ?? 0
         memoryMiB = values.flexInt64(.memoryMiB)
         autoRun = values.flexBool(.autoRun) ?? false
-        virtualDisks = (try? values.decode([VirtualDisk].self, forKey: .virtualDisks)) ?? []
-        networkInterfaces = (try? values.decode([VirtualNetworkInterface].self, forKey: .networkInterfaces)) ?? []
+        virtualDisks = try values.decodeIfPresent([VirtualDisk].self, forKey: .virtualDisks) ?? []
+        networkInterfaces = try values.decodeIfPresent([VirtualNetworkInterface].self, forKey: .networkInterfaces) ?? []
     }
 }
 
-struct VirtualDisk: Decodable, Hashable, Sendable {
+struct VirtualDisk: nonisolated Decodable, Hashable, Sendable {
     let id: String?
     let name: String?
     let storageName: String?
@@ -70,7 +70,7 @@ struct VirtualDisk: Decodable, Hashable, Sendable {
         case size
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         id = values.flexString(.id)
         name = values.flexString(.name)
@@ -79,7 +79,7 @@ struct VirtualDisk: Decodable, Hashable, Sendable {
     }
 }
 
-struct VirtualNetworkInterface: Decodable, Hashable, Sendable {
+struct VirtualNetworkInterface: nonisolated Decodable, Hashable, Sendable {
     let id: String?
     let networkName: String?
     let macAddress: String?
@@ -92,7 +92,7 @@ struct VirtualNetworkInterface: Decodable, Hashable, Sendable {
         case model
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         id = values.flexString(.id)
         networkName = values.flexString(.networkName)
@@ -101,14 +101,14 @@ struct VirtualNetworkInterface: Decodable, Hashable, Sendable {
     }
 }
 
-struct VirtualMachineList: Decodable, Sendable {
+struct VirtualMachineList: nonisolated Decodable, Sendable {
     let guests: [VirtualMachine]
 
     enum CodingKeys: String, CodingKey { case guests }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        guests = (try? values.decode([VirtualMachine].self, forKey: .guests)) ?? []
+        guests = try values.decodeIfPresent([VirtualMachine].self, forKey: .guests) ?? []
     }
 }
 

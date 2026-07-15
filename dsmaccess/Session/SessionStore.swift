@@ -16,6 +16,7 @@ final class SessionStore {
     private(set) var endpoint: DSMEndpoint?
     /// Le client possède la session DSM et reste la seule source du SID et du SynoToken.
     private var client: DSMClientProtocol?
+    private var generation = 0
     /// API réellement exposées par le DSM et ses paquets installés.
     private(set) var capabilities = DSMCapabilities()
 
@@ -33,6 +34,7 @@ final class SessionStore {
         self.endpoint = endpoint
         self.client = client
         self.capabilities = capabilities
+        generation += 1
         disconnectionMessage = nil
     }
 
@@ -45,9 +47,17 @@ final class SessionStore {
             expireSession()
             throw DSMError.sessionExpired
         }
+        let operationGeneration = generation
         do {
-            return try await operation(client)
+            let value = try await operation(client)
+            guard operationGeneration == generation, self.client === client else {
+                throw DSMError.cancelled
+            }
+            return value
         } catch DSMError.sessionExpired {
+            guard operationGeneration == generation, self.client === client else {
+                throw DSMError.cancelled
+            }
             expireSession()
             throw DSMError.sessionExpired
         }
@@ -66,6 +76,7 @@ final class SessionStore {
 
     /// Réinitialise l'état (après logout ou expiration de session).
     func clear() {
+        generation += 1
         self.endpoint = nil
         self.client = nil
         capabilities = DSMCapabilities()

@@ -149,7 +149,7 @@ struct PackagesView: View {
             }
             let matchesSearch = searchText.isEmpty
                 || package.displayName.localizedStandardContains(searchText)
-                || (package.pkgId?.localizedStandardContains(searchText) == true)
+                || package.pkgId.localizedStandardContains(searchText)
             return matchesFilter && matchesSearch
         }
     }

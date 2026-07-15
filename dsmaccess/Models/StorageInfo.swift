@@ -9,14 +9,14 @@
 
 import Foundation
 
-struct StorageInfo: Decodable {
+struct StorageInfo: nonisolated Decodable, Sendable {
     let disks: [Disk]?
     let volumes: [Volume]?
     let storagePools: [StoragePool]?
 }
 
 /// Taille (octets et inodes en chaînes) partagée par volumes et pools.
-struct ByteSize: Decodable {
+struct ByteSize: nonisolated Decodable, Sendable {
     let total: String?
     let used: String?
     let totalInode: String?
@@ -30,7 +30,7 @@ struct ByteSize: Decodable {
 }
 
 /// Un disque physique.
-struct Disk: Decodable, Identifiable {
+struct Disk: nonisolated Decodable, Identifiable, Sendable {
     let id: String
     let name: String?
     let model: String?
@@ -57,7 +57,7 @@ struct Disk: Decodable, Identifiable {
 }
 
 /// Un volume logique.
-struct Volume: Decodable, Identifiable {
+struct Volume: nonisolated Decodable, Identifiable, Sendable {
     let id: String
     let numId: Int?
     let desc: String?
@@ -66,7 +66,7 @@ struct Volume: Decodable, Identifiable {
     let size: ByteSize?
     let progress: Progress?
 
-    struct Progress: Decodable {
+    struct Progress: nonisolated Decodable, Sendable {
         let percent: String?
         let step: String?
     }
@@ -79,7 +79,7 @@ struct Volume: Decodable, Identifiable {
 }
 
 /// Un groupe de stockage (pool) et son RAID.
-struct StoragePool: Decodable, Identifiable {
+struct StoragePool: nonisolated Decodable, Identifiable, Sendable {
     let id: String
     let desc: String?
     let deviceType: String?          // "shr_with_2_disk_protect", "raid_5", "basic"…

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SurveillanceCamera: Decodable, Identifiable, Hashable, Sendable {
+struct SurveillanceCamera: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let id: String
     let name: String
     let enabled: Bool
@@ -33,9 +33,9 @@ struct SurveillanceCamera: Decodable, Identifiable, Hashable, Sendable {
 
     enum StreamKeys: String, CodingKey { case resolution, fps }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        id = values.flexString(.id) ?? UUID().uuidString
+        id = try values.requiredFlexString(.id)
         name = values.flexString(.name) ?? String(localized: "Caméra sans nom")
         status = values.flexInt(.status) ?? 0
         enabled = values.flexBool(.enabled) ?? (status != 7)
@@ -55,15 +55,13 @@ struct SurveillanceCamera: Decodable, Identifiable, Hashable, Sendable {
     }
 }
 
-struct SurveillanceCameraList: Decodable, Sendable {
+struct SurveillanceCameraList: nonisolated Decodable, Sendable {
     let cameras: [SurveillanceCamera]
 
     enum CodingKeys: String, CodingKey { case cameras, camera }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        cameras = (try? values.decode([SurveillanceCamera].self, forKey: .cameras))
-            ?? (try? values.decode([SurveillanceCamera].self, forKey: .camera))
-            ?? []
+        cameras = try values.decodeArray(SurveillanceCamera.self, forFirstPresent: [.cameras, .camera])
     }
 }

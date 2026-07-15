@@ -7,7 +7,7 @@
 //  expected multi-selection and VoiceOver table semantics.
 //
 
-import AppKit
+@preconcurrency import AppKit
 import SwiftUI
 
 struct FileTableView: NSViewRepresentable {
@@ -212,19 +212,23 @@ struct FileTableView: NSViewRepresentable {
     }
 }
 
-private final class ClosureMenuItem: NSMenuItem {
+private final class ClosureMenuTarget: NSObject {
     private let handler: () -> Void
 
-    init(title: String, handler: @escaping () -> Void) {
+    init(handler: @escaping () -> Void) {
         self.handler = handler
-        super.init(title: title, action: #selector(fire), keyEquivalent: "")
-        target = self
     }
 
-    @available(*, unavailable)
-    required init(coder: NSCoder) { fatalError("init(coder:) non supporté") }
+    @objc func fire() { handler() }
+}
 
-    @objc private func fire() { handler() }
+private func closureMenuItem(title: String, handler: @escaping () -> Void) -> NSMenuItem {
+    let target = ClosureMenuTarget(handler: handler)
+    let item = NSMenuItem(title: title, action: #selector(ClosureMenuTarget.fire), keyEquivalent: "")
+    item.target = target
+    // `target` est faible sur NSMenuItem ; representedObject le conserve pendant la vie du menu.
+    item.representedObject = target
+    return item
 }
 
 private func makeFileContextMenu(
@@ -243,31 +247,31 @@ private func makeFileContextMenu(
 ) -> NSMenu {
     let menu = NSMenu()
     if let activate {
-        menu.addItem(ClosureMenuItem(title: String(localized: "Ouvrir"), handler: activate))
+        menu.addItem(closureMenuItem(title: String(localized: "Ouvrir"), handler: activate))
     }
-    menu.addItem(ClosureMenuItem(title: String(localized: "Télécharger"), handler: download))
+    menu.addItem(closureMenuItem(title: String(localized: "Télécharger"), handler: download))
 
     if canWrite {
         if let share {
-            menu.addItem(ClosureMenuItem(title: String(localized: "Créer un lien de partage"), handler: share))
+            menu.addItem(closureMenuItem(title: String(localized: "Créer un lien de partage"), handler: share))
         }
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(ClosureMenuItem(title: String(localized: "Compresser…"), handler: compress))
+        menu.addItem(closureMenuItem(title: String(localized: "Compresser…"), handler: compress))
         if canExtract, let extract {
-            menu.addItem(ClosureMenuItem(title: String(localized: "Extraire"), handler: extract))
+            menu.addItem(closureMenuItem(title: String(localized: "Extraire"), handler: extract))
         }
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(ClosureMenuItem(title: String(localized: "Copier"), handler: copy))
-        menu.addItem(ClosureMenuItem(title: String(localized: "Déplacer (couper)"), handler: cut))
+        menu.addItem(closureMenuItem(title: String(localized: "Copier"), handler: copy))
+        menu.addItem(closureMenuItem(title: String(localized: "Déplacer (couper)"), handler: cut))
         if let rename {
-            menu.addItem(ClosureMenuItem(title: String(localized: "Renommer…"), handler: rename))
+            menu.addItem(closureMenuItem(title: String(localized: "Renommer…"), handler: rename))
         }
-        menu.addItem(ClosureMenuItem(title: String(localized: "Supprimer…"), handler: delete))
+        menu.addItem(closureMenuItem(title: String(localized: "Supprimer…"), handler: delete))
     }
 
     if let showInfo {
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(ClosureMenuItem(title: String(localized: "Lire les informations"), handler: showInfo))
+        menu.addItem(closureMenuItem(title: String(localized: "Lire les informations"), handler: showInfo))
     }
     return menu
 }

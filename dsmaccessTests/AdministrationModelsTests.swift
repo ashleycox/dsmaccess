@@ -148,4 +148,56 @@ struct AdministrationModelsTests {
         #expect(entry.user == "alex")
         #expect(entry.message == "Login failed")
     }
+
+    @Test func rejectsItemsWithoutOperationalIdentifiers() {
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(DownloadTask.self, from: Data(#"{"title":"x"}"#.utf8))
+        }
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(VirtualMachine.self, from: Data(#"{"guest_name":"x"}"#.utf8))
+        }
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(SurveillanceCamera.self, from: Data(#"{"name":"x"}"#.utf8))
+        }
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(ContainerItem.self, from: Data(#"{"id":"x"}"#.utf8))
+        }
+    }
+
+    @Test func rejectsMalformedCollectionsInsteadOfReportingEmptyState() {
+        let malformed = Data(#"{"items":"not-an-array"}"#.utf8)
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(SystemLogList.self, from: malformed)
+        }
+    }
+
+    @Test func requiresCompletePackageSettingsBeforeMutation() throws {
+        let complete = Data(
+            #"{"enable_autoupdate":true,"autoupdateall":false,"autoupdateimportant":true,"enable_dsm":1,"enable_email":"false","default_vol":"volume1","trust_level":"2","update_channel":"stable"}"#.utf8
+        )
+        var settings = try JSONDecoder().decode(PackageSettings.self, from: complete)
+        settings.setAutoUpdateMode(.latest)
+
+        #expect(settings.autoUpdateMode == .latest)
+        #expect(settings.defaultVol == "volume1")
+        #expect(settings.trustLevel == 2)
+        #expect(settings.enableDsm)
+        #expect(!settings.enableEmail)
+
+        let incomplete = Data(
+            #"{"enable_autoupdate":true,"autoupdateall":false,"autoupdateimportant":true,"enable_dsm":true,"enable_email":false,"default_vol":"volume1","update_channel":false}"#.utf8
+        )
+        #expect(throws: (any Error).self) {
+            try JSONDecoder().decode(PackageSettings.self, from: incomplete)
+        }
+    }
+
+    @Test func sharedFolderIdentityIsStable() throws {
+        let folder = try JSONDecoder().decode(
+            SharedFolder.self,
+            from: Data(#"{"name":"documents","vol_path":"/volume1"}"#.utf8)
+        )
+        #expect(folder.id == "documents")
+        #expect(folder.id == folder.id)
+    }
 }

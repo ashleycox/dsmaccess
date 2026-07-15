@@ -28,6 +28,7 @@ final class SystemResourcesViewModel {
 
     private let session: SessionStore
     private var refreshTask: Task<Void, Never>?
+    private var loadGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
@@ -35,17 +36,21 @@ final class SystemResourcesViewModel {
 
     /// Recharge les mesures. `announce == true` réannonce le résumé (actualisation manuelle).
     func load(announce: Bool = false) async {
+        loadGeneration += 1
+        let generation = loadGeneration
         if usage == nil { isLoading = true }
         errorMessage = nil
+        defer { if generation == loadGeneration { isLoading = false } }
         do {
-            usage = try await session.withClient { try await $0.resourceUsage() }
+            let result = try await session.withClient { try await $0.resourceUsage() }
+            guard generation == loadGeneration else { return }
+            usage = result
         } catch {
-            if !DSMError.isCancellation(error) {
+            if generation == loadGeneration, !DSMError.isCancellation(error) {
                 errorMessage = (error as? DSMError)?.errorDescription ?? error.localizedDescription
             }
         }
-        isLoading = false
-        if announce {
+        if announce, generation == loadGeneration {
             VoiceOver.announce(summary, priority: .low)
         }
     }

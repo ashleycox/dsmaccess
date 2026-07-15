@@ -10,6 +10,8 @@
 import SwiftUI
 
 enum VoiceOver {
+    @MainActor private static var pendingAnnouncement: Task<Void, Never>?
+
     /// Priorité de l'annonce : `.low` s'insère dans la file, `.high` interrompt la parole en cours.
     enum Priority {
         case low, normal, high
@@ -18,15 +20,22 @@ enum VoiceOver {
     /// Poste une annonce VoiceOver après un court délai, avec la priorité demandée.
     @MainActor
     static func announce(_ message: String, priority: Priority = .normal) {
+        pendingAnnouncement?.cancel()
         var text = AttributedString(message)
         switch priority {
         case .low: text.accessibilitySpeechAnnouncementPriority = .low
         case .normal: text.accessibilitySpeechAnnouncementPriority = .default
         case .high: text.accessibilitySpeechAnnouncementPriority = .high
         }
-        Task {
-            try? await Task.sleep(for: .milliseconds(100))
+        pendingAnnouncement = Task {
+            do {
+                try await Task.sleep(for: .milliseconds(100))
+            } catch {
+                return
+            }
+            guard !Task.isCancelled else { return }
             AccessibilityNotification.Announcement(text).post()
+            pendingAnnouncement = nil
         }
     }
 }

@@ -9,7 +9,7 @@
 import Foundation
 
 /// Dossier ou fichier tel que décrit par File Station.
-struct FileStationItem: Decodable, Identifiable, Sendable {
+struct FileStationItem: nonisolated Decodable, Identifiable, Sendable {
     /// Nom affiché (ex. « photo », « vacances.jpg »).
     let name: String
     /// Chemin absolu côté NAS (ex. « /photo/vacances.jpg ») — sert de clé de navigation.
@@ -21,7 +21,7 @@ struct FileStationItem: Decodable, Identifiable, Sendable {
 
     var id: String { path }
 
-    struct Additional: Decodable, Sendable {
+    struct Additional: nonisolated Decodable, Sendable {
         /// Taille en octets (fichiers uniquement).
         let size: Int64?
         let time: TimeInfo?
@@ -37,7 +37,7 @@ struct FileStationItem: Decodable, Identifiable, Sendable {
         }
     }
 
-    struct TimeInfo: Decodable, Sendable {
+    struct TimeInfo: nonisolated Decodable, Sendable {
         /// Date de dernière modification, en secondes depuis l'époque Unix.
         let mtime: Int?
         let atime: Int?
@@ -45,17 +45,17 @@ struct FileStationItem: Decodable, Identifiable, Sendable {
         let crtime: Int?
     }
 
-    struct OwnerInfo: Decodable, Sendable {
+    struct OwnerInfo: nonisolated Decodable, Sendable {
         let user: String?
         let group: String?
     }
 
-    struct PermissionInfo: Decodable, Sendable {
+    struct PermissionInfo: nonisolated Decodable, Sendable {
         let posix: Int?
         let acl: ACLInfo?
     }
 
-    struct ACLInfo: Decodable, Sendable {
+    struct ACLInfo: nonisolated Decodable, Sendable {
         let read: Bool?
         let write: Bool?
         let delete: Bool?
@@ -104,29 +104,29 @@ extension Array where Element == FileStationItem {
 }
 
 /// Charge utile de `method=list_share` : les dossiers partagés à la racine.
-struct FileStationShares: Decodable {
+struct FileStationShares: nonisolated Decodable, Sendable {
     let shares: [FileStationItem]
 }
 
 /// Charge utile de `method=list` : le contenu d'un dossier.
-struct FileStationFiles: Decodable {
+struct FileStationFiles: nonisolated Decodable, Sendable {
     let files: [FileStationItem]
 }
 
-struct FileStationSearchTask: Decodable {
+struct FileStationSearchTask: nonisolated Decodable, Sendable {
     let taskid: String
 }
 
-struct FileStationSearchResults: Decodable {
+struct FileStationSearchResults: nonisolated Decodable, Sendable {
     let files: [FileStationItem]
     let finished: Bool
 }
 
-struct FileStationFavorites: Decodable {
+struct FileStationFavorites: nonisolated Decodable, Sendable {
     let favorites: [FileStationFavorite]
 }
 
-struct FileStationFavorite: Decodable, Identifiable, Sendable {
+struct FileStationFavorite: nonisolated Decodable, Identifiable, Sendable {
     let path: String
     let name: String
     let status: String?
@@ -136,26 +136,26 @@ struct FileStationFavorite: Decodable, Identifiable, Sendable {
 }
 
 /// Réponse de `SYNO.FileStation.CopyMove` `method=start` : l'identifiant de tâche à suivre.
-struct CopyMoveTask: Decodable {
+struct CopyMoveTask: nonisolated Decodable, Sendable {
     let taskid: String
 }
 
-struct FileOperationTask: Decodable {
+struct FileOperationTask: nonisolated Decodable, Sendable {
     let taskid: String
 }
 
-struct FileOperationStatus: Decodable {
+struct FileOperationStatus: nonisolated Decodable, Sendable {
     let finished: Bool
 }
 
 /// Réponse de `SYNO.FileStation.Sharing` `method=create` : les liens de partage créés.
-struct SharingLinks: Decodable {
+struct SharingLinks: nonisolated Decodable, Sendable {
     let links: [SharingLink]
 }
 
 /// Un lien de partage : identifiant, URL publique, et chemin de l'élément partagé
 /// (`path` n'est renvoyé qu'au listing, pas à la création).
-struct SharingLink: Decodable, Identifiable {
+struct SharingLink: nonisolated Decodable, Identifiable, Sendable {
     let id: String
     let url: String
     let path: String?

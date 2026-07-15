@@ -55,9 +55,7 @@ final class PackagesViewModel {
 
     /// Démarre ou arrête un paquet. Renvoie le message à annoncer à VoiceOver.
     func setRunning(_ package: PackageInfo, running: Bool) async -> String {
-        guard let id = package.pkgId else {
-            return String(localized: "Identifiant de paquet introuvable.")
-        }
+        let id = package.pkgId
         busy.insert(id)
         defer { busy.remove(id) }
         do {
@@ -75,9 +73,7 @@ final class PackagesViewModel {
 
     /// Désinstalle un paquet. Renvoie le message à annoncer à VoiceOver.
     func uninstall(_ package: PackageInfo) async -> String {
-        guard let id = package.pkgId else {
-            return String(localized: "Identifiant de paquet introuvable.")
-        }
+        let id = package.pkgId
         busy.insert(id)
         defer { busy.remove(id) }
         do {
@@ -97,8 +93,8 @@ final class PackagesViewModel {
     /// à canal propre (ex. Plex) peut être installé dans une version plus récente que celle
     /// du catalogue — ce n'est pas une mise à jour, il ne faut pas proposer de downgrade.
     func updateVersion(for package: PackageInfo) -> String? {
-        guard let id = package.pkgId?.lowercased(),
-              let available = availableVersions[id],
+        let id = package.pkgId.lowercased()
+        guard let available = availableVersions[id],
               let installed = package.version,
               Self.isVersion(available, newerThan: installed) else { return nil }
         return available

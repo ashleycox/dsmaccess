@@ -10,7 +10,7 @@
 import Foundation
 
 /// Détail d'une API renvoyé par SYNO.API.Info (chemin CGI relatif à /webapi/).
-struct APIInfoEntry: Decodable, Equatable, Sendable {
+struct APIInfoEntry: nonisolated Decodable, Equatable, Sendable {
     let path: String
     let minVersion: Int
     let maxVersion: Int

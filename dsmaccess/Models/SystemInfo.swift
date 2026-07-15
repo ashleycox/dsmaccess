@@ -9,7 +9,7 @@
 import Foundation
 
 /// Informations système de base du NAS.
-struct SystemInfo: Decodable {
+struct SystemInfo: nonisolated Decodable, Sendable {
     let model: String
     let serial: String
     let ram: Int?

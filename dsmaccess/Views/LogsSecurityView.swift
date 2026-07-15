@@ -241,8 +241,8 @@ struct LogsSecurityView: View {
     private var filteredBlockedAddresses: [BlockedAddress] {
         guard !searchText.isEmpty else { return viewModel.blockedAddresses }
         return viewModel.blockedAddresses.filter {
-            $0.address.localizedCaseInsensitiveContains(searchText)
-                || ($0.reason?.localizedCaseInsensitiveContains(searchText) == true)
+            $0.address.localizedStandardContains(searchText)
+                || ($0.reason?.localizedStandardContains(searchText) == true)
         }
     }
 
@@ -268,10 +268,10 @@ struct LogsSecurityView: View {
 
     private func searchMatches(_ entry: SystemLogEntry) -> Bool {
         guard !searchText.isEmpty else { return true }
-        return entry.message.localizedCaseInsensitiveContains(searchText)
-            || (entry.user?.localizedCaseInsensitiveContains(searchText) == true)
-            || (entry.address?.localizedCaseInsensitiveContains(searchText) == true)
-            || (entry.category?.localizedCaseInsensitiveContains(searchText) == true)
+        return entry.message.localizedStandardContains(searchText)
+            || (entry.user?.localizedStandardContains(searchText) == true)
+            || (entry.address?.localizedStandardContains(searchText) == true)
+            || (entry.category?.localizedStandardContains(searchText) == true)
     }
 
     private func load() async {

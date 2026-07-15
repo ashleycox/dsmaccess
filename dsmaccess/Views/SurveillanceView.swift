@@ -251,10 +251,10 @@ struct SurveillanceView: View {
     private var filteredCameras: [SurveillanceCamera] {
         guard !searchText.isEmpty else { return viewModel.cameras }
         return viewModel.cameras.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
-                || ($0.address?.localizedCaseInsensitiveContains(searchText) == true)
-                || ($0.vendor?.localizedCaseInsensitiveContains(searchText) == true)
-                || ($0.model?.localizedCaseInsensitiveContains(searchText) == true)
+            $0.name.localizedStandardContains(searchText)
+                || ($0.address?.localizedStandardContains(searchText) == true)
+                || ($0.vendor?.localizedStandardContains(searchText) == true)
+                || ($0.model?.localizedStandardContains(searchText) == true)
         }
     }
 

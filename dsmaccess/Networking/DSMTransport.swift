@@ -95,7 +95,7 @@ final class DSMTransport {
         return capabilities
     }
 
-    func response<Value: Decodable>(
+    func response<Value: Decodable & Sendable>(
         api: DSMAPI,
         method: String,
         parameters: [String: DSMParameter] = [:],
@@ -112,7 +112,7 @@ final class DSMTransport {
         return try await send(path: resolved.path, parameters: query)
     }
 
-    func value<Value: Decodable>(
+    func value<Value: Decodable & Sendable>(
         api: DSMAPI,
         method: String,
         parameters: [String: DSMParameter] = [:],
@@ -264,7 +264,7 @@ final class DSMTransport {
         return encoded
     }
 
-    private func send<Value: Decodable>(
+    private func send<Value: Decodable & Sendable>(
         path: String,
         parameters: [String: String]
     ) async throws -> DSMResponse<Value> {
@@ -274,6 +274,14 @@ final class DSMTransport {
               (200..<300).contains(httpResponse.statusCode) else {
             throw DSMError.invalidResponse
         }
+        return try await Self.decodeResponse(Value.self, from: data)
+    }
+
+    @concurrent
+    private static func decodeResponse<Value: Decodable & Sendable>(
+        _ type: Value.Type,
+        from data: Data
+    ) async throws -> sending DSMResponse<Value> {
         do {
             return try JSONDecoder().decode(DSMResponse<Value>.self, from: data)
         } catch {

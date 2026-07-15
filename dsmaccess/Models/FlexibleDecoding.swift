@@ -8,7 +8,7 @@
 import Foundation
 
 extension KeyedDecodingContainer {
-    func flexInt(_ key: Key) -> Int? {
+    nonisolated func flexInt(_ key: Key) -> Int? {
         if let value = try? decode(Int.self, forKey: key) { return value }
         if let value = try? decode(Int64.self, forKey: key) { return Int(exactly: value) }
         if let value = try? decode(Double.self, forKey: key) { return Int(value.rounded()) }
@@ -19,7 +19,7 @@ extension KeyedDecodingContainer {
         return nil
     }
 
-    func flexInt64(_ key: Key) -> Int64? {
+    nonisolated func flexInt64(_ key: Key) -> Int64? {
         if let value = try? decode(Int64.self, forKey: key) { return value }
         if let value = try? decode(Int.self, forKey: key) { return Int64(value) }
         if let value = try? decode(Double.self, forKey: key) { return Int64(value.rounded()) }
@@ -30,7 +30,7 @@ extension KeyedDecodingContainer {
         return nil
     }
 
-    func flexBool(_ key: Key) -> Bool? {
+    nonisolated func flexBool(_ key: Key) -> Bool? {
         if let value = try? decode(Bool.self, forKey: key) { return value }
         if let value = flexInt(key) { return value != 0 }
         if let value = try? decode(String.self, forKey: key) {
@@ -43,11 +43,57 @@ extension KeyedDecodingContainer {
         return nil
     }
 
-    func flexString(_ key: Key) -> String? {
+    nonisolated func flexString(_ key: Key) -> String? {
         if let value = try? decode(String.self, forKey: key) { return value }
         if let value = try? decode(Int64.self, forKey: key) { return String(value) }
         if let value = try? decode(Double.self, forKey: key) { return value.formatted() }
         if let value = try? decode(Bool.self, forKey: key) { return value ? "true" : "false" }
         return nil
+    }
+
+    nonisolated func requiredFlexString(_ key: Key) throws -> String {
+        guard let value = flexString(key), !value.isEmpty else {
+            throw DecodingError.dataCorruptedError(
+                forKey: key,
+                in: self,
+                debugDescription: "Required DSM identifier is missing or malformed."
+            )
+        }
+        return value
+    }
+
+    nonisolated func requiredFlexInt(_ key: Key) throws -> Int {
+        guard let value = flexInt(key) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: key,
+                in: self,
+                debugDescription: "Required DSM integer is missing or malformed."
+            )
+        }
+        return value
+    }
+
+    nonisolated func requiredFlexBool(_ key: Key) throws -> Bool {
+        guard let value = flexBool(key) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: key,
+                in: self,
+                debugDescription: "Required DSM Boolean is missing or malformed."
+            )
+        }
+        return value
+    }
+
+    /// Décode le premier alias présent. Une clé absente signifie « aucune donnée » ;
+    /// une clé présente mais mal formée reste une erreur de schéma et n'est jamais
+    /// transformée en collection vide.
+    nonisolated func decodeArray<Element: Decodable>(
+        _ type: Element.Type,
+        forFirstPresent keys: [Key]
+    ) throws -> [Element] {
+        for key in keys where contains(key) {
+            return try decodeIfPresent([Element].self, forKey: key) ?? []
+        }
+        return []
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ContainerItem: Decodable, Identifiable, Hashable, Sendable {
+struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let id: String
     let name: String
     let image: String?
@@ -36,10 +36,10 @@ struct ContainerItem: Decodable, Identifiable, Hashable, Sendable {
         case memoryBytes = "memory_usage"
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        id = values.flexString(.id) ?? values.flexString(.name) ?? UUID().uuidString
-        name = values.flexString(.name) ?? String(localized: "Conteneur sans nom")
+        name = try values.requiredFlexString(.name)
+        id = values.flexString(.id) ?? name
         image = values.flexString(.image)
         status = values.flexString(.status) ?? values.flexString(.state) ?? "unknown"
         createdAt = values.flexInt64(.createdAt)
@@ -56,18 +56,18 @@ struct ContainerItem: Decodable, Identifiable, Hashable, Sendable {
     }
 }
 
-struct ContainerList: Decodable, Sendable {
+struct ContainerList: nonisolated Decodable, Sendable {
     let containers: [ContainerItem]
 
     enum CodingKeys: String, CodingKey { case containers }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        containers = (try? values.decode([ContainerItem].self, forKey: .containers)) ?? []
+        containers = try values.decodeIfPresent([ContainerItem].self, forKey: .containers) ?? []
     }
 }
 
-struct ContainerLogEntry: Decodable, Identifiable, Hashable, Sendable {
+struct ContainerLogEntry: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let id: String
     let timestamp: Int64?
     let stream: String?
@@ -81,7 +81,7 @@ struct ContainerLogEntry: Decodable, Identifiable, Hashable, Sendable {
         case alternateMessage = "message"
     }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         if let value = try? decoder.singleValueContainer().decode(String.self) {
             id = UUID().uuidString
             timestamp = nil
@@ -98,14 +98,14 @@ struct ContainerLogEntry: Decodable, Identifiable, Hashable, Sendable {
     }
 }
 
-struct ContainerLogList: Decodable, Sendable {
+struct ContainerLogList: nonisolated Decodable, Sendable {
     let logs: [ContainerLogEntry]
 
     enum CodingKeys: String, CodingKey { case logs }
 
-    init(from decoder: Decoder) throws {
+    nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        logs = (try? values.decode([ContainerLogEntry].self, forKey: .logs)) ?? []
+        logs = try values.decodeIfPresent([ContainerLogEntry].self, forKey: .logs) ?? []
     }
 }
 

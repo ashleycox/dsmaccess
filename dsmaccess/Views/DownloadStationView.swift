@@ -217,9 +217,9 @@ struct DownloadStationView: View {
     private var filteredTasks: [DownloadTask] {
         guard !searchText.isEmpty else { return viewModel.tasks }
         return viewModel.tasks.filter {
-            $0.title.localizedCaseInsensitiveContains(searchText)
-                || $0.status.localizedCaseInsensitiveContains(searchText)
-                || ($0.additional?.detail?.destination?.localizedCaseInsensitiveContains(searchText) == true)
+            $0.title.localizedStandardContains(searchText)
+                || $0.status.localizedStandardContains(searchText)
+                || ($0.additional?.detail?.destination?.localizedStandardContains(searchText) == true)
         }
     }
 

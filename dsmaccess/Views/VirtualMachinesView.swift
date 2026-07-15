@@ -256,10 +256,10 @@ struct VirtualMachinesView: View {
     private var filteredMachines: [VirtualMachine] {
         guard !searchText.isEmpty else { return viewModel.machines }
         return viewModel.machines.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
-                || $0.status.localizedCaseInsensitiveContains(searchText)
-                || ($0.description?.localizedCaseInsensitiveContains(searchText) == true)
-                || ($0.storageName?.localizedCaseInsensitiveContains(searchText) == true)
+            $0.name.localizedStandardContains(searchText)
+                || $0.status.localizedStandardContains(searchText)
+                || ($0.description?.localizedStandardContains(searchText) == true)
+                || ($0.storageName?.localizedStandardContains(searchText) == true)
         }
     }
 

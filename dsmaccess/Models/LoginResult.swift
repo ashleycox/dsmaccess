@@ -8,7 +8,7 @@
 import Foundation
 
 /// Résultat d'un login réussi.
-struct LoginResult: Decodable {
+struct LoginResult: nonisolated Decodable, Sendable {
     /// Identifiant de session à joindre (`_sid=`) à toutes les requêtes suivantes.
     let sid: String
     /// Jeton d'appareil (device token) renvoyé quand on demande à « se souvenir de l'appareil ».

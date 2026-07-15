@@ -60,7 +60,7 @@ enum FileService: String, CaseIterable, Identifiable, Sendable {
 /// Réponse `get` d'un service de fichiers. On ne déclare que les drapeaux d'activation
 /// connus, tous optionnels : DSM renvoie beaucoup d'autres champs qu'on ignore, et un
 /// service donné ne renseigne que le sien.
-struct FileServiceStatus: Decodable {
+struct FileServiceStatus: nonisolated Decodable, Sendable {
     let enableSMB: Bool?
     let enableNFS: Bool?
     let enableFTP: Bool?

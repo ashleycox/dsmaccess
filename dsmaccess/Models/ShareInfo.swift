@@ -9,14 +9,14 @@
 import Foundation
 
 /// Charge utile de `SYNO.Core.Share` `method=list`.
-struct ShareList: Decodable {
+struct ShareList: nonisolated Decodable, Sendable {
     let shares: [SharedFolder]?
     let total: Int?
 }
 
 /// Un dossier partagé.
-struct SharedFolder: Decodable, Identifiable {
-    let name: String?
+struct SharedFolder: nonisolated Decodable, Identifiable, Sendable {
+    let name: String
     let volPath: String?
     let desc: String?
     let uuid: String?
@@ -29,7 +29,17 @@ struct SharedFolder: Decodable, Identifiable {
         case shareQuota = "share_quota"
     }
 
-    var id: String { uuid ?? name ?? UUID().uuidString }
+    nonisolated init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        name = try values.requiredFlexString(.name)
+        volPath = values.flexString(.volPath)
+        desc = values.flexString(.desc)
+        uuid = values.flexString(.uuid)
+        recyclebin = values.flexBool(.recyclebin)
+        shareQuota = values.flexInt(.shareQuota)
+    }
+
+    var id: String { uuid ?? name }
 }
 
 /// Objet `shareinfo` envoyé à `SYNO.Core.Share` `create` (sérialisé en JSON dans le paramètre).
@@ -61,7 +71,7 @@ func volumeLabel(for path: String) -> String {
 }
 
 extension SharedFolder {
-    var displayName: String { name ?? "—" }
+    var displayName: String { name }
 
     /// Nom lisible du volume hébergeant le partage (« Volume 1 »).
     var volumeText: String? {

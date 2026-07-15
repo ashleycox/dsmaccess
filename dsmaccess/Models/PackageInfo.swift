@@ -9,30 +9,30 @@
 
 import Foundation
 
-struct PackageList: Decodable {
+struct PackageList: nonisolated Decodable, Sendable {
     let packages: [PackageInfo]?
 }
 
 /// Réponse de SYNO.Core.Package.Server (method=list) : le catalogue des paquets disponibles
 /// (officiels et tiers-parti). On n'en retient que l'identifiant et la version pour comparer
 /// avec l'installé et détecter les mises à jour.
-struct ServerPackageList: Decodable {
+struct ServerPackageList: nonisolated Decodable, Sendable {
     let packages: [ServerPackage]?
 }
 
-struct ServerPackage: Decodable {
+struct ServerPackage: nonisolated Decodable, Sendable {
     let id: String?
     let version: String?
 }
 
-struct PackageInfo: Decodable, Identifiable {
-    let pkgId: String?
+struct PackageInfo: nonisolated Decodable, Identifiable, Sendable {
+    let pkgId: String
     let name: String?
     let version: String?
     let additional: Additional?
 
     /// Champs supplémentaires demandés via le paramètre `additional` de l'API.
-    struct Additional: Decodable {
+    struct Additional: nonisolated Decodable, Sendable {
         let status: String?
         let installType: String?
         /// Le paquet peut-il être démarré/arrêté ? (absent pour les paquets non pilotables).
@@ -56,12 +56,12 @@ struct PackageInfo: Decodable, Identifiable {
         case name, version, additional
     }
 
-    var id: String { pkgId ?? name ?? version ?? "?" }
+    var id: String { pkgId }
 
     /// Nom affiché : le nom fourni, sinon l'identifiant.
     var displayName: String {
         if let name, !name.isEmpty { return name }
-        return pkgId ?? String(localized: "Paquet inconnu")
+        return pkgId
     }
 
     /// État traduit (marche / arrêt).

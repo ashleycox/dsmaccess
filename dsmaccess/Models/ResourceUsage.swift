@@ -10,13 +10,13 @@
 
 import Foundation
 
-struct ResourceUsage: Decodable {
+struct ResourceUsage: nonisolated Decodable, Sendable {
     let cpu: CPU?
     let memory: Memory?
     let network: [Interface]?
 
     /// Charges processeur en pourcentage (utilisateur / système / autre).
-    struct CPU: Decodable {
+    struct CPU: nonisolated Decodable, Sendable {
         let userLoad: Int?
         let systemLoad: Int?
         let otherLoad: Int?
@@ -27,7 +27,7 @@ struct ResourceUsage: Decodable {
             case otherLoad = "other_load"
         }
 
-        init(from decoder: Decoder) throws {
+        nonisolated init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
             userLoad = c.flexInt(.userLoad)
             systemLoad = c.flexInt(.systemLoad)
@@ -36,7 +36,7 @@ struct ResourceUsage: Decodable {
     }
 
     /// Mémoire vive : pourcentage utilisé et tailles réelles/échange (en Kio).
-    struct Memory: Decodable {
+    struct Memory: nonisolated Decodable, Sendable {
         let realUsage: Int?     // %
         let totalReal: Int?     // Kio
         let availReal: Int?     // Kio
@@ -49,7 +49,7 @@ struct ResourceUsage: Decodable {
             case swapUsage = "swap_usage"
         }
 
-        init(from decoder: Decoder) throws {
+        nonisolated init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
             realUsage = c.flexInt(.realUsage)
             totalReal = c.flexInt(.totalReal)
@@ -60,14 +60,14 @@ struct ResourceUsage: Decodable {
 
     /// Débit d'une interface réseau (octets par seconde). DSM inclut une entrée
     /// synthétique `device == "total"` cumulant toutes les interfaces.
-    struct Interface: Decodable {
+    struct Interface: nonisolated Decodable, Sendable {
         let device: String?
         let rx: Int?            // octets/s reçus
         let tx: Int?            // octets/s envoyés
 
         enum CodingKeys: String, CodingKey { case device, rx, tx }
 
-        init(from decoder: Decoder) throws {
+        nonisolated init(from decoder: Decoder) throws {
             let c = try decoder.container(keyedBy: CodingKeys.self)
             device = try? c.decode(String.self, forKey: .device)
             rx = c.flexInt(.rx)
