@@ -39,12 +39,6 @@ final class FileBrowserViewModel {
         }
     }
 
-    enum OperationOutcome {
-        case success(String)
-        case failure(String)
-        case cancelled
-    }
-
     private(set) var stack: [Level]
     private(set) var items: [FileStationItem] = []
     private(set) var favorites: [FileStationFavorite] = []
@@ -206,7 +200,7 @@ final class FileBrowserViewModel {
         item.isdir ? "\(item.name).zip" : item.name
     }
 
-    func download(_ item: FileStationItem, to destination: URL) async -> OperationOutcome {
+    func download(_ item: FileStationItem, to destination: URL) async -> DSMOperationOutcome {
         defer { destination.stopAccessingSecurityScopedResource() }
         isDownloading = true
         defer { isDownloading = false }
@@ -219,7 +213,7 @@ final class FileBrowserViewModel {
         }
     }
 
-    func download(_ selectedItems: [FileStationItem], to directory: URL) async -> OperationOutcome {
+    func download(_ selectedItems: [FileStationItem], to directory: URL) async -> DSMOperationOutcome {
         defer { directory.stopAccessingSecurityScopedResource() }
         isDownloading = true
         defer { isDownloading = false }
@@ -245,7 +239,7 @@ final class FileBrowserViewModel {
         )
     }
 
-    func createFolder(named name: String) async -> OperationOutcome {
+    func createFolder(named name: String) async -> DSMOperationOutcome {
         guard let parent = currentLevel.path else {
             return .failure(String(localized: "Impossible de créer le dossier ici."))
         }
@@ -255,14 +249,14 @@ final class FileBrowserViewModel {
         }
     }
 
-    func rename(_ item: FileStationItem, to name: String) async -> OperationOutcome {
+    func rename(_ item: FileStationItem, to name: String) async -> DSMOperationOutcome {
         return await performAndReload {
             try await self.session.withClient { try await $0.rename(path: item.path, to: name) }
             return String(localized: "Renommé en : \(name)")
         }
     }
 
-    func delete(_ selectedItems: [FileStationItem]) async -> OperationOutcome {
+    func delete(_ selectedItems: [FileStationItem]) async -> DSMOperationOutcome {
         return await performAndReload {
             try await self.session.withClient { try await $0.delete(paths: selectedItems.map(\.path)) }
             return selectedItems.count == 1
@@ -271,7 +265,7 @@ final class FileBrowserViewModel {
         }
     }
 
-    func upload(fileURLs: [URL]) async -> OperationOutcome {
+    func upload(fileURLs: [URL]) async -> DSMOperationOutcome {
         guard let parent = currentLevel.path else {
             return .failure(String(localized: "Impossible d’envoyer ici."))
         }
@@ -322,7 +316,7 @@ final class FileBrowserViewModel {
             : String(localized: "\(selectedItems.count) éléments coupés. Ouvrez la destination puis Coller pour déplacer.")
     }
 
-    func paste() async -> OperationOutcome {
+    func paste() async -> DSMOperationOutcome {
         guard let clipboard else { return .failure(String(localized: "Rien à coller.")) }
         guard let destination = currentLevel.path else {
             return .failure(String(localized: "Impossible de coller ici."))
@@ -342,7 +336,7 @@ final class FileBrowserViewModel {
         }
     }
 
-    func compress(_ selectedItems: [FileStationItem], archiveName: String) async -> OperationOutcome {
+    func compress(_ selectedItems: [FileStationItem], archiveName: String) async -> DSMOperationOutcome {
         guard let folder = currentLevel.path else {
             return .failure(String(localized: "Impossible de créer une archive ici."))
         }
@@ -357,7 +351,7 @@ final class FileBrowserViewModel {
         }
     }
 
-    func extract(_ item: FileStationItem) async -> OperationOutcome {
+    func extract(_ item: FileStationItem) async -> DSMOperationOutcome {
         guard let folder = currentLevel.path else {
             return .failure(String(localized: "Impossible d’extraire l’archive ici."))
         }
@@ -379,7 +373,7 @@ final class FileBrowserViewModel {
         favorites.contains { $0.path == path }
     }
 
-    func toggleCurrentFavorite() async -> OperationOutcome {
+    func toggleCurrentFavorite() async -> DSMOperationOutcome {
         guard let path = currentLevel.path else {
             return .failure(String(localized: "Impossible d’ajouter ce dossier aux favoris."))
         }
@@ -440,7 +434,7 @@ final class FileBrowserViewModel {
         }
     }
 
-    func deleteShareLink(_ link: SharingLink) async -> OperationOutcome {
+    func deleteShareLink(_ link: SharingLink) async -> DSMOperationOutcome {
         do {
             try await session.withClient { try await $0.deleteShareLink(id: link.id) }
             await loadShareLinks()
@@ -466,7 +460,7 @@ final class FileBrowserViewModel {
 
     private func performAndReload(
         _ operation: () async throws -> String
-    ) async -> OperationOutcome {
+    ) async -> DSMOperationOutcome {
         isWorking = true
         defer { isWorking = false }
         do {

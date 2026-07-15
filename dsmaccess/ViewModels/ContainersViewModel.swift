@@ -47,7 +47,7 @@ final class ContainersViewModel {
         }
     }
 
-    func perform(_ action: ContainerAction, on container: ContainerItem) async -> String {
+    func perform(_ action: ContainerAction, on container: ContainerItem) async -> DSMOperationOutcome {
         busyNames.insert(container.name)
         defer { busyNames.remove(container.name) }
 
@@ -57,13 +57,14 @@ final class ContainersViewModel {
             }
             await load(silently: true)
             switch action {
-            case .start: return String(localized: "Conteneur démarré : \(container.name)")
-            case .stop: return String(localized: "Conteneur arrêté : \(container.name)")
-            case .restart: return String(localized: "Conteneur redémarré : \(container.name)")
+            case .start: return .success(String(localized: "Conteneur démarré : \(container.name)"))
+            case .stop: return .success(String(localized: "Conteneur arrêté : \(container.name)"))
+            case .restart: return .success(String(localized: "Conteneur redémarré : \(container.name)"))
             }
         } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
             let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec pour \(container.name) : \(reason)")
+            return .failure(String(localized: "Échec pour \(container.name) : \(reason)"))
         }
     }
 

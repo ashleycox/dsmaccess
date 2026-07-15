@@ -50,19 +50,22 @@ final class FileServicesViewModel {
     }
 
     /// Bascule un service. Renvoie le message à annoncer à VoiceOver.
-    func setEnabled(_ service: FileService, _ enabled: Bool) async -> String {
+    func setEnabled(_ service: FileService, _ enabled: Bool) async -> DSMOperationOutcome {
         busy.insert(service)
         defer { busy.remove(service) }
         do {
             try await session.withClient { try await $0.setFileService(service, enabled: enabled) }
             states[service] = await fetch(service)
-            return enabled
-                ? String(localized: "\(service.displayName) activé")
-                : String(localized: "\(service.displayName) désactivé")
+            return .success(
+                enabled
+                    ? String(localized: "\(service.displayName) activé")
+                    : String(localized: "\(service.displayName) désactivé")
+            )
         } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
             let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
             states[service] = await fetch(service)
-            return String(localized: "Échec pour \(service.displayName) : \(reason)")
+            return .failure(String(localized: "Échec pour \(service.displayName) : \(reason)"))
         }
     }
 

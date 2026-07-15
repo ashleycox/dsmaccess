@@ -60,36 +60,42 @@ final class PackagesViewModel {
     }
 
     /// Démarre ou arrête un paquet. Renvoie le message à annoncer à VoiceOver.
-    func setRunning(_ package: PackageInfo, running: Bool) async -> String {
+    func setRunning(_ package: PackageInfo, running: Bool) async -> DSMOperationOutcome {
         let id = package.pkgId
         busy.insert(id)
         defer { busy.remove(id) }
         do {
             try await session.withClient { try await $0.setPackageRunning(id: id, running: running) }
             await load()   // relit l'état réel du paquet
-            return running
-                ? String(localized: "\(package.displayName) démarré")
-                : String(localized: "\(package.displayName) arrêté")
+            return .success(
+                running
+                    ? String(localized: "\(package.displayName) démarré")
+                    : String(localized: "\(package.displayName) arrêté")
+            )
         } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
             let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
             await load()
-            return String(localized: "Échec pour \(package.displayName) : \(reason)")
+            return .failure(String(localized: "Échec pour \(package.displayName) : \(reason)"))
         }
     }
 
     /// Désinstalle un paquet. Renvoie le message à annoncer à VoiceOver.
-    func uninstall(_ package: PackageInfo) async -> String {
+    func uninstall(_ package: PackageInfo) async -> DSMOperationOutcome {
         let id = package.pkgId
         busy.insert(id)
         defer { busy.remove(id) }
         do {
             try await session.withClient { try await $0.uninstallPackage(id: id) }
             await load()
-            return String(localized: "\(package.displayName) désinstallé")
+            return .success(String(localized: "\(package.displayName) désinstallé"))
         } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
             let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
             await load()
-            return String(localized: "Échec de la désinstallation de \(package.displayName) : \(reason)")
+            return .failure(
+                String(localized: "Échec de la désinstallation de \(package.displayName) : \(reason)")
+            )
         }
     }
 

@@ -298,8 +298,8 @@ struct DownloadStationView: View {
         await announce(viewModel.delete(ids: ids, forceComplete: forceComplete))
     }
 
-    private func announce(_ message: String) async {
-        VoiceOver.announce(message, priority: .high)
+    private func announce(_ outcome: DSMOperationOutcome) async {
+        VoiceOver.announce(outcome, priority: .high)
     }
 
     private func sizeSummary(_ task: DownloadTask) -> String {

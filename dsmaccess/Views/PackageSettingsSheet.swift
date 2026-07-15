@@ -129,7 +129,7 @@ struct PackageSettingsSheet: View {
 
     /// Fabrique un Binding<Bool> qui lit un champ des réglages et enregistre via `set`.
     private func boolBinding(get: @escaping (PackageSettings) -> Bool,
-                             set: @escaping (Bool) async -> String) -> Binding<Bool> {
+                             set: @escaping (Bool) async -> DSMOperationOutcome) -> Binding<Bool> {
         Binding(
             get: { vm.settings.map(get) ?? false },
             set: { newValue in

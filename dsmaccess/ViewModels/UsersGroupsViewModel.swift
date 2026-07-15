@@ -50,14 +50,14 @@ final class UsersGroupsViewModel {
         }
     }
 
-    func createUser(_ draft: DSMUserDraft) async -> String {
+    func createUser(_ draft: DSMUserDraft) async -> DSMOperationOutcome {
         await perform(key: "user:\(draft.name)") { client in
             try await client.createUser(draft)
             return String(localized: "Utilisateur créé : \(draft.name)")
         }
     }
 
-    func setUser(_ user: DSMUser, disabled: Bool) async -> String {
+    func setUser(_ user: DSMUser, disabled: Bool) async -> DSMOperationOutcome {
         await perform(key: "user:\(user.name)") { client in
             try await client.setUser(user.name, disabled: disabled)
             return disabled
@@ -66,21 +66,21 @@ final class UsersGroupsViewModel {
         }
     }
 
-    func deleteUser(_ user: DSMUser) async -> String {
+    func deleteUser(_ user: DSMUser) async -> DSMOperationOutcome {
         await perform(key: "user:\(user.name)") { client in
             try await client.deleteUser(user.name)
             return String(localized: "Utilisateur supprimé : \(user.name)")
         }
     }
 
-    func createGroup(_ draft: DSMGroupDraft) async -> String {
+    func createGroup(_ draft: DSMGroupDraft) async -> DSMOperationOutcome {
         await perform(key: "group:\(draft.name)") { client in
             try await client.createGroup(draft)
             return String(localized: "Groupe créé : \(draft.name)")
         }
     }
 
-    func deleteGroup(_ group: DSMGroup) async -> String {
+    func deleteGroup(_ group: DSMGroup) async -> DSMOperationOutcome {
         await perform(key: "group:\(group.name)") { client in
             try await client.deleteGroup(group.name)
             return String(localized: "Groupe supprimé : \(group.name)")
@@ -95,16 +95,17 @@ final class UsersGroupsViewModel {
     private func perform(
         key: String,
         operation: (DSMClientProtocol) async throws -> String
-    ) async -> String {
+    ) async -> DSMOperationOutcome {
         busyItems.insert(key)
         defer { busyItems.remove(key) }
 
         do {
             let message = try await session.withClient(operation)
             await load()
-            return message
+            return .success(message)
         } catch {
-            return String(localized: "Échec de l’opération : \(reason(for: error))")
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(String(localized: "Échec de l’opération : \(reason(for: error))"))
         }
     }
 

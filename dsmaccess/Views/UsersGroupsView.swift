@@ -298,8 +298,8 @@ struct UsersGroupsView: View {
         )
     }
 
-    private func announce(_ message: String) async {
-        VoiceOver.announce(message, priority: .high)
+    private func announce(_ outcome: DSMOperationOutcome) async {
+        VoiceOver.announce(outcome, priority: .high)
     }
 }
 

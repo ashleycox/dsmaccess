@@ -58,7 +58,7 @@ final class SharesViewModel {
     }
 
     /// Crée un dossier partagé. Renvoie le message à annoncer.
-    func create(name: String, volumePath: String, description: String) async -> String {
+    func create(name: String, volumePath: String, description: String) async -> DSMOperationOutcome {
         do {
             try await session.withClient {
                 try await $0.createSharedFolder(
@@ -68,21 +68,23 @@ final class SharesViewModel {
                 )
             }
             await load()
-            return String(localized: "Dossier partagé créé : \(name)")
+            return .success(String(localized: "Dossier partagé créé : \(name)"))
         } catch {
-            return String(localized: "Échec de la création : \(reason(for: error))")
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(String(localized: "Échec de la création : \(reason(for: error))"))
         }
     }
 
     /// Supprime un dossier partagé. Renvoie le message à annoncer.
-    func delete(_ folder: SharedFolder) async -> String {
+    func delete(_ folder: SharedFolder) async -> DSMOperationOutcome {
         let name = folder.name
         do {
             try await session.withClient { try await $0.deleteSharedFolder(name: name) }
             await load()
-            return String(localized: "Dossier partagé supprimé : \(name)")
+            return .success(String(localized: "Dossier partagé supprimé : \(name)"))
         } catch {
-            return String(localized: "Échec de la suppression : \(reason(for: error))")
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(String(localized: "Échec de la suppression : \(reason(for: error))"))
         }
     }
 

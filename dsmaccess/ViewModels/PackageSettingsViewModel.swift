@@ -42,27 +42,27 @@ final class PackageSettingsViewModel {
         }
     }
 
-    func setAutoUpdateMode(_ mode: AutoUpdateMode) async -> String {
+    func setAutoUpdateMode(_ mode: AutoUpdateMode) async -> DSMOperationOutcome {
         await apply { $0.setAutoUpdateMode(mode) }
     }
 
-    func setBeta(_ enabled: Bool) async -> String {
+    func setBeta(_ enabled: Bool) async -> DSMOperationOutcome {
         await apply { $0.updateChannelBeta = enabled }
     }
 
-    func setDsmNotify(_ enabled: Bool) async -> String {
+    func setDsmNotify(_ enabled: Bool) async -> DSMOperationOutcome {
         await apply { $0.enableDsm = enabled }
     }
 
-    func setEmailNotify(_ enabled: Bool) async -> String {
+    func setEmailNotify(_ enabled: Bool) async -> DSMOperationOutcome {
         await apply { $0.enableEmail = enabled }
     }
 
     /// Applique une mutation aux réglages chargés, enregistre l'objet complet, et renvoie le
     /// message à annoncer à VoiceOver.
-    private func apply(_ mutate: (inout PackageSettings) -> Void) async -> String {
+    private func apply(_ mutate: (inout PackageSettings) -> Void) async -> DSMOperationOutcome {
         guard var updated = settings else {
-            return String(localized: "Réglages non chargés.")
+            return .failure(String(localized: "Réglages non chargés."))
         }
         mutate(&updated)
         isSaving = true
@@ -70,10 +70,11 @@ final class PackageSettingsViewModel {
         do {
             try await session.withClient { try await $0.setPackageSettings(updated) }
             settings = updated
-            return String(localized: "Réglage enregistré")
+            return .success(String(localized: "Réglage enregistré"))
         } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
             let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec de l'enregistrement : \(reason)")
+            return .failure(String(localized: "Échec de l'enregistrement : \(reason)"))
         }
     }
 }

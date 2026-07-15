@@ -42,7 +42,7 @@ final class VirtualMachinesViewModel {
         }
     }
 
-    func perform(_ action: VirtualMachinePowerAction, on machine: VirtualMachine) async -> String {
+    func perform(_ action: VirtualMachinePowerAction, on machine: VirtualMachine) async -> DSMOperationOutcome {
         busyIDs.insert(machine.id)
         defer { busyIDs.remove(machine.id) }
 
@@ -52,13 +52,14 @@ final class VirtualMachinesViewModel {
             }
             await load(silently: true)
             switch action {
-            case .powerOn: return String(localized: "Démarrage demandé pour \(machine.name)")
-            case .shutdown: return String(localized: "Arrêt propre demandé pour \(machine.name)")
-            case .powerOff: return String(localized: "Extinction forcée demandée pour \(machine.name)")
+            case .powerOn: return .success(String(localized: "Démarrage demandé pour \(machine.name)"))
+            case .shutdown: return .success(String(localized: "Arrêt propre demandé pour \(machine.name)"))
+            case .powerOff: return .success(String(localized: "Extinction forcée demandée pour \(machine.name)"))
             }
         } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
             let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec pour \(machine.name) : \(reason)")
+            return .failure(String(localized: "Échec pour \(machine.name) : \(reason)"))
         }
     }
 

@@ -66,17 +66,18 @@ final class LogsSecurityViewModel {
         }
     }
 
-    func unblock(_ blockedAddress: BlockedAddress) async -> String {
+    func unblock(_ blockedAddress: BlockedAddress) async -> DSMOperationOutcome {
         busyAddresses.insert(blockedAddress.address)
         defer { busyAddresses.remove(blockedAddress.address) }
 
         do {
             try await session.withClient { try await $0.unblockAddress(blockedAddress.address) }
             blockedAddresses.removeAll { $0.id == blockedAddress.id }
-            return String(localized: "Adresse débloquée : \(blockedAddress.address)")
+            return .success(String(localized: "Adresse débloquée : \(blockedAddress.address)"))
         } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
             let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec du déblocage : \(reason)")
+            return .failure(String(localized: "Échec du déblocage : \(reason)"))
         }
     }
 

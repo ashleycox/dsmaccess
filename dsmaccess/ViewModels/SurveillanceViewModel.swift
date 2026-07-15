@@ -47,8 +47,10 @@ final class SurveillanceViewModel {
         }
     }
 
-    func setEnabled(_ enabled: Bool, ids: Set<String>) async -> String {
-        guard !ids.isEmpty else { return String(localized: "Aucune caméra sélectionnée") }
+    func setEnabled(_ enabled: Bool, ids: Set<String>) async -> DSMOperationOutcome {
+        guard !ids.isEmpty else {
+            return .failure(String(localized: "Aucune caméra sélectionnée"))
+        }
         busyIDs.formUnion(ids)
         defer { busyIDs.subtract(ids) }
 
@@ -57,12 +59,15 @@ final class SurveillanceViewModel {
                 try await $0.setSurveillanceCameras(ids: ids, enabled: enabled)
             }
             await load(silently: true)
-            return enabled
-                ? String(localized: "\(ids.count) caméras activées")
-                : String(localized: "\(ids.count) caméras désactivées")
+            return .success(
+                enabled
+                    ? String(localized: "\(ids.count) caméras activées")
+                    : String(localized: "\(ids.count) caméras désactivées")
+            )
         } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
             let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-            return String(localized: "Échec de l’opération : \(reason)")
+            return .failure(String(localized: "Échec de l’opération : \(reason)"))
         }
     }
 

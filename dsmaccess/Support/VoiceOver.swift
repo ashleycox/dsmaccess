@@ -52,6 +52,23 @@ enum VoiceOver {
     }
 
     @MainActor
+    static func announce(
+        _ outcome: DSMOperationOutcome,
+        priority: Priority = .normal,
+        onSuccess: () -> Void = { }
+    ) {
+        switch outcome {
+        case .success(let message):
+            onSuccess()
+            announce(message, category: .result, priority: priority)
+        case .failure(let message):
+            announce(message, category: .error, priority: priority)
+        case .cancelled:
+            break
+        }
+    }
+
+    @MainActor
     private static func scheduleQueuedBatch() {
         queuedBatchTask?.cancel()
         queuedBatchTask = Task {

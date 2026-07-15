@@ -55,31 +55,31 @@ final class DownloadStationViewModel {
         }
     }
 
-    func create(uri: String, destination: String?) async -> String {
+    func create(uri: String, destination: String?) async -> DSMOperationOutcome {
         do {
             try await session.withClient { try await $0.createDownload(uri: uri, destination: destination) }
             await load()
-            return String(localized: "Téléchargement ajouté")
+            return .success(String(localized: "Téléchargement ajouté"))
         } catch {
             return failure(error)
         }
     }
 
-    func pause(ids: Set<String>) async -> String {
+    func pause(ids: Set<String>) async -> DSMOperationOutcome {
         await perform(ids: ids) { client in
             try await client.pauseDownloads(ids: ids)
             return String(localized: "\(ids.count) téléchargements mis en pause")
         }
     }
 
-    func resume(ids: Set<String>) async -> String {
+    func resume(ids: Set<String>) async -> DSMOperationOutcome {
         await perform(ids: ids) { client in
             try await client.resumeDownloads(ids: ids)
             return String(localized: "\(ids.count) téléchargements repris")
         }
     }
 
-    func delete(ids: Set<String>, forceComplete: Bool) async -> String {
+    func delete(ids: Set<String>, forceComplete: Bool) async -> DSMOperationOutcome {
         await perform(ids: ids) { client in
             try await client.deleteDownloads(ids: ids, forceComplete: forceComplete)
             return String(localized: "\(ids.count) téléchargements supprimés")
@@ -95,23 +95,26 @@ final class DownloadStationViewModel {
     private func perform(
         ids: Set<String>,
         operation: (DSMClientProtocol) async throws -> String
-    ) async -> String {
-        guard !ids.isEmpty else { return String(localized: "Aucun téléchargement sélectionné") }
+    ) async -> DSMOperationOutcome {
+        guard !ids.isEmpty else {
+            return .failure(String(localized: "Aucun téléchargement sélectionné"))
+        }
         busyIDs.formUnion(ids)
         defer { busyIDs.subtract(ids) }
 
         do {
             let message = try await session.withClient(operation)
             await load()
-            return message
+            return .success(message)
         } catch {
             await load(silently: true)
             return failure(error)
         }
     }
 
-    private func failure(_ error: Error) -> String {
+    private func failure(_ error: Error) -> DSMOperationOutcome {
+        guard !DSMError.isCancellation(error) else { return .cancelled }
         let reason = (error as? DSMError)?.errorDescription ?? error.localizedDescription
-        return String(localized: "Échec de l’opération : \(reason)")
+        return .failure(String(localized: "Échec de l’opération : \(reason)"))
     }
 }
