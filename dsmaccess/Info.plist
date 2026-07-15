@@ -14,7 +14,7 @@
 	<!-- Sparkle : requis en sandbox pour lancer le service XPC d'installation. -->
 	<key>SUEnableInstallerLauncherService</key>
 	<true/>
-	<!-- URL de l'appcast. PROVISOIRE : à confirmer/ajuster à l'étape distribution. -->
+	<!-- URL de l'appcast Sparkle publié avec les versions de l'app. -->
 	<key>SUFeedURL</key>
 	<string>https://math65.github.io/dsmaccess/appcast.xml</string>
 	<!-- Clé publique EdDSA de vérification des mises à jour. La clé privée
