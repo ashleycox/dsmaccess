@@ -10,38 +10,40 @@ import SwiftUI
 struct AppSettingsView: View {
     let settings: AppSettings
     let session: SessionStore
-    @State private var selection = AppSettingsPane.announcements
+    @AppStorage("selectedSettingsPane") private var selection = AppSettingsPane.announcements
 
     var body: some View {
-        NavigationSplitView(columnVisibility: .constant(.all)) {
-            List(AppSettingsPane.allCases, selection: $selection) { pane in
-                Label(pane.title, systemImage: pane.systemImage)
-                    .tag(pane)
-                    .help(pane.help)
-                    .accessibilityIdentifier("settings.pane.\(pane.rawValue)")
-            }
-            .listStyle(.sidebar)
-            .navigationTitle("Réglages")
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200, max: 240)
-            .accessibilityLabel("Sections des réglages")
-            .accessibilityIdentifier("settings.sidebar")
-        } detail: {
-            Group {
-                switch selection {
-                case .announcements:
-                    AnnouncementSettingsView(settings: settings)
-                        .navigationTitle(AppSettingsPane.announcements.title)
-                case .sidebar:
-                    SidebarSettingsView(settings: settings)
-                        .navigationTitle(AppSettingsPane.sidebar.title)
-                case .nas:
-                    NASSettingsView(session: session)
-                        .navigationTitle(AppSettingsPane.nas.title)
+        TabView(selection: $selection) {
+            AnnouncementSettingsView(settings: settings)
+                .tabItem {
+                    Label(
+                        AppSettingsPane.announcements.title,
+                        systemImage: AppSettingsPane.announcements.systemImage
+                    )
                 }
-            }
+                .tag(AppSettingsPane.announcements)
+
+            SidebarSettingsView(settings: settings)
+                .tabItem {
+                    Label(
+                        AppSettingsPane.sidebar.title,
+                        systemImage: AppSettingsPane.sidebar.systemImage
+                    )
+                }
+                .tag(AppSettingsPane.sidebar)
+
+            NASSettingsView(session: session)
+                .tabItem {
+                    Label(
+                        AppSettingsPane.nas.title,
+                        systemImage: AppSettingsPane.nas.systemImage
+                    )
+                }
+                .tag(AppSettingsPane.nas)
         }
-        .toolbar(.hidden, for: .windowToolbar)
-        .frame(minWidth: 760, idealWidth: 820, minHeight: 520, idealHeight: 600)
+        .background(SettingsWindowConfigurator())
+        .accessibilityIdentifier("settings.panes")
+        .frame(minWidth: 640, idealWidth: 720, minHeight: 440, idealHeight: 520)
         .task {
             announceSelection(selection)
         }

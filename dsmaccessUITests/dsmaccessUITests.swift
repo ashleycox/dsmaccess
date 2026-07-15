@@ -71,19 +71,20 @@ final class dsmaccessUITests: XCTestCase {
     }
 
     @MainActor
-    func testSettingsUsesAccessibleSidebarNavigation() throws {
+    func testSettingsUsesAccessibleToolbarNavigation() throws {
         app.typeKey(",", modifierFlags: .command)
 
-        let settingsSidebar = app.descendants(matching: .any)["settings.sidebar"]
-        let announcementsPane = app.descendants(matching: .any)["settings.pane.announcements"]
-        let sidebarPane = app.descendants(matching: .any)["settings.pane.sidebar"]
-        let nasPane = app.descendants(matching: .any)["settings.pane.nas"]
+        let settingsPanes = app.descendants(matching: .any)["settings.panes"]
+        let settingsToolbar = app.toolbars.firstMatch
+        let announcementsPane = settingsToolbar.buttons["Annonces"]
+        let sidebarPane = settingsToolbar.buttons["Barre latérale"]
+        let nasPane = settingsToolbar.buttons["NAS"]
 
-        XCTAssertTrue(settingsSidebar.waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsPanes.waitForExistence(timeout: 5))
+        XCTAssertTrue(settingsToolbar.exists)
         XCTAssertTrue(announcementsPane.exists)
         XCTAssertTrue(sidebarPane.exists)
         XCTAssertTrue(nasPane.exists)
-        XCTAssertFalse(app.buttons["Masquer la barre latérale"].exists)
 
         sidebarPane.click()
         XCTAssertTrue(app.checkBoxes["Masquer automatiquement les fonctionnalités indisponibles sur le NAS connecté"].waitForExistence(timeout: 2))

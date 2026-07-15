@@ -38,11 +38,11 @@ enum AppSettingsPane: String, CaseIterable, Identifiable {
         }
     }
 
-    var help: LocalizedStringKey {
+    var localizedHelp: String {
         switch self {
-        case .announcements: "Configurer les annonces VoiceOver"
-        case .sidebar: "Configurer les modules de la barre latérale"
-        case .nas: "Gérer les NAS enregistrés"
+        case .announcements: String(localized: "Configurer les annonces VoiceOver")
+        case .sidebar: String(localized: "Configurer les modules de la barre latérale")
+        case .nas: String(localized: "Gérer les NAS enregistrés")
         }
     }
 }
