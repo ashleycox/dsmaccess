@@ -8,6 +8,7 @@ actor DSMRequestStub {
 
     private var results: [Result]
     private(set) var requestCount = 0
+    private(set) var requests: [URLRequest] = []
 
     init(results: [Result]) {
         self.results = results
@@ -15,6 +16,7 @@ actor DSMRequestStub {
 
     func data(for request: URLRequest) throws -> (Data, URLResponse) {
         requestCount += 1
+        requests.append(request)
         guard !results.isEmpty else {
             throw URLError(.badServerResponse)
         }

@@ -94,6 +94,16 @@
         }
       }
     },
+    "%@ mis à jour" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ updated"
+          }
+        }
+      }
+    },
     "%@ n’est pas disponible sur ce NAS" : {
       "localizations" : {
         "en" : {
@@ -2073,6 +2083,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No virtual machines"
+          }
+        }
+      }
+    },
+    "Aucune mise à jour disponible pour %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No update is available for %@."
           }
         }
       }
@@ -5121,6 +5141,16 @@
         }
       }
     },
+    "La mise à jour a expiré." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The package update timed out."
+          }
+        }
+      }
+    },
     "La réponse du NAS n'a pas pu être lue." : {
       "localizations" : {
         "en" : {
@@ -5551,6 +5581,62 @@
         }
       }
     },
+    "Mettre à jour" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update"
+          }
+        }
+      }
+    },
+    "Mettre à jour %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update %@"
+          }
+        }
+      }
+    },
+    "Mettre à jour %@ vers la version %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update %1$@ to version %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mettre à jour %1$@ vers la version %2$@"
+          }
+        }
+      }
+    },
+    "Mettre à jour ce paquet ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update this package?"
+          }
+        }
+      }
+    },
+    "Mettre à jour…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update…"
+          }
+        }
+      }
+    },
     "Migration" : {
       "localizations" : {
         "en" : {
@@ -5577,6 +5663,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Automatic updates"
+          }
+        }
+      }
+    },
+    "Mise à jour de %@ en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating %@…"
           }
         }
       }
@@ -5857,6 +5953,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Navigation and screen changes"
+          }
+        }
+      }
+    },
+    "Ne pas mettre à jour ce paquet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do not update this package"
           }
         }
       }
@@ -8517,6 +8623,22 @@
         }
       }
     },
+    "« %@ » sera mis à jour vers la version %@. Le paquet sera téléchargé, installé puis redémarré. L’opération peut prendre plusieurs minutes. Si DSM exige un redémarrage du NAS, vous devrez l’effectuer depuis DSM." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” will be updated to version %2$@. The package will be downloaded, installed, and restarted. This may take several minutes. If DSM requires a NAS restart, you will need to do it from DSM."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "« %1$@ » sera mis à jour vers la version %2$@. Le paquet sera téléchargé, installé puis redémarré. L’opération peut prendre plusieurs minutes. Si DSM exige un redémarrage du NAS, vous devrez l’effectuer depuis DSM."
+          }
+        }
+      }
+    },
     "« %@ » sera supprimé définitivement. Cette action est irréversible." : {
       "localizations" : {
         "en" : {
@@ -8563,6 +8685,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed to uninstall %@: %@"
+          }
+        }
+      }
+    },
+    "Échec de la mise à jour de %@ : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to update %1$@: %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Échec de la mise à jour de %1$@ : %2$@"
           }
         }
       }

@@ -13,9 +13,7 @@ struct PackageList: nonisolated Decodable, Sendable {
     let packages: [PackageInfo]?
 }
 
-/// Réponse de SYNO.Core.Package.Server (method=list) : le catalogue des paquets disponibles
-/// (officiels et tiers-parti). On n'en retient que l'identifiant et la version pour comparer
-/// avec l'installé et détecter les mises à jour.
+/// Réponse du catalogue du Centre de paquets.
 struct ServerPackageList: nonisolated Decodable, Sendable {
     let packages: [ServerPackage]?
 }
@@ -23,6 +21,28 @@ struct ServerPackageList: nonisolated Decodable, Sendable {
 struct ServerPackage: nonisolated Decodable, Sendable {
     let id: String?
     let version: String?
+    let link: String?
+    let md5: String?
+    let size: Int?
+    let beta: Bool?
+    let source: String?
+    let type: Int?
+
+    private enum CodingKeys: String, CodingKey {
+        case id, version, link, md5, size, beta, source, type
+    }
+
+    nonisolated init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = container.flexString(.id)
+        version = container.flexString(.version)
+        link = container.flexString(.link)
+        md5 = container.flexString(.md5)
+        size = container.flexInt(.size)
+        beta = container.flexBool(.beta)
+        source = container.flexString(.source)
+        type = container.flexInt(.type)
+    }
 }
 
 struct PackageInfo: nonisolated Decodable, Identifiable, Sendable {

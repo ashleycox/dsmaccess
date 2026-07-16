@@ -57,7 +57,8 @@ protocol DSMClientProtocol: AnyObject {
     func fileServiceEnabled(_ service: FileService) async throws -> Bool?
     func setFileService(_ service: FileService, enabled: Bool) async throws
     func listPackages() async throws -> [PackageInfo]
-    func availablePackageVersions() async throws -> [String: String]
+    func availablePackageUpdates() async throws -> [String: PackageUpdate]
+    func upgradePackage(_ update: PackageUpdate) async throws
     func setPackageRunning(id: String, running: Bool) async throws
     func uninstallPackage(id: String) async throws
     func packageSettings() async throws -> PackageSettings
@@ -280,8 +281,12 @@ final class DSMClient: DSMClientProtocol {
         try await packages.installedPackages()
     }
 
-    func availablePackageVersions() async throws -> [String: String] {
-        try await packages.availableVersions()
+    func availablePackageUpdates() async throws -> [String: PackageUpdate] {
+        try await packages.availableUpdates()
+    }
+
+    func upgradePackage(_ update: PackageUpdate) async throws {
+        try await packages.upgrade(update)
     }
 
     func setPackageRunning(id: String, running: Bool) async throws {

@@ -8,6 +8,7 @@ import SwiftUI
 struct PackagesView: View {
     @State private var vm: PackagesViewModel
     @State private var pendingUninstall: PackageInfo?
+    @State private var pendingUpdate: PackageInfo?
     @State private var showSettings = false
     @State private var searchText = ""
     @State private var filter = PackageFilter.all
@@ -72,6 +73,23 @@ struct PackagesView: View {
         } message: { package in
             Text(uninstallWarning(for: package))
         }
+        .confirmationDialog(
+            "Mettre à jour ce paquet ?",
+            isPresented: Binding(
+                get: { pendingUpdate != nil },
+                set: { if !$0 { pendingUpdate = nil } }
+            ),
+            presenting: pendingUpdate
+        ) { package in
+            Button("Mettre à jour \(package.displayName)") {
+                requestUpdate(package)
+            }
+            .help(String(localized: "Mettre à jour \(package.displayName)"))
+            Button("Annuler", role: .cancel) { }
+                .help("Ne pas mettre à jour ce paquet")
+        } message: { package in
+            Text(updateWarning(for: package))
+        }
         .sheet(isPresented: $showSettings) {
             PackageSettingsSheet(session: session)
         }
@@ -130,6 +148,18 @@ struct PackagesView: View {
             control(for: package)
         }
         .contextMenu {
+            if let version = vm.updateVersion(for: package) {
+                Button("Mettre à jour…") { pendingUpdate = package }
+                    .disabled(vm.busy.contains(package.id))
+                    .help(
+                        String(
+                            localized: "Mettre à jour \(package.displayName) vers la version \(version)"
+                        )
+                    )
+                if package.canStartStop || package.canUninstall {
+                    Divider()
+                }
+            }
             if package.canStartStop {
                 Button(package.isRunning ? "Arrêter" : "Démarrer") {
                     setRunning(package, running: !package.isRunning)
@@ -165,6 +195,23 @@ struct PackagesView: View {
     private func control(for package: PackageInfo) -> some View {
         let isBusy = vm.busy.contains(package.id)
         HStack(spacing: 8) {
+            if isBusy {
+                ProgressView()
+                    .controlSize(.small)
+                    .accessibilityLabel("Opération en cours pour \(package.displayName)")
+            }
+            if let version = vm.updateVersion(for: package) {
+                Button("Mettre à jour") { pendingUpdate = package }
+                    .disabled(isBusy)
+                    .accessibilityLabel(
+                        "Mettre à jour \(package.displayName) vers la version \(version)"
+                    )
+                    .help(
+                        String(
+                            localized: "Mettre à jour \(package.displayName) vers la version \(version)"
+                        )
+                    )
+            }
             if package.canStartStop {
                 if package.isRunning {
                     Button("Arrêter") { setRunning(package, running: false) }
@@ -205,6 +252,18 @@ struct PackagesView: View {
         }
     }
 
+    private func requestUpdate(_ package: PackageInfo) {
+        Task {
+            VoiceOver.announce(
+                String(localized: "Mise à jour de \(package.displayName) en cours…"),
+                category: .progress,
+                priority: .high
+            )
+            let outcome = await vm.applyUpdate(package)
+            VoiceOver.announce(outcome, priority: .high)
+        }
+    }
+
     private func load(restoresInitialFocus: Bool = false) async {
         VoiceOver.announce(
             String(localized: "Chargement des paquets…"),
@@ -228,6 +287,13 @@ struct PackagesView: View {
             text += " " + String(localized: "Ce paquet propose des options de désinstallation dans DSM (conserver ou supprimer les données) qui ne sont pas disponibles ici : les réglages par défaut seront appliqués.")
         }
         return text
+    }
+
+    private func updateWarning(for package: PackageInfo) -> String {
+        let version = vm.updateVersion(for: package) ?? ""
+        return String(
+            localized: "« \(package.displayName) » sera mis à jour vers la version \(version). Le paquet sera téléchargé, installé puis redémarré. L’opération peut prendre plusieurs minutes. Si DSM exige un redémarrage du NAS, vous devrez l’effectuer depuis DSM."
+        )
     }
 }
 

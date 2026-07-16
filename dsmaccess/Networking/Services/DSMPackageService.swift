@@ -14,11 +14,23 @@ final class DSMPackageService {
     private static let controlAPI = DSMAPI("SYNO.Core.Package.Control")
     private static let uninstallationAPI = DSMAPI("SYNO.Core.Package.Uninstallation")
     private static let settingAPI = DSMAPI("SYNO.Core.Package.Setting")
+    private static let installationAPI = DSMAPI(
+        "SYNO.Core.Package.Installation",
+        preferredVersion: 1
+    )
 
     private let transport: DSMTransport
+    private let updatePollInterval: Duration
+    private let updatePollLimit: Int
 
-    init(transport: DSMTransport) {
+    init(
+        transport: DSMTransport,
+        updatePollInterval: Duration = .milliseconds(1200),
+        updatePollLimit: Int = 900
+    ) {
         self.transport = transport
+        self.updatePollInterval = updatePollInterval
+        self.updatePollLimit = updatePollLimit
     }
 
     func installedPackages() async throws -> [PackageInfo] {
@@ -35,25 +47,64 @@ final class DSMPackageService {
         return list.packages ?? []
     }
 
-    func availableVersions() async throws -> [String: String] {
-        var versions: [String: String] = [:]
-        for loadsThirdPartyPackages in [false, true] {
-            let list = try await transport.read(
-                api: Self.serverAPI,
-                method: "list",
-                parameters: [
-                    "blforcerefresh": .boolean(false),
-                    "blloadothers": .boolean(loadsThirdPartyPackages),
-                ],
-                as: ServerPackageList.self
-            )
-            for package in list.packages ?? [] {
-                if let identifier = package.id?.lowercased(), let version = package.version {
-                    versions[identifier] = version
-                }
-            }
+    func availableUpdates() async throws -> [String: PackageUpdate] {
+        guard transport.capabilities.supports(Self.installationAPI.name) else { return [:] }
+        let list = try await transport.read(
+            api: Self.serverAPI,
+            method: "list",
+            parameters: [
+                "blforcerefresh": .boolean(false),
+                "blloadothers": .boolean(false),
+            ],
+            as: ServerPackageList.self
+        )
+
+        var updates: [String: PackageUpdate] = [:]
+        for package in list.packages ?? [] {
+            guard let update = packageUpdate(from: package) else { continue }
+            updates[update.packageID.lowercased()] = update
         }
-        return versions
+        return updates
+    }
+
+    func upgrade(_ update: PackageUpdate) async throws {
+        guard !update.packageID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              update.fileSize > 0,
+              update.packageType >= 0,
+              Self.isValidChecksum(update.checksum),
+              update.downloadURL.scheme?.lowercased() == "https",
+              update.downloadURL.host != nil else {
+            throw DSMError.invalidResponse
+        }
+
+        let task = try await transport.value(
+            api: Self.installationAPI,
+            method: "upgrade",
+            parameters: [
+                "name": .string(update.packageID),
+                "is_syno": .boolean(true),
+                "beta": .boolean(update.isBeta),
+                "url": .string(update.downloadURL.absoluteString),
+                "checksum": .string(update.checksum),
+                "filesize": .integer(update.fileSize),
+                "type": .integer(update.packageType),
+                "blqinst": .boolean(false),
+                "operation": .string("upgrade"),
+            ],
+            as: PackageInstallTask.self
+        )
+
+        for _ in 0..<updatePollLimit {
+            try await Task.sleep(for: updatePollInterval)
+            let status = try await transport.read(
+                api: Self.installationAPI,
+                method: "status",
+                parameters: ["task_id": .string(task.taskID)],
+                as: PackageInstallStatus.self
+            )
+            if status.isFinished { return }
+        }
+        throw DSMError.network(String(localized: "La mise à jour a expiré."))
     }
 
     func setRunning(_ running: Bool, packageID: String) async throws {
@@ -98,5 +149,42 @@ final class DSMPackageService {
                 "update_channel": .string(settings.updateChannelBeta ? "beta" : "stable"),
             ]
         )
+    }
+
+    private func packageUpdate(from package: ServerPackage) -> PackageUpdate? {
+        let packageType = package.type ?? 0
+        let source = package.source?.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard source?.lowercased() == "syno",
+              let packageID = package.id?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !packageID.isEmpty,
+              let version = package.version?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !version.isEmpty,
+              let link = package.link,
+              let downloadURL = URL(string: link),
+              downloadURL.scheme?.lowercased() == "https",
+              downloadURL.host != nil,
+              let rawChecksum = package.md5?.trimmingCharacters(in: .whitespacesAndNewlines),
+              Self.isValidChecksum(rawChecksum),
+              let fileSize = package.size,
+              fileSize > 0,
+              packageType >= 0 else { return nil }
+
+        return PackageUpdate(
+            packageID: packageID,
+            version: version,
+            downloadURL: downloadURL,
+            checksum: rawChecksum.lowercased(),
+            fileSize: fileSize,
+            isBeta: package.beta ?? false,
+            packageType: packageType
+        )
+    }
+
+    private static func isValidChecksum(_ checksum: String) -> Bool {
+        let bytes = checksum.utf8
+        guard bytes.count == 32 else { return false }
+        return bytes.allSatisfy { byte in
+            (48...57).contains(byte) || (65...70).contains(byte) || (97...102).contains(byte)
+        }
     }
 }
