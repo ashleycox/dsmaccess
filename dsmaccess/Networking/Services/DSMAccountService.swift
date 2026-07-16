@@ -19,7 +19,7 @@ final class DSMAccountService {
     }
 
     func users() async throws -> [DSMUser] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.userAPI,
             method: "list",
             parameters: [
@@ -33,7 +33,7 @@ final class DSMAccountService {
     }
 
     func groups() async throws -> [DSMGroup] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.groupAPI,
             method: "list",
             parameters: [

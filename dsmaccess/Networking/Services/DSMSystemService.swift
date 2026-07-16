@@ -19,7 +19,7 @@ final class DSMSystemService {
     }
 
     func information() async throws -> SystemInfo {
-        try await transport.value(
+        try await transport.read(
             api: Self.infoAPI,
             method: "getinfo",
             as: SystemInfo.self
@@ -27,7 +27,7 @@ final class DSMSystemService {
     }
 
     func resourceUsage() async throws -> ResourceUsage {
-        try await transport.value(
+        try await transport.read(
             api: Self.utilizationAPI,
             method: "get",
             as: ResourceUsage.self

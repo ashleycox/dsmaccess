@@ -16,7 +16,7 @@ final class DSMFileServiceSettingsService {
     }
 
     func isEnabled(_ service: FileService) async throws -> Bool? {
-        let status = try await transport.value(
+        let status = try await transport.read(
             api: DSMAPI(service.api),
             method: "get",
             as: FileServiceStatus.self

@@ -18,7 +18,7 @@ final class DSMSurveillanceService {
     }
 
     func cameras() async throws -> [SurveillanceCamera] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.cameraAPI,
             method: "List",
             parameters: [

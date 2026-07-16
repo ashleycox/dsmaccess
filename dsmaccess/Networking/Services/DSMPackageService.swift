@@ -22,7 +22,7 @@ final class DSMPackageService {
     }
 
     func installedPackages() async throws -> [PackageInfo] {
-        let list = try await transport.value(
+        let list = try await transport.read(
             api: Self.packageAPI,
             method: "list",
             parameters: [
@@ -38,7 +38,7 @@ final class DSMPackageService {
     func availableVersions() async throws -> [String: String] {
         var versions: [String: String] = [:]
         for loadsThirdPartyPackages in [false, true] {
-            let list = try await transport.value(
+            let list = try await transport.read(
                 api: Self.serverAPI,
                 method: "list",
                 parameters: [
@@ -76,7 +76,7 @@ final class DSMPackageService {
     }
 
     func settings() async throws -> PackageSettings {
-        try await transport.value(
+        try await transport.read(
             api: Self.settingAPI,
             method: "get",
             as: PackageSettings.self

@@ -19,7 +19,7 @@ final class DSMVirtualMachineService {
     }
 
     func guests() async throws -> [VirtualMachine] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.guestAPI,
             method: "list",
             parameters: ["additional": .boolean(true)],

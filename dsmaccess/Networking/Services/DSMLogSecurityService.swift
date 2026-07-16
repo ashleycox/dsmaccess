@@ -22,7 +22,7 @@ final class DSMLogSecurityService {
     }
 
     func logs(limit: Int = 500) async throws -> [SystemLogEntry] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.logAPI,
             method: "list",
             parameters: [
@@ -38,7 +38,7 @@ final class DSMLogSecurityService {
 
     func blockedAddresses() async throws -> [BlockedAddress] {
         guard let api = blockAPI else { return [] }
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: api,
             method: "list",
             parameters: ["offset": .integer(0), "limit": .integer(-1)],

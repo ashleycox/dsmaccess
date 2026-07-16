@@ -19,7 +19,7 @@ final class DSMDownloadStationService {
     }
 
     func tasks() async throws -> [DownloadTask] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.taskAPI,
             method: "list",
             parameters: [
@@ -33,7 +33,7 @@ final class DSMDownloadStationService {
     }
 
     func statistic() async throws -> DownloadStatistic {
-        try await transport.value(
+        try await transport.read(
             api: Self.statisticAPI,
             method: "getinfo",
             as: DownloadStatistic.self

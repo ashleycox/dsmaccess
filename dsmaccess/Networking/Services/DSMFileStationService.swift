@@ -29,7 +29,7 @@ final class DSMFileStationService {
     }
 
     func shares() async throws -> [FileStationItem] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.listAPI,
             method: "list_share",
             parameters: [
@@ -41,7 +41,7 @@ final class DSMFileStationService {
     }
 
     func items(in folderPath: String) async throws -> [FileStationItem] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.listAPI,
             method: "list",
             parameters: [
@@ -196,7 +196,7 @@ final class DSMFileStationService {
     }
 
     func shareLinks() async throws -> [SharingLink] {
-        try await transport.value(
+        try await transport.read(
             api: Self.sharingAPI,
             method: "list",
             as: SharingLinks.self
@@ -227,7 +227,7 @@ final class DSMFileStationService {
         do {
             for _ in 0..<120 {
                 try Task.checkCancellation()
-                let result = try await transport.value(
+                let result = try await transport.read(
                     api: Self.searchAPI,
                     method: "list",
                     parameters: [
@@ -257,7 +257,7 @@ final class DSMFileStationService {
     }
 
     func favorites() async throws -> [FileStationFavorite] {
-        try await transport.value(
+        try await transport.read(
             api: Self.favoriteAPI,
             method: "list",
             parameters: ["limit": .integer(0), "status_filter": "all"],
@@ -325,7 +325,7 @@ final class DSMFileStationService {
     private func waitForOperation(api: DSMAPI, taskID: String) async throws {
         for _ in 0..<600 {
             try Task.checkCancellation()
-            let status = try await transport.value(
+            let status = try await transport.read(
                 api: api,
                 method: "status",
                 parameters: ["taskid": .string(taskID)],

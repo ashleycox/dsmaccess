@@ -19,7 +19,7 @@ final class DSMContainerService {
     }
 
     func containers() async throws -> [ContainerItem] {
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.containerAPI,
             method: "list",
             parameters: [
@@ -42,7 +42,7 @@ final class DSMContainerService {
 
     func logs(name: String, limit: Int = 300) async throws -> [ContainerLogEntry] {
         guard transport.capabilities.supports(Self.logAPI.name) else { return [] }
-        let result = try await transport.value(
+        let result = try await transport.read(
             api: Self.logAPI,
             method: "get",
             parameters: [

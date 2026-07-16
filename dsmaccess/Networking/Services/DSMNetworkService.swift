@@ -18,7 +18,7 @@ final class DSMNetworkService {
     }
 
     func information() async throws -> NetworkInfo {
-        try await transport.value(
+        try await transport.read(
             api: Self.networkAPI,
             method: "get",
             as: NetworkInfo.self

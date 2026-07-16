@@ -48,6 +48,7 @@ final class DSMAuthenticationService {
             method: "login",
             parameters: parameters,
             authenticated: false,
+            requestPolicy: .idempotent,
             as: LoginResult.self
         )
         guard response.success, let result = response.data else {

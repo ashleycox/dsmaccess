@@ -18,7 +18,7 @@ final class DSMStorageService {
     }
 
     func information() async throws -> StorageInfo {
-        try await transport.value(
+        try await transport.read(
             api: Self.storageAPI,
             method: "load_info",
             as: StorageInfo.self

@@ -18,7 +18,7 @@ final class DSMShareService {
     }
 
     func folders() async throws -> [SharedFolder] {
-        let list = try await transport.value(
+        let list = try await transport.read(
             api: Self.shareAPI,
             method: "list",
             parameters: ["additional": try DSMParameter.json(["recyclebin", "share_quota"])],

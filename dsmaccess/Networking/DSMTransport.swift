@@ -9,6 +9,8 @@ import Foundation
 
 @MainActor
 final class DSMTransport {
+    typealias RequestData = @Sendable (URLRequest) async throws -> (Data, URLResponse)
+
     private static let infoAPI = DSMAPI("SYNO.API.Info", preferredVersion: 1)
     /// Point d'amorçage stable ; toutes les autres routes proviennent de cette découverte.
     private static let discoveryPath = "query.cgi"
@@ -16,6 +18,7 @@ final class DSMTransport {
     let endpoint: DSMEndpoint
     private let session: URLSession
     private let trustDelegate: ServerTrustDelegate?
+    private let requestData: RequestData
 
     private(set) var capabilities = DSMCapabilities()
     private var sessionID: String?
@@ -29,7 +32,9 @@ final class DSMTransport {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 20
         configuration.waitsForConnectivity = false
-        session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
+        let session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
+        self.session = session
+        requestData = { try await session.data(for: $0) }
     }
 
     init(
@@ -41,6 +46,20 @@ final class DSMTransport {
         self.session = session
         trustDelegate = nil
         self.capabilities = capabilities
+        requestData = { try await session.data(for: $0) }
+    }
+
+    init(
+        endpoint: DSMEndpoint,
+        session: URLSession,
+        capabilities: DSMCapabilities,
+        requestData: @escaping RequestData
+    ) {
+        self.endpoint = endpoint
+        self.session = session
+        trustDelegate = nil
+        self.capabilities = capabilities
+        self.requestData = requestData
     }
 
     convenience init(endpoint: DSMEndpoint, session: URLSession) {
@@ -68,7 +87,8 @@ final class DSMTransport {
         ]
         let response: DSMResponse<[String: APIInfoEntry]> = try await send(
             path: Self.discoveryPath,
-            parameters: parameters
+            parameters: parameters,
+            requestPolicy: .idempotent
         )
         guard response.success, let data = response.data else {
             throw error(from: response.error)
@@ -87,7 +107,8 @@ final class DSMTransport {
         ]
         let response: DSMResponse<[String: APIInfoEntry]> = try await send(
             path: Self.discoveryPath,
-            parameters: parameters
+            parameters: parameters,
+            requestPolicy: .idempotent
         )
         guard response.success, let data = response.data else {
             throw error(from: response.error)
@@ -101,6 +122,7 @@ final class DSMTransport {
         method: String,
         parameters: [String: DSMParameter] = [:],
         authenticated: Bool = true,
+        requestPolicy: DSMRequestPolicy = .singleAttempt,
         as type: Value.Type
     ) async throws -> DSMResponse<Value> {
         let resolved = try await resolve(api)
@@ -110,14 +132,38 @@ final class DSMTransport {
             parameters: parameters,
             authenticated: authenticated
         )
-        return try await send(path: resolved.path, parameters: query)
+        return try await send(
+            path: resolved.path,
+            parameters: query,
+            requestPolicy: requestPolicy
+        )
     }
 
+    /// Exécute une lecture idempotente, avec une seconde tentative après un timeout.
+    func read<Value: Decodable & Sendable>(
+        api: DSMAPI,
+        method: String,
+        parameters: [String: DSMParameter] = [:],
+        authenticated: Bool = true,
+        as type: Value.Type
+    ) async throws -> Value {
+        try await value(
+            api: api,
+            method: method,
+            parameters: parameters,
+            authenticated: authenticated,
+            requestPolicy: .idempotent,
+            as: type
+        )
+    }
+
+    /// Exécute une requête qui renvoie une valeur sans nouvelle tentative automatique.
     func value<Value: Decodable & Sendable>(
         api: DSMAPI,
         method: String,
         parameters: [String: DSMParameter] = [:],
         authenticated: Bool = true,
+        requestPolicy: DSMRequestPolicy = .singleAttempt,
         as type: Value.Type
     ) async throws -> Value {
         let response = try await response(
@@ -125,6 +171,7 @@ final class DSMTransport {
             method: method,
             parameters: parameters,
             authenticated: authenticated,
+            requestPolicy: requestPolicy,
             as: type
         )
         guard response.success, let data = response.data else {
@@ -202,7 +249,7 @@ final class DSMTransport {
 
     func data(for request: URLRequest) async throws -> (Data, URLResponse) {
         do {
-            return try await session.data(for: request)
+            return try await requestData(request)
         } catch let error as URLError {
             throw mappedNetworkError(error)
         }
@@ -259,10 +306,30 @@ final class DSMTransport {
 
     private func send<Value: Decodable & Sendable>(
         path: String,
-        parameters: [String: String]
+        parameters: [String: String],
+        requestPolicy: DSMRequestPolicy
     ) async throws -> DSMResponse<Value> {
         let url = try makeURL(path: path, parameters: parameters)
-        let (data, response) = try await data(for: URLRequest(url: url))
+        let request = URLRequest(url: url)
+        do {
+            return try await sendOnce(request)
+        } catch let error as URLError
+            where requestPolicy == .idempotent && error.code == .timedOut {
+            try await Task.sleep(for: .milliseconds(500))
+            do {
+                return try await sendOnce(request)
+            } catch let retryError as URLError {
+                throw mappedNetworkError(retryError)
+            }
+        } catch let error as URLError {
+            throw mappedNetworkError(error)
+        }
+    }
+
+    private func sendOnce<Value: Decodable & Sendable>(
+        _ request: URLRequest
+    ) async throws -> DSMResponse<Value> {
+        let (data, response) = try await requestData(request)
         guard let httpResponse = response as? HTTPURLResponse,
               (200..<300).contains(httpResponse.statusCode) else {
             throw DSMError.invalidResponse
