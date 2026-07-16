@@ -1,7 +1,8 @@
 # DSM Access repository instructions
 
-These rules apply to Claude Code in this repository. They are a quality gate, not suggestions.
-Do not weaken or edit them unless the user explicitly asks for changes to this file.
+These rules apply to every automated coding agent working in this repository. They are a
+quality gate, not suggestions. Do not weaken or edit them unless the user explicitly asks
+for changes to this file.
 
 ## Product and priorities
 
