@@ -14,6 +14,7 @@ struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let status: String
     let createdAt: Int64?
     let startedAt: Int64?
+    let uptimeSeconds: Int64?
     let autoRestart: Bool
     let cpuPercent: Double?
     let memoryBytes: Int64?
@@ -31,9 +32,12 @@ struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
         case state
         case createdAt = "created"
         case startedAt = "started"
+        case uptimeSeconds = "up_time"
         case autoRestart = "enable_auto_restart"
-        case cpuPercent = "cpu_percent"
-        case memoryBytes = "memory_usage"
+        case cpuPercent = "cpu"
+        case legacyCPUPercent = "cpu_percent"
+        case memoryBytes = "memory"
+        case legacyMemoryBytes = "memory_usage"
     }
 
     nonisolated init(from decoder: Decoder) throws {
@@ -44,15 +48,59 @@ struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
         status = values.flexString(.status) ?? values.flexString(.state) ?? "unknown"
         createdAt = values.flexInt64(.createdAt)
         startedAt = values.flexInt64(.startedAt)
+        uptimeSeconds = values.flexInt64(.uptimeSeconds)
         autoRestart = values.flexBool(.autoRestart) ?? false
-        if let number = try? values.decode(Double.self, forKey: .cpuPercent) {
-            cpuPercent = number
-        } else if let string = values.flexString(.cpuPercent) {
-            cpuPercent = Double(string.replacingOccurrences(of: "%", with: ""))
-        } else {
-            cpuPercent = nil
+        cpuPercent = Self.percent(in: values, forKey: .cpuPercent)
+            ?? Self.percent(in: values, forKey: .legacyCPUPercent)
+        memoryBytes = values.flexInt64(.memoryBytes) ?? values.flexInt64(.legacyMemoryBytes)
+    }
+
+    func applying(_ resource: ContainerResource) -> ContainerItem {
+        ContainerItem(
+            id: id,
+            name: name,
+            image: image,
+            status: status,
+            createdAt: createdAt,
+            startedAt: startedAt,
+            uptimeSeconds: uptimeSeconds,
+            autoRestart: autoRestart,
+            cpuPercent: resource.cpuPercent,
+            memoryBytes: resource.memoryBytes
+        )
+    }
+
+    private init(
+        id: String,
+        name: String,
+        image: String?,
+        status: String,
+        createdAt: Int64?,
+        startedAt: Int64?,
+        uptimeSeconds: Int64?,
+        autoRestart: Bool,
+        cpuPercent: Double?,
+        memoryBytes: Int64?
+    ) {
+        self.id = id
+        self.name = name
+        self.image = image
+        self.status = status
+        self.createdAt = createdAt
+        self.startedAt = startedAt
+        self.uptimeSeconds = uptimeSeconds
+        self.autoRestart = autoRestart
+        self.cpuPercent = cpuPercent
+        self.memoryBytes = memoryBytes
+    }
+
+    private static nonisolated func percent(
+        in values: KeyedDecodingContainer<CodingKeys>,
+        forKey key: CodingKeys
+    ) -> Double? {
+        values.flexString(key).flatMap {
+            Double($0.replacingOccurrences(of: "%", with: ""))
         }
-        memoryBytes = values.flexInt64(.memoryBytes)
     }
 }
 
@@ -67,17 +115,65 @@ struct ContainerList: nonisolated Decodable, Sendable {
     }
 }
 
+struct ContainerResource: nonisolated Decodable, Hashable, Sendable {
+    let name: String
+    let cpuPercent: Double
+    let memoryBytes: Int64
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case cpuPercent = "cpu"
+        case memoryBytes = "memory"
+    }
+
+    nonisolated init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        name = try values.requiredFlexString(.name)
+        guard let cpuText = values.flexString(.cpuPercent),
+              let decodedCPU = Double(cpuText.replacingOccurrences(of: "%", with: "")) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .cpuPercent,
+                in: values,
+                debugDescription: "Required container CPU usage is missing or malformed."
+            )
+        }
+        guard let decodedMemory = values.flexInt64(.memoryBytes) else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .memoryBytes,
+                in: values,
+                debugDescription: "Required container memory usage is missing or malformed."
+            )
+        }
+        cpuPercent = decodedCPU
+        memoryBytes = decodedMemory
+    }
+}
+
+struct ContainerResourceList: nonisolated Decodable, Sendable {
+    let resources: [ContainerResource]
+
+    enum CodingKeys: String, CodingKey { case resources }
+
+    nonisolated init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        resources = try values.decodeIfPresent([ContainerResource].self, forKey: .resources) ?? []
+    }
+}
+
 struct ContainerLogEntry: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let id: String
-    let timestamp: Int64?
+    let timestamp: String?
     let stream: String?
     let message: String
 
     enum CodingKeys: String, CodingKey {
-        case timestamp = "time"
+        case id = "docid"
+        case timestamp = "created"
+        case legacyTimestamp = "time"
         case alternateTimestamp = "timestamp"
         case stream
-        case message = "log"
+        case message = "text"
+        case legacyMessage = "log"
         case alternateMessage = "message"
     }
 
@@ -92,11 +188,17 @@ struct ContainerLogEntry: nonisolated Decodable, Identifiable, Hashable, Sendabl
         }
 
         let values = try decoder.container(keyedBy: CodingKeys.self)
-        timestamp = values.flexInt64(.timestamp) ?? values.flexInt64(.alternateTimestamp)
+        timestamp = values.flexString(.timestamp)
+            ?? values.flexString(.legacyTimestamp)
+            ?? values.flexString(.alternateTimestamp)
         stream = values.flexString(.stream)
-        message = values.flexString(.message) ?? values.flexString(.alternateMessage) ?? ""
+        message = values.flexString(.message)
+            ?? values.flexString(.legacyMessage)
+            ?? values.flexString(.alternateMessage)
+            ?? ""
         let position = decoder.codingPath.last?.intValue ?? 0
-        id = "fallback:\(position):\(timestamp ?? 0):\(message.hashValue)"
+        id = values.flexString(.id)
+            ?? "fallback:\(position):\(timestamp ?? ""):\(message.hashValue)"
     }
 }
 

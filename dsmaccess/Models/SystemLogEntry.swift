@@ -28,6 +28,7 @@ struct SystemLogEntry: nonisolated Decodable, Identifiable, Hashable, Sendable {
         case who
         case address = "from"
         case ip
+        case description = "descr"
         case message
         case event
     }
@@ -39,7 +40,10 @@ struct SystemLogEntry: nonisolated Decodable, Identifiable, Hashable, Sendable {
         category = values.flexString(.category) ?? values.flexString(.type)
         user = values.flexString(.user) ?? values.flexString(.who)
         address = values.flexString(.address) ?? values.flexString(.ip)
-        message = values.flexString(.message) ?? values.flexString(.event) ?? ""
+        message = values.flexString(.description)
+            ?? values.flexString(.message)
+            ?? values.flexString(.event)
+            ?? ""
         let position = decoder.codingPath.last?.intValue ?? 0
         id = values.flexString(.id)
             ?? "fallback:\(position):\(timestamp ?? ""):\(message.hashValue)"

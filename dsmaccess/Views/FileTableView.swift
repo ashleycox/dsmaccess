@@ -297,6 +297,7 @@ final class KeyboardTableView: NSTableView {
     var onCut: (() -> Void)?
     var onShowInfo: (() -> Void)?
     var menuProvider: ((NSEvent) -> NSMenu?)?
+    private var selectionBeforeRightMouseDown: IndexSet?
 
     override func keyDown(with event: NSEvent) {
         let command = event.modifierFlags.contains(.command)
@@ -324,7 +325,36 @@ final class KeyboardTableView: NSTableView {
     }
 
     override func menu(for event: NSEvent) -> NSMenu? {
-        menuProvider?(event)
+        let point = convert(event.locationInWindow, from: nil)
+        let clickedRow = row(at: point)
+        if clickedRow >= 0 {
+            let selection = Self.contextMenuSelection(
+                clickedRow: clickedRow,
+                currentSelection: selectedRowIndexes,
+                selectionBeforeRightMouseDown: selectionBeforeRightMouseDown
+            )
+            selectRowIndexes(selection, byExtendingSelection: false)
+        }
+        return menuProvider?(event)
+    }
+
+    override func rightMouseDown(with event: NSEvent) {
+        selectionBeforeRightMouseDown = selectedRowIndexes
+        super.rightMouseDown(with: event)
+        selectionBeforeRightMouseDown = nil
+    }
+
+    static func contextMenuSelection(
+        clickedRow: Int,
+        currentSelection: IndexSet,
+        selectionBeforeRightMouseDown: IndexSet?
+    ) -> IndexSet {
+        guard let previousSelection = selectionBeforeRightMouseDown,
+              previousSelection.count > 1,
+              previousSelection.contains(clickedRow) else {
+            return currentSelection
+        }
+        return previousSelection
     }
 }
 

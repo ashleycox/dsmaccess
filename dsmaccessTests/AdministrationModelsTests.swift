@@ -89,8 +89,9 @@ struct AdministrationModelsTests {
               "image": "nginx:latest",
               "status": "running",
               "enable_auto_restart": "true",
-              "cpu_percent": "2.5%",
-              "memory_usage": "67108864"
+              "cpu": "2.5%",
+              "memory": "67108864",
+              "up_time": "90061"
             }
             """#.utf8
         )
@@ -101,6 +102,7 @@ struct AdministrationModelsTests {
         #expect(container.autoRestart)
         #expect(container.cpuPercent == 2.5)
         #expect(container.memoryBytes == 67_108_864)
+        #expect(container.uptimeSeconds == 90_061)
     }
 
     @Test func decodesSurveillanceCameraStream() throws {
@@ -136,7 +138,7 @@ struct AdministrationModelsTests {
               "type": "connection",
               "who": "alex",
               "from": "192.168.1.30",
-              "event": "Login failed"
+              "descr": "Login failed"
             }
             """#.utf8
         )

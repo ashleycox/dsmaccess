@@ -122,6 +122,7 @@ final class DSMTransport {
         method: String,
         parameters: [String: DSMParameter] = [:],
         authenticated: Bool = true,
+        httpMethod: DSMHTTPMethod = .get,
         requestPolicy: DSMRequestPolicy = .singleAttempt,
         as type: Value.Type
     ) async throws -> DSMResponse<Value> {
@@ -135,6 +136,7 @@ final class DSMTransport {
         return try await send(
             path: resolved.path,
             parameters: query,
+            httpMethod: httpMethod,
             requestPolicy: requestPolicy
         )
     }
@@ -145,6 +147,7 @@ final class DSMTransport {
         method: String,
         parameters: [String: DSMParameter] = [:],
         authenticated: Bool = true,
+        httpMethod: DSMHTTPMethod = .get,
         as type: Value.Type
     ) async throws -> Value {
         try await value(
@@ -152,6 +155,7 @@ final class DSMTransport {
             method: method,
             parameters: parameters,
             authenticated: authenticated,
+            httpMethod: httpMethod,
             requestPolicy: .idempotent,
             as: type
         )
@@ -163,6 +167,7 @@ final class DSMTransport {
         method: String,
         parameters: [String: DSMParameter] = [:],
         authenticated: Bool = true,
+        httpMethod: DSMHTTPMethod = .get,
         requestPolicy: DSMRequestPolicy = .singleAttempt,
         as type: Value.Type
     ) async throws -> Value {
@@ -171,6 +176,7 @@ final class DSMTransport {
             method: method,
             parameters: parameters,
             authenticated: authenticated,
+            httpMethod: httpMethod,
             requestPolicy: requestPolicy,
             as: type
         )
@@ -208,7 +214,9 @@ final class DSMTransport {
         components.host = endpoint.host
         components.port = endpoint.port
         components.path = "/webapi/\(path)"
-        components.queryItems = parameters.map { URLQueryItem(name: $0.key, value: $0.value) }
+        if !parameters.isEmpty {
+            components.queryItems = parameters.map { URLQueryItem(name: $0.key, value: $0.value) }
+        }
         guard let url = components.url else {
             throw DSMError.invalidEndpoint
         }
@@ -307,10 +315,14 @@ final class DSMTransport {
     private func send<Value: Decodable & Sendable>(
         path: String,
         parameters: [String: String],
+        httpMethod: DSMHTTPMethod = .get,
         requestPolicy: DSMRequestPolicy
     ) async throws -> DSMResponse<Value> {
-        let url = try makeURL(path: path, parameters: parameters)
-        let request = URLRequest(url: url)
+        let request = try makeRequest(
+            path: path,
+            parameters: parameters,
+            httpMethod: httpMethod
+        )
         do {
             return try await sendOnce(request)
         } catch let error as URLError
@@ -323,6 +335,33 @@ final class DSMTransport {
             }
         } catch let error as URLError {
             throw mappedNetworkError(error)
+        }
+    }
+
+    private func makeRequest(
+        path: String,
+        parameters: [String: String],
+        httpMethod: DSMHTTPMethod
+    ) throws -> URLRequest {
+        switch httpMethod {
+        case .get:
+            return URLRequest(url: try makeURL(path: path, parameters: parameters))
+        case .post:
+            var request = URLRequest(url: try makeURL(path: path, parameters: [:]))
+            var body = URLComponents()
+            body.queryItems = parameters
+                .sorted { $0.key < $1.key }
+                .map { URLQueryItem(name: $0.key, value: $0.value) }
+            guard let encodedBody = body.percentEncodedQuery?.data(using: .utf8) else {
+                throw DSMError.invalidResponse
+            }
+            request.httpMethod = httpMethod.rawValue
+            request.httpBody = encodedBody
+            request.setValue(
+                "application/x-www-form-urlencoded; charset=utf-8",
+                forHTTPHeaderField: "Content-Type"
+            )
+            return request
         }
     }
 

@@ -32,24 +32,21 @@ final class dsmaccessUITests: XCTestCase {
         XCTAssertTrue(app.checkBoxes["login.https"].exists)
         XCTAssertTrue(app.checkBoxes["login.remember-password"].exists)
 
-        host.click()
-        host.typeText("nas.local")
+        replaceText(in: host, with: "nas.local")
         XCTAssertEqual(host.value as? String, "nas.local")
 
-        account.click()
-        account.typeText("tester")
+        replaceText(in: account, with: "tester")
         password.click()
+        password.typeKey("a", modifierFlags: .command)
         password.typeText("not-a-real-password")
 
-        port.click()
-        port.typeKey("a", modifierFlags: .command)
-        port.typeText("0")
+        replaceText(in: port, with: "0")
         XCTAssertTrue(app.staticTexts["login.port-error"].waitForExistence(timeout: 2))
         XCTAssertFalse(submit.isEnabled)
 
-        port.typeKey("a", modifierFlags: .command)
-        port.typeText("5001")
-        XCTAssertFalse(app.staticTexts["login.port-error"].exists)
+        replaceText(in: port, with: "5001")
+        XCTAssertEqual(port.value as? String, "5001")
+        XCTAssertTrue(app.staticTexts["login.port-error"].waitForNonExistence(timeout: 2))
         XCTAssertTrue(submit.isEnabled)
     }
 
@@ -108,6 +105,15 @@ final class dsmaccessUITests: XCTestCase {
             "-selectedNASProfileID", ""
         ]
         return application
+    }
+
+    @MainActor
+    private func replaceText(in element: XCUIElement, with text: String) {
+        element.click()
+        element.typeKey("a", modifierFlags: .command)
+        for character in text {
+            element.typeKey(String(character), modifierFlags: [])
+        }
     }
 
     @MainActor

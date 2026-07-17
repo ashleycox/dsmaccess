@@ -208,18 +208,22 @@ struct ContainersView: View {
                         if let image = container.image { LabeledContent("Image", value: image) }
                         LabeledContent("Redémarrage automatique", value: container.autoRestart ? "Oui" : "Non")
                     }
-                    Section("Ressources") {
-                        if let cpu = container.cpuPercent {
-                            LabeledContent(
-                                "Processeur",
-                                value: "\(cpu.formatted(.number.precision(.fractionLength(1)))) %"
-                            )
-                        }
-                        if let memory = container.memoryBytes {
-                            LabeledContent("Mémoire", value: memory.formatted(.byteCount(style: .memory)))
-                        }
-                        if let started = dateText(container.startedAt) {
-                            LabeledContent("Démarré", value: started)
+                    if hasResourceInformation(container) {
+                        Section("Ressources") {
+                            if let cpu = container.cpuPercent {
+                                LabeledContent(
+                                    "Processeur",
+                                    value: "\(cpu.formatted(.number.precision(.fractionLength(1)))) %"
+                                )
+                            }
+                            if let memory = container.memoryBytes {
+                                LabeledContent("Mémoire", value: memory.formatted(.byteCount(style: .memory)))
+                            }
+                            if let uptime = uptimeText(container.uptimeSeconds) {
+                                LabeledContent("Temps de fonctionnement", value: uptime)
+                            } else if let started = dateText(container.startedAt) {
+                                LabeledContent("Démarré", value: started)
+                            }
                         }
                     }
                 }
@@ -346,6 +350,36 @@ struct ContainersView: View {
         guard let timestamp, timestamp > 0 else { return nil }
         return Date(timeIntervalSince1970: TimeInterval(timestamp))
             .formatted(date: .abbreviated, time: .shortened)
+    }
+
+    private func dateText(_ timestamp: String?) -> String? {
+        guard let timestamp, !timestamp.isEmpty else { return nil }
+        if let seconds = TimeInterval(timestamp) {
+            return Date(timeIntervalSince1970: seconds)
+                .formatted(date: .abbreviated, time: .shortened)
+        }
+        if let date = try? Date(timestamp, strategy: .iso8601) {
+            return date.formatted(date: .abbreviated, time: .shortened)
+        }
+        return timestamp
+    }
+
+    private func uptimeText(_ seconds: Int64?) -> String? {
+        guard let seconds, seconds >= 0 else { return nil }
+        return Duration.seconds(seconds).formatted(
+            .units(
+                allowed: [.days, .hours, .minutes, .seconds],
+                width: .wide,
+                maximumUnitCount: 2
+            )
+        )
+    }
+
+    private func hasResourceInformation(_ container: ContainerItem) -> Bool {
+        container.cpuPercent != nil
+            || container.memoryBytes != nil
+            || container.uptimeSeconds != nil
+            || container.startedAt != nil
     }
 
     private func logMetadata(_ entry: ContainerLogEntry) -> String? {

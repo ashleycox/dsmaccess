@@ -41,6 +41,7 @@ struct FileBrowserView: View {
 
     var body: some View {
         content
+            .navigationTitle(vm.title)
             .searchable(text: $searchText, prompt: "Rechercher dans ce dossier")
             .toolbar { fileToolbar }
             .focusedSceneValue(\.fileCommandActions, commandActions)
@@ -591,7 +592,7 @@ struct FileBrowserView: View {
             selection.removeAll()
             focusEmptyState = true
         }
-        announceSummary()
+        announceSummary(category: .navigation)
     }
 
     private func restoreInitialContentFocus() {
@@ -604,10 +605,10 @@ struct FileBrowserView: View {
         }
     }
 
-    private func announceSummary() {
+    private func announceSummary(category: AnnouncementCategory = .result) {
         VoiceOver.announce(
             vm.summary,
-            category: vm.errorMessage == nil ? .result : .error
+            category: vm.errorMessage == nil ? category : .error
         )
     }
 }
