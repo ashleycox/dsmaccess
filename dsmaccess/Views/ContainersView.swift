@@ -8,12 +8,19 @@
 import SwiftUI
 
 struct ContainersView: View {
+    private enum InspectorSection: Hashable {
+        case information
+        case logs
+    }
+
     @State private var viewModel: ContainersViewModel
     @State private var selection: String?
     @State private var searchText = ""
     @State private var autoRefresh = true
     @State private var showInspector = false
+    @State private var inspectorSection = InspectorSection.information
     @AccessibilityFocusState private var contentFocused: Bool
+    @AccessibilityFocusState private var inspectorSectionFocused: Bool
 
     init(session: SessionStore) {
         _viewModel = State(initialValue: ContainersViewModel(session: session))
@@ -37,6 +44,10 @@ struct ContainersView: View {
                     self.selection = nil
                     showInspector = false
                 }
+            }
+            .onChange(of: showInspector) { _, isPresented in
+                guard isPresented else { return }
+                Task { await focusInspector() }
             }
     }
 
@@ -200,38 +211,49 @@ struct ContainersView: View {
     @ViewBuilder
     private var inspector: some View {
         if let container = selectedContainer {
-            TabView {
-                Form {
-                    Section("Conteneur") {
-                        LabeledContent("Nom", value: container.name)
-                        LabeledContent("État", value: container.isRunning ? "En fonctionnement" : "Arrêté")
-                        if let image = container.image { LabeledContent("Image", value: image) }
-                        LabeledContent("Redémarrage automatique", value: container.autoRestart ? "Oui" : "Non")
-                    }
-                    if hasResourceInformation(container) {
-                        Section("Ressources") {
-                            if let cpu = container.cpuPercent {
-                                LabeledContent(
-                                    "Processeur",
-                                    value: "\(cpu.formatted(.number.precision(.fractionLength(1)))) %"
-                                )
-                            }
-                            if let memory = container.memoryBytes {
-                                LabeledContent("Mémoire", value: memory.formatted(.byteCount(style: .memory)))
-                            }
-                            if let uptime = uptimeText(container.uptimeSeconds) {
-                                LabeledContent("Temps de fonctionnement", value: uptime)
-                            } else if let started = dateText(container.startedAt) {
-                                LabeledContent("Démarré", value: started)
+            VStack(spacing: 0) {
+                Picker("Informations et journaux", selection: $inspectorSection) {
+                    Text("Informations").tag(InspectorSection.information)
+                    Text("Journal").tag(InspectorSection.logs)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .padding()
+                .accessibilityFocused($inspectorSectionFocused)
+
+                Divider()
+
+                if inspectorSection == .information {
+                    Form {
+                        Section("Conteneur") {
+                            LabeledContent("Nom", value: container.name)
+                            LabeledContent("État", value: container.isRunning ? "En fonctionnement" : "Arrêté")
+                            if let image = container.image { LabeledContent("Image", value: image) }
+                            LabeledContent("Redémarrage automatique", value: container.autoRestart ? "Oui" : "Non")
+                        }
+                        if hasResourceInformation(container) {
+                            Section("Ressources") {
+                                if let cpu = container.cpuPercent {
+                                    LabeledContent(
+                                        "Processeur",
+                                        value: "\(cpu.formatted(.number.precision(.fractionLength(1)))) %"
+                                    )
+                                }
+                                if let memory = container.memoryBytes {
+                                    LabeledContent("Mémoire", value: memory.formatted(.byteCount(style: .memory)))
+                                }
+                                if let uptime = uptimeText(container.uptimeSeconds) {
+                                    LabeledContent("Temps de fonctionnement", value: uptime)
+                                } else if let started = dateText(container.startedAt) {
+                                    LabeledContent("Démarré", value: started)
+                                }
                             }
                         }
                     }
+                    .formStyle(.grouped)
+                } else {
+                    logView(container)
                 }
-                .formStyle(.grouped)
-                .tabItem { Label("Informations", systemImage: "info.circle") }
-
-                logView(container)
-                    .tabItem { Label("Journal", systemImage: "text.alignleft") }
             }
             .inspectorColumnWidth(min: 300, ideal: 360, max: 520)
             .accessibilityLabel("Informations et journaux de \(container.name)")
@@ -336,6 +358,16 @@ struct ContainersView: View {
 
     private func perform(_ action: ContainerAction, on container: ContainerItem) async {
         VoiceOver.announce(await viewModel.perform(action, on: container), priority: .high)
+    }
+
+    private func focusInspector() async {
+        await Task.yield()
+        guard showInspector, let selectedContainer else { return }
+        inspectorSectionFocused = true
+        VoiceOver.announce(
+            String(localized: "Informations et journaux de \(selectedContainer.name)"),
+            category: .navigation
+        )
     }
 
     private func containerAccessibilityLabel(_ container: ContainerItem) -> String {
