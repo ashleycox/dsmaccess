@@ -29,7 +29,7 @@ struct DSMContainerServiceTests {
         #expect(try query(from: requests[1])["method"] == "get")
     }
 
-    @Test func postsCompleteContainerLogRequestAndDecodesDSM74Rows() async throws {
+    @Test func getsCompleteContainerLogRequestAndDecodesDSM74Rows() async throws {
         let response = Data(
             #"{"success":true,"data":{"logs":[{"created":"2025-06-15T10:38:55.869358659Z","docid":"42","stream":"stderr","text":"Starting server"}]}}"#.utf8
         )
@@ -46,10 +46,9 @@ struct DSMContainerServiceTests {
 
         let requests = await stub.requests
         let request = try #require(requests.first)
-        #expect(request.httpMethod == "POST")
-        #expect(request.url?.query == nil)
-        #expect(request.value(forHTTPHeaderField: "Content-Type") == "application/x-www-form-urlencoded; charset=utf-8")
-        let parameters = try formParameters(from: request)
+        #expect(request.httpMethod == "GET")
+        #expect(request.httpBody == nil)
+        let parameters = try query(from: request)
         #expect(parameters["api"] == "SYNO.Docker.Container.Log")
         #expect(parameters["method"] == "get")
         #expect(parameters["name"] == #""web""#)
@@ -98,15 +97,6 @@ struct DSMContainerServiceTests {
         let items = try #require(
             URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
         )
-        return Dictionary(uniqueKeysWithValues: items.compactMap { item in
-            item.value.map { (item.name, $0) }
-        })
-    }
-
-    private func formParameters(from request: URLRequest) throws -> [String: String] {
-        let body = try #require(request.httpBody)
-        let encoded = try #require(String(data: body, encoding: .utf8))
-        let items = try #require(URLComponents(string: "?\(encoded)")?.queryItems)
         return Dictionary(uniqueKeysWithValues: items.compactMap { item in
             item.value.map { (item.name, $0) }
         })

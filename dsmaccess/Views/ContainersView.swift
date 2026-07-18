@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContainersView: View {
-    private enum InspectorSection: Hashable {
+    private enum DetailsSection: Hashable {
         case information
         case logs
     }
@@ -17,10 +17,10 @@ struct ContainersView: View {
     @State private var selection: String?
     @State private var searchText = ""
     @State private var autoRefresh = true
-    @State private var showInspector = false
-    @State private var inspectorSection = InspectorSection.information
+    @State private var detailsContainer: ContainerItem?
+    @State private var detailsSection = DetailsSection.information
     @AccessibilityFocusState private var contentFocused: Bool
-    @AccessibilityFocusState private var inspectorSectionFocused: Bool
+    @AccessibilityFocusState private var detailsSectionFocused: Bool
 
     init(session: SessionStore) {
         _viewModel = State(initialValue: ContainersViewModel(session: session))
@@ -33,21 +33,13 @@ struct ContainersView: View {
             .safeAreaInset(edge: .bottom) { statusBar }
             .task { await load(restoresInitialFocus: true) }
             .task(id: autoRefresh) { await refreshPeriodically() }
-            .inspector(isPresented: $showInspector) { inspector }
-            .onChange(of: selection) {
-                guard showInspector, let selectedContainer else { return }
-                Task { await viewModel.loadLogs(for: selectedContainer) }
-            }
+            .sheet(item: $detailsContainer, content: detailsSheet)
             .onChange(of: viewModel.containers) {
                 guard let selection else { return }
                 if !viewModel.containers.contains(where: { $0.id == selection }) {
                     self.selection = nil
-                    showInspector = false
+                    detailsContainer = nil
                 }
-            }
-            .onChange(of: showInspector) { _, isPresented in
-                guard isPresented else { return }
-                Task { await focusInspector() }
             }
     }
 
@@ -116,15 +108,13 @@ struct ContainersView: View {
 
         ToolbarItem {
             Button {
-                showInspector.toggle()
-                if showInspector, let selectedContainer {
-                    Task { await viewModel.loadLogs(for: selectedContainer) }
-                }
+                guard let selectedContainer else { return }
+                presentDetails(for: selectedContainer)
             } label: {
                 Label("Informations et journaux", systemImage: "info.circle")
             }
             .disabled(selectedContainer == nil)
-            .help(showInspector ? "Masquer les informations" : "Afficher les informations et journaux")
+            .help("Afficher les informations et journaux")
         }
 
         ToolbarItem {
@@ -180,9 +170,7 @@ struct ContainersView: View {
                     .help("Redémarrer le conteneur")
             }
             Button("Informations et journaux") {
-                selection = container.id
-                showInspector = true
-                Task { await viewModel.loadLogs(for: container) }
+                presentDetails(for: container)
             }
             .help("Afficher les informations et journaux du conteneur")
         }
@@ -201,29 +189,26 @@ struct ContainersView: View {
         }
         Divider()
         Button("Informations et journaux") {
-            selection = container.id
-            showInspector = true
-            Task { await viewModel.loadLogs(for: container) }
+            presentDetails(for: container)
         }
         .help("Afficher les informations et journaux du conteneur")
     }
 
-    @ViewBuilder
-    private var inspector: some View {
-        if let container = selectedContainer {
+    private func detailsSheet(_ container: ContainerItem) -> some View {
+        NavigationStack {
             VStack(spacing: 0) {
-                Picker("Informations et journaux", selection: $inspectorSection) {
-                    Text("Informations").tag(InspectorSection.information)
-                    Text("Journal").tag(InspectorSection.logs)
+                Picker("Informations et journaux", selection: $detailsSection) {
+                    Text("Informations").tag(DetailsSection.information)
+                    Text("Journal").tag(DetailsSection.logs)
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .padding()
-                .accessibilityFocused($inspectorSectionFocused)
+                .accessibilityFocused($detailsSectionFocused)
 
                 Divider()
 
-                if inspectorSection == .information {
+                if detailsSection == .information {
                     Form {
                         Section("Conteneur") {
                             LabeledContent("Nom", value: container.name)
@@ -255,15 +240,19 @@ struct ContainersView: View {
                     logView(container)
                 }
             }
-            .inspectorColumnWidth(min: 300, ideal: 360, max: 520)
             .accessibilityLabel("Informations et journaux de \(container.name)")
-        } else {
-            EmptyModuleView(
-                title: "Aucune sélection",
-                systemImage: "shippingbox",
-                description: "Sélectionnez un conteneur pour lire ses informations."
-            )
+            .navigationTitle("Informations et journaux de \(container.name)")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Terminé") { detailsContainer = nil }
+                        .keyboardShortcut(.defaultAction)
+                        .help("Fermer les informations")
+                }
+            }
         }
+        .frame(minWidth: 520, minHeight: 430)
+        .task { await focusDetails(for: container) }
+        .onDisappear { detailsSectionFocused = false }
     }
 
     @ViewBuilder
@@ -360,12 +349,19 @@ struct ContainersView: View {
         VoiceOver.announce(await viewModel.perform(action, on: container), priority: .high)
     }
 
-    private func focusInspector() async {
+    private func presentDetails(for container: ContainerItem) {
+        selection = container.id
+        detailsSection = .information
+        detailsContainer = container
+        Task { await viewModel.loadLogs(for: container) }
+    }
+
+    private func focusDetails(for container: ContainerItem) async {
         await Task.yield()
-        guard showInspector, let selectedContainer else { return }
-        inspectorSectionFocused = true
+        guard detailsContainer?.id == container.id else { return }
+        detailsSectionFocused = true
         VoiceOver.announce(
-            String(localized: "Informations et journaux de \(selectedContainer.name)"),
+            String(localized: "Informations et journaux de \(container.name)"),
             category: .navigation
         )
     }
@@ -376,12 +372,6 @@ struct ContainersView: View {
         if let cpu = container.cpuPercent { parts.append(String(localized: "processeur \(cpu.formatted()) pour cent")) }
         if let memory = container.memoryBytes { parts.append(memory.formatted(.byteCount(style: .memory))) }
         return parts.formatted(.list(type: .and))
-    }
-
-    private func dateText(_ timestamp: Int64?) -> String? {
-        guard let timestamp, timestamp > 0 else { return nil }
-        return Date(timeIntervalSince1970: TimeInterval(timestamp))
-            .formatted(date: .abbreviated, time: .shortened)
     }
 
     private func dateText(_ timestamp: String?) -> String? {

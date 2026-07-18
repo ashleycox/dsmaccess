@@ -91,6 +91,7 @@ struct AdministrationModelsTests {
               "enable_auto_restart": "true",
               "cpu": "2.5%",
               "memory": "67108864",
+              "started": 1718702062,
               "up_time": "90061"
             }
             """#.utf8
@@ -102,7 +103,30 @@ struct AdministrationModelsTests {
         #expect(container.autoRestart)
         #expect(container.cpuPercent == 2.5)
         #expect(container.memoryBytes == 67_108_864)
+        #expect(container.startedAt == "1718702062")
         #expect(container.uptimeSeconds == 90_061)
+    }
+
+    @Test func decodesContainerStartTimeFromDSM74State() throws {
+        let data = Data(
+            #"""
+            {
+              "id": "container-id",
+              "name": "web",
+              "status": "running",
+              "started": null,
+              "up_time": null,
+              "State": {
+                "StartedAt": "2026-06-18T09:14:22.123456789Z"
+              }
+            }
+            """#.utf8
+        )
+
+        let container = try JSONDecoder().decode(ContainerItem.self, from: data)
+
+        #expect(container.startedAt == "2026-06-18T09:14:22.123456789Z")
+        #expect(container.uptimeSeconds == nil)
     }
 
     @Test func decodesSurveillanceCameraStream() throws {

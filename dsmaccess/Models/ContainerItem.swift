@@ -13,7 +13,7 @@ struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let image: String?
     let status: String
     let createdAt: Int64?
-    let startedAt: Int64?
+    let startedAt: String?
     let uptimeSeconds: Int64?
     let autoRestart: Bool
     let cpuPercent: Double?
@@ -30,6 +30,7 @@ struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
         case image
         case status
         case state
+        case runtimeState = "State"
         case createdAt = "created"
         case startedAt = "started"
         case uptimeSeconds = "up_time"
@@ -40,6 +41,10 @@ struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
         case legacyMemoryBytes = "memory_usage"
     }
 
+    private enum RuntimeStateCodingKeys: String, CodingKey {
+        case startedAt = "StartedAt"
+    }
+
     nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         name = try values.requiredFlexString(.name)
@@ -47,7 +52,17 @@ struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
         image = values.flexString(.image)
         status = values.flexString(.status) ?? values.flexString(.state) ?? "unknown"
         createdAt = values.flexInt64(.createdAt)
-        startedAt = values.flexInt64(.startedAt)
+        let nestedStartedAt: String?
+        if values.contains(.runtimeState), !(try values.decodeNil(forKey: .runtimeState)) {
+            let runtimeState = try values.nestedContainer(
+                keyedBy: RuntimeStateCodingKeys.self,
+                forKey: .runtimeState
+            )
+            nestedStartedAt = runtimeState.flexString(.startedAt)
+        } else {
+            nestedStartedAt = nil
+        }
+        startedAt = nestedStartedAt ?? values.flexString(.startedAt)
         uptimeSeconds = values.flexInt64(.uptimeSeconds)
         autoRestart = values.flexBool(.autoRestart) ?? false
         cpuPercent = Self.percent(in: values, forKey: .cpuPercent)
@@ -76,7 +91,7 @@ struct ContainerItem: nonisolated Decodable, Identifiable, Hashable, Sendable {
         image: String?,
         status: String,
         createdAt: Int64?,
-        startedAt: Int64?,
+        startedAt: String?,
         uptimeSeconds: Int64?,
         autoRestart: Bool,
         cpuPercent: Double?,

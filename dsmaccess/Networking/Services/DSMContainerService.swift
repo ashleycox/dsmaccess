@@ -73,7 +73,6 @@ final class DSMContainerService {
                 "offset": .integer(0),
                 "limit": .integer(limit),
             ],
-            httpMethod: .post,
             as: ContainerLogList.self
         )
         return result.logs
