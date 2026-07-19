@@ -74,6 +74,8 @@ final class FileBrowserViewModel {
     private(set) var isLoadingInspectorDetails = false
     private(set) var isCalculatingInspectorSize = false
     private(set) var isCalculatingInspectorChecksum = false
+    private(set) var archiveItems: [FileStationArchiveItem] = []
+    private(set) var isLoadingArchive = false
 
     var errorMessage: String?
     var shareLinksError: String?
@@ -82,6 +84,7 @@ final class FileBrowserViewModel {
     var backgroundTasksError: String?
     var inspectorError: String?
     var inspectorDetailErrors: [String] = []
+    var archiveError: String?
     var sortMode = SortMode.name
     var sortAscending = true
 
@@ -93,6 +96,7 @@ final class FileBrowserViewModel {
     private var favoritesGeneration = 0
     private var backgroundTasksGeneration = 0
     private var inspectorGeneration = 0
+    private var archiveGeneration = 0
     private var advancedSearchCriteria: FileStationSearchCriteria?
 
     init(session: SessionStore) {
@@ -702,6 +706,40 @@ final class FileBrowserViewModel {
                 String(localized: "Somme MD5 indisponible : \(errorMessage(for: error))")
             )
         }
+    }
+
+    func loadArchive(
+        _ item: FileStationItem,
+        options: FileStationArchiveListOptions
+    ) async {
+        archiveGeneration += 1
+        let generation = archiveGeneration
+        isLoadingArchive = true
+        archiveError = nil
+        defer {
+            if generation == archiveGeneration {
+                isLoadingArchive = false
+            }
+        }
+        do {
+            let page = try await session.withClient {
+                try await $0.archiveItems(archivePath: item.path, options: options)
+            }
+            guard generation == archiveGeneration else { return }
+            archiveItems = page.elements
+        } catch {
+            guard generation == archiveGeneration,
+                  !DSMError.isCancellation(error) else { return }
+            archiveItems = []
+            archiveError = errorMessage(for: error)
+        }
+    }
+
+    func clearArchive() {
+        archiveGeneration += 1
+        archiveItems = []
+        archiveError = nil
+        isLoadingArchive = false
     }
 
     func copy(_ selectedItems: [FileStationItem]) -> String {

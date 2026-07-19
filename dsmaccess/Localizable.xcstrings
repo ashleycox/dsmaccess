@@ -1,6 +1,236 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
+    "Afficher le dossier parent dans l’archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show the parent folder in the archive"
+          }
+        }
+      }
+    },
+    "Appliquer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply"
+          }
+        }
+      }
+    },
+    "Ce niveau ne contient aucun élément." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This level contains no items."
+          }
+        }
+      }
+    },
+    "Choisir l’encodage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose encoding"
+          }
+        }
+      }
+    },
+    "Compressé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compressed: %@"
+          }
+        }
+      }
+    },
+    "Contenu de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contents of %@"
+          }
+        }
+      }
+    },
+    "Contenu de l’archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive contents"
+          }
+        }
+      }
+    },
+    "Dossier vide dans l’archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Empty folder in archive"
+          }
+        }
+      }
+    },
+    "Effacer la sélection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear selection"
+          }
+        }
+      }
+    },
+    "Éléments dans ce dossier : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Items in this folder: %lld"
+          }
+        }
+      }
+    },
+    "Extraire la sélection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extract selection"
+          }
+        }
+      }
+    },
+    "Extraire tout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extract all"
+          }
+        }
+      }
+    },
+    "Extraire tout le contenu de l’archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extract all archive contents"
+          }
+        }
+      }
+    },
+    "Extraire uniquement les éléments sélectionnés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Extract only the selected items"
+          }
+        }
+      }
+    },
+    "Lecture de l’archive en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading archive…"
+          }
+        }
+      }
+    },
+    "Lecture de l’archive…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reading archive…"
+          }
+        }
+      }
+    },
+    "Ouvrir %@ dans l’archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open %@ in the archive"
+          }
+        }
+      }
+    },
+    "Racine" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Root"
+          }
+        }
+      }
+    },
+    "Relire le contenu de l’archive" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reload archive contents"
+          }
+        }
+      }
+    },
+    "Taille compressée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compressed size"
+          }
+        }
+      }
+    },
+    "Taille d’origine" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Original size"
+          }
+        }
+      }
+    },
+    "Tout sélectionner" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select all"
+          }
+        }
+      }
+    },
+    "Vérifiez le mot de passe ou l’encodage, puis réessayez." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the password or encoding, then try again."
+          }
+        }
+      }
+    },
     "%@ en cours…" : {
       "localizations" : {
         "en" : {

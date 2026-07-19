@@ -170,7 +170,7 @@ struct FileBrowserView: View {
                 }
             }
             .sheet(item: $extractionItem) { item in
-                FileExtractionOptionsSheet(archiveName: item.name, itemIDs: []) { options in
+                ArchiveBrowserSheet(vm: vm, archive: item) { options in
                     performExtraction(item, options: options)
                 }
             }

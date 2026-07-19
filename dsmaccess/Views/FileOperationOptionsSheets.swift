@@ -265,6 +265,21 @@ struct FileExtractionOptionsSheet: View {
     @State private var password = ""
     @AccessibilityFocusState private var focusTitle: Bool
 
+    init(
+        archiveName: String,
+        itemIDs: [Int],
+        initialCodepage: FileStationArchiveCodepage? = nil,
+        initialPassword: String = "",
+        onSubmit: @escaping (FileStationExtractionOptions) -> Void
+    ) {
+        self.archiveName = archiveName
+        self.itemIDs = itemIDs
+        self.onSubmit = onSubmit
+        _usesCodepage = State(initialValue: initialCodepage != nil)
+        _codepage = State(initialValue: initialCodepage ?? .french)
+        _password = State(initialValue: initialPassword)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             Text("Extraire \(archiveName)")
