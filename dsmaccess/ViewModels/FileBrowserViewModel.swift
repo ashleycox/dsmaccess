@@ -56,6 +56,8 @@ final class FileBrowserViewModel {
     private(set) var isShowingSearchResults = false
     private(set) var searchQuery = ""
     private(set) var searchProgress: FileStationSearchProgress?
+    private(set) var operationProgress: FileOperationProgress?
+    private(set) var activeOperationLabel: String?
     private(set) var clipboard: Clipboard?
     private(set) var shareLinks: [SharingLink] = []
     private(set) var isLoadingShareLinks = false
@@ -455,15 +457,20 @@ final class FileBrowserViewModel {
 
     func delete(_ selectedItems: [FileStationItem]) async -> DSMOperationOutcome {
         guard canDelete else { return unavailableOutcome(for: .delete) }
-        return await performAndReload {
-            try await self.session.withClient { try await $0.delete(paths: selectedItems.map(\.path)) }
+        return await performProgressOperation(label: String(localized: "Suppression")) { progress in
+            try await self.session.withClient {
+                try await $0.delete(paths: selectedItems.map(\.path), progress: progress)
+            }
             return selectedItems.count == 1
                 ? String(localized: "Supprimé : \(selectedItems[0].name)")
                 : String(localized: "\(selectedItems.count) éléments supprimés")
         }
     }
 
-    func upload(fileURLs: [URL]) async -> DSMOperationOutcome {
+    func upload(
+        fileURLs: [URL],
+        options: FileStationUploadOptions = FileStationUploadOptions(conflictPolicy: .skip)
+    ) async -> DSMOperationOutcome {
         guard canUpload else { return unavailableOutcome(for: .upload) }
         guard let parent = currentLevel.path else {
             return .failure(String(localized: "Impossible d’envoyer ici."))
@@ -495,7 +502,7 @@ final class FileBrowserViewModel {
                     try await $0.upload(
                         fileURL: url,
                         to: parent,
-                        options: FileStationUploadOptions(),
+                        options: options,
                         progress: { [weak self] progress in
                             self?.updateTransfer(id: transferID, progress: progress)
                         }
@@ -711,18 +718,23 @@ final class FileBrowserViewModel {
             : String(localized: "\(selectedItems.count) éléments coupés. Ouvrez la destination puis Coller pour déplacer.")
     }
 
-    func paste() async -> DSMOperationOutcome {
+    func paste(conflictPolicy: FileConflictPolicy = .skip) async -> DSMOperationOutcome {
         guard canCopyMove else { return unavailableOutcome(for: .copyMove) }
         guard let clipboard else { return .failure(String(localized: "Rien à coller.")) }
         guard let destination = currentLevel.path else {
             return .failure(String(localized: "Impossible de coller ici."))
         }
-        return await performAndReload {
+        let label = clipboard.movesItems
+            ? String(localized: "Déplacement")
+            : String(localized: "Copie")
+        return await performProgressOperation(label: label) { progress in
             try await self.session.withClient {
                 try await $0.copyMove(
                     paths: clipboard.items.map(\.path),
                     to: destination,
-                    remove: clipboard.movesItems
+                    remove: clipboard.movesItems,
+                    conflictPolicy: conflictPolicy,
+                    progress: progress
                 )
             }
             if clipboard.movesItems { self.clipboard = nil }
@@ -732,30 +744,52 @@ final class FileBrowserViewModel {
         }
     }
 
-    func compress(_ selectedItems: [FileStationItem], archiveName: String) async -> DSMOperationOutcome {
+    func compress(
+        _ selectedItems: [FileStationItem],
+        archiveName: String,
+        options: FileStationCompressionOptions = FileStationCompressionOptions()
+    ) async -> DSMOperationOutcome {
         guard canCompress else { return unavailableOutcome(for: .compress) }
         guard let folder = currentLevel.path else {
             return .failure(String(localized: "Impossible de créer une archive ici."))
         }
         let trimmed = archiveName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let filename = trimmed.lowercased().hasSuffix(".zip") ? trimmed : "\(trimmed).zip"
+        let expectedExtension = options.format.rawValue
+        let currentExtension = trimmed.pathExtension.lowercased()
+        let basename = ["zip", "7z"].contains(currentExtension)
+            ? (trimmed as NSString).deletingPathExtension
+            : trimmed
+        let filename = "\(basename).\(expectedExtension)"
         let destination = folder.appendingNASPathComponent(filename)
-        return await performAndReload {
+        return await performProgressOperation(label: String(localized: "Compression")) { progress in
             try await self.session.withClient {
-                try await $0.compress(paths: selectedItems.map(\.path), to: destination)
+                try await $0.compress(
+                    paths: selectedItems.map(\.path),
+                    to: destination,
+                    options: options,
+                    progress: progress
+                )
             }
             return String(localized: "Archive créée : \(filename)")
         }
     }
 
-    func extract(_ item: FileStationItem) async -> DSMOperationOutcome {
+    func extract(
+        _ item: FileStationItem,
+        options: FileStationExtractionOptions = FileStationExtractionOptions()
+    ) async -> DSMOperationOutcome {
         guard canExtractArchives else { return unavailableOutcome(for: .extract) }
         guard let folder = currentLevel.path else {
             return .failure(String(localized: "Impossible d’extraire l’archive ici."))
         }
-        return await performAndReload {
+        return await performProgressOperation(label: String(localized: "Extraction")) { progress in
             try await self.session.withClient {
-                try await $0.extract(archivePath: item.path, to: folder)
+                try await $0.extract(
+                    archivePath: item.path,
+                    to: folder,
+                    options: options,
+                    progress: progress
+                )
             }
             return String(localized: "Archive extraite : \(item.name)")
         }
@@ -869,6 +903,37 @@ final class FileBrowserViewModel {
         defer { isWorking = false }
         do {
             let message = try await operation()
+            let query = searchQuery
+            let criteria = advancedSearchCriteria
+            await loadCurrent()
+            if let criteria {
+                await search(criteria)
+            } else if !query.isEmpty {
+                await search(query)
+            }
+            return .success(message)
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(String(localized: "Échec de l’opération : \(errorMessage(for: error))"))
+        }
+    }
+
+    private func performProgressOperation(
+        label: String,
+        _ operation: (_ progress: (FileOperationProgress) -> Void) async throws -> String
+    ) async -> DSMOperationOutcome {
+        isWorking = true
+        activeOperationLabel = label
+        operationProgress = nil
+        defer {
+            isWorking = false
+            activeOperationLabel = nil
+            operationProgress = nil
+        }
+        do {
+            let message = try await operation { [weak self] progress in
+                self?.operationProgress = progress
+            }
             let query = searchQuery
             let criteria = advancedSearchCriteria
             await loadCurrent()
