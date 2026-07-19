@@ -1,27 +1,21 @@
-## v1.1-beta.3 (build 4) — 14 juillet 2026
+## v1.1-beta.5 (build 6) — 19 juillet 2026
 
-Cette bêta ajoute les informations d'identité réseau et la mise à jour des
-paquets, avec une meilleure reprise après un délai d'attente dépassé.
+### En bref
 
-### Nouveautés
-
-- Panneau de configuration : le nouvel aperçu « Réseau et identité », en lecture
-  seule, affiche le nom du serveur, l'adresse IP locale, le masque de sous-réseau,
-  la passerelle, les serveurs DNS, l'adresse IPv6 et l'interface réseau.
-- Centre de paquets : les mises à jour des paquets officiels Synology peuvent
-  désormais être confirmées et installées depuis l'app. Le NAS télécharge,
-  installe et redémarre le paquet. Si une mise à jour exige un redémarrage du NAS,
-  terminez l'opération depuis DSM.
+- Corrige un problème de connexion apparu dans la beta.4 : l'approbation du
+  certificat de votre NAS fonctionne à nouveau, au lieu de voir la demande de
+  confiance revenir sans arrêt.
 
 ### Corrections
 
-- Les connexions et les lectures reprennent après un délai d'attente dépassé
-  grâce à une seconde tentative automatique. Les actions d'administration ne
-  sont jamais relancées automatiquement.
+- Lorsque macOS ne reconnaît pas le certificat de votre NAS, l'approuver une fois
+  vous connecte désormais du premier coup, et le choix est retenu pour ce serveur.
+  Dans la beta.4, l'approbation n'était pas prise en compte : la demande de
+  confiance revenait en boucle et vous restiez bloqué sur l'écran de connexion.
 
-Les deux nouveautés proposent des libellés VoiceOver explicites, un focus adapté
-aux états de chargement et d'erreur, ainsi que des annonces de progression et de
-résultat.
+### Remerciements
+
+- Merci à Ashley Cox, qui a identifié et corrigé ce problème.
 
 ### Configuration requise
 
@@ -30,4 +24,4 @@ résultat.
 
 ### Téléchargement
 
-[dsmaccess-1.1-beta.3.zip](https://github.com/math65/dsmaccess/releases/download/v1.1-beta.3/dsmaccess-1.1-beta.3.zip)
+[dsmaccess-1.1-beta.5.zip](https://github.com/math65/dsmaccess/releases/download/v1.1-beta.5/dsmaccess-1.1-beta.5.zip)
