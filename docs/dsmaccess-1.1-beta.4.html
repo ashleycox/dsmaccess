@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dsmaccess-1.1-beta.4</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1d1d1f;
+  --muted: #6e6e73;
+  --code-bg: #f5f5f7;
+  --link: #0066cc;
+  --link-hover: #0040a0;
+  --rule: #e5e5ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1e1e;
+    --fg: #ececec;
+    --muted: #a0a0a0;
+    --code-bg: #2d2d2d;
+    --link: #4eaaff;
+    --link-hover: #82c4ff;
+    --rule: #3a3a3a;
+  }
+}
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 1rem 1.25rem 1.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+h1, h2, h3, h4 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 1.4em 0 0.5em;
+}
+h1 { font-size: 1.35rem; }
+h2 { font-size: 1.15rem; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
+h3 { font-size: 1.02rem; }
+h4 { font-size: 0.95rem; color: var(--muted); }
+p { margin: 0.6em 0; }
+ul, ol { padding-left: 1.4em; margin: 0.6em 0; }
+li { margin: 0.25em 0; }
+li > p { margin: 0.3em 0; }
+a { color: var(--link); text-decoration: none; }
+a:hover, a:focus { color: var(--link-hover); text-decoration: underline; }
+code {
+  background: var(--code-bg);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 0.75em 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+pre code { background: transparent; padding: 0; border-radius: 0; }
+blockquote {
+  border-left: 3px solid var(--rule);
+  margin: 0.8em 0;
+  padding: 0.1em 0 0.1em 1em;
+  color: var(--muted);
+}
+hr { border: 0; border-top: 1px solid var(--rule); margin: 1.5em 0; }
+strong { font-weight: 600; }
+</style>
+</head>
+<body>
+<h2 id="v11-beta4-build-5--2026-07-19">v1.1-beta.4 (build 5) —
+2026-07-19</h2>
+<p>This is a large update. DSM Access has been rebuilt around native
+macOS — a standard sidebar, toolbars, and a real Settings window — with
+full keyboard and VoiceOver support throughout. It also adds several new
+areas you can manage, stronger certificate security, and a set of
+fixes.</p>
+<h3 id="new-areas">New areas</h3>
+<ul>
+<li>File Station, rebuilt: multiple selection, copy, cut and paste,
+uploads and downloads, folder creation, search, and share links with
+optional passwords and expiry dates. A details panel shows size, type,
+owner, permissions, and paths.</li>
+<li>Users and Groups.</li>
+<li>Download Station.</li>
+<li>Virtual Machine Manager.</li>
+<li>Container Manager, including each container's logs.</li>
+<li>Surveillance Station, including camera snapshots.</li>
+<li>Logs and Security.</li>
+<li>Multiple NAS: save several servers and switch between them.</li>
+</ul>
+<h3 id="a-more-native-app">A more native app</h3>
+<ul>
+<li>A standard sidebar groups everything into Overview, Files and
+Sharing, Administration, and Applications, with a keyboard shortcut for
+each module.</li>
+<li>A native Settings window (Command-comma) lets you choose which
+announcements you hear and show, hide, or reorder the modules in the
+sidebar.</li>
+<li>Common actions now live in the toolbar and the menu bar, with
+standard shortcuts.</li>
+</ul>
+<h3 id="security">Security</h3>
+<ul>
+<li>DSM Access now checks your NAS certificate. A self-signed
+certificate is accepted only after you approve its fingerprint once; the
+choice is remembered for that server, and you are asked again if the
+certificate later changes. This replaces the earlier behaviour that
+accepted any certificate — which matters if your NAS is reachable from
+outside your home.</li>
+</ul>
+<h3 id="accessibility">Accessibility</h3>
+<ul>
+<li>VoiceOver labels, focus, and spoken feedback across every screen and
+every state: loading, empty, error, and success.</li>
+<li>Announcements are queued, so quick status updates are read one after
+another instead of cutting each other off.</li>
+</ul>
+<h3 id="fixes">Fixes</h3>
+<ul>
+<li>Container details open reliably again and show processor use,
+memory, and the start time.</li>
+<li>Container logs load correctly.</li>
+<li>System logs show their full message on every line.</li>
+<li>In Files, right-clicking several selected items keeps the whole
+selection, and the window title now follows the folder you are in.</li>
+</ul>
+<h3 id="thanks">Thanks</h3>
+<ul>
+<li>This release is in large part the work of Ashley Cox. The native
+rebuild, the new modules, and the certificate security are hers, and the
+difference they make is hard to overstate. Thank you, Ashley.</li>
+</ul>
+<h3 id="requirements">Requirements</h3>
+<ul>
+<li>macOS 14 (Sonoma) or later.</li>
+<li>A Synology NAS running DSM 7 on your local network.</li>
+</ul>
+<h3 id="download">Download</h3>
+<p><a
+href="https://github.com/math65/dsmaccess/releases/download/v1.1-beta.4/dsmaccess-1.1-beta.4.zip">dsmaccess-1.1-beta.4.zip</a></p>
+</body>
+</html>
