@@ -9,151 +9,23 @@ import SwiftUI
 
 struct PackageCatalogView: View {
     @Bindable var vm: PackagesViewModel
-    let refresh: () async -> Void
-
-    @Environment(\.dismiss) private var dismiss
-    @State private var searchText = ""
-    @State private var filter = CatalogFilter.all
-    @State private var isRefreshing = false
-    @State private var refreshTask: Task<Void, Never>?
-    @State private var operationTask: Task<Void, Never>?
-    @State private var pendingAction: CatalogActionRequest?
-    @State private var operationError: String?
-    @AccessibilityFocusState private var focusHeading: Bool
-    @AccessibilityFocusState private var focusStatus: Bool
+    let searchText: String
+    let filter: CatalogFilter
+    let operationsDisabled: Bool
+    let retry: () -> Void
+    let requestAction: (CatalogActionRequest) -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-            controls
-            Divider()
-            operationBanner
-            content
-            Divider()
-            HStack {
-                Spacer()
-                Button("Fermer", role: .cancel) { dismiss() }
-                    .keyboardShortcut(.cancelAction)
-                    .disabled(isRefreshing || operationTask != nil)
-            }
-            .padding()
-        }
-        .frame(width: 760, height: 560)
-        .interactiveDismissDisabled(operationTask != nil)
-        .onAppear {
-            focusHeading = true
-            VoiceOver.announce("Catalogue officiel", category: .navigation)
-        }
-        .onDisappear {
-            refreshTask?.cancel()
-            operationTask?.cancel()
-        }
-        .confirmationDialog(
-            confirmationTitle,
-            isPresented: Binding(
-                get: { pendingAction != nil },
-                set: { if !$0 { pendingAction = nil } }
-            ),
-            presenting: pendingAction
-        ) { request in
-            Button(confirmButtonTitle(for: request)) {
-                perform(request)
-            }
-            Button("Annuler", role: .cancel) { }
-        } message: { request in
-            Text(confirmationMessage(for: request))
-        }
-    }
-
-    private var header: some View {
-        HStack {
-            Text("Catalogue officiel")
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityFocused($focusHeading)
-            Spacer()
-            if isRefreshing {
-                ProgressView()
-                    .controlSize(.small)
-                    .accessibilityLabel("Actualisation du catalogue…")
-            }
-            Button("Fermer", role: .cancel) { dismiss() }
-                .keyboardShortcut(.cancelAction)
-                .disabled(isRefreshing || operationTask != nil)
-        }
-        .padding()
-    }
-
-    private var controls: some View {
-        HStack(spacing: 14) {
-            TextField("Rechercher dans le catalogue", text: $searchText)
-                .textFieldStyle(.roundedBorder)
-                .frame(maxWidth: 300)
-            Picker("Afficher", selection: $filter) {
-                ForEach(CatalogFilter.allCases) { filter in
-                    Text(filter.title).tag(filter)
-                }
-            }
-            .frame(maxWidth: 230)
-            Spacer()
-            Button("Actualiser", systemImage: "arrow.clockwise") {
-                startRefresh()
-            }
-            .disabled(isRefreshing || operationTask != nil)
-            .help("Forcer l’actualisation du catalogue sur le NAS")
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
-    }
-
-    @ViewBuilder
-    private var operationBanner: some View {
-        if let status = vm.operationStatusText {
-            HStack(spacing: 10) {
-                ProgressView()
-                    .controlSize(.small)
-                Text(status)
-                Spacer()
-                Button("Arrêter le suivi") { stopTrackingOperation() }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(.quaternary)
-            .accessibilityElement(children: .contain)
-        }
-        if let operationError {
-            HStack {
-                Label(operationError, systemImage: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
-                    .accessibilityFocused($focusStatus)
-                Spacer()
-                Button("Fermer l’erreur") { self.operationError = nil }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(.quaternary)
-        }
-    }
-
-    @ViewBuilder
-    private var content: some View {
-        if let error = vm.errorMessage ?? vm.catalogErrorMessage {
-            VStack(spacing: 12) {
-                Text(error)
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                Button("Réessayer") { startRefresh() }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .accessibilityFocused($focusStatus)
+        if vm.isLoading && vm.catalog.isEmpty {
+            ModuleLoadingView()
+        } else if let error = vm.errorMessage ?? vm.catalogErrorMessage {
+            ModuleErrorView(message: error, retry: retry)
         } else if visibleCatalog.isEmpty {
             ContentUnavailableView(
                 "Aucun paquet correspondant",
                 systemImage: "shippingbox",
                 description: Text("Modifiez la recherche ou le filtre du catalogue.")
             )
-            .accessibilityFocused($focusStatus)
         } else {
             List(visibleCatalog) { item in
                 catalogRow(item)
@@ -185,11 +57,13 @@ struct PackageCatalogView: View {
             installedPackage: installedPackage,
             updateAvailable: installedPackage.map { vm.update(for: $0) != nil } == true,
             action: action(for: item, installedPackage: installedPackage),
-            isDisabled: operationTask != nil || vm.busy.contains(item.packageID),
+            isDisabled: operationsDisabled || vm.busy.contains(item.packageID),
             requestAction: {
-                pendingAction = CatalogActionRequest(
-                    item: item,
-                    installedPackage: installedPackage
+                requestAction(
+                    CatalogActionRequest(
+                        item: item,
+                        installedPackage: installedPackage
+                    )
                 )
             }
         )
@@ -203,106 +77,6 @@ struct PackageCatalogView: View {
             return vm.update(for: installedPackage) != nil && vm.canApplyUpdates ? .update : nil
         }
         return vm.canInstall(item) ? .install : nil
-    }
-
-    private func refreshCatalog() async {
-        isRefreshing = true
-        defer { isRefreshing = false }
-        VoiceOver.announce(
-            String(localized: "Actualisation du catalogue…"),
-            category: .progress,
-            priority: .low
-        )
-        await refresh()
-        guard !Task.isCancelled else { return }
-        if let error = vm.errorMessage ?? vm.catalogErrorMessage {
-            focusStatus = true
-            VoiceOver.announce(error, category: .error, priority: .high)
-        } else {
-            focusHeading = true
-            VoiceOver.announce(
-                String(localized: "Catalogue actualisé : \(vm.catalog.count) paquets"),
-                category: .result
-            )
-        }
-    }
-
-    private func startRefresh() {
-        guard refreshTask == nil else { return }
-        refreshTask = Task {
-            await refreshCatalog()
-            refreshTask = nil
-        }
-    }
-
-    private var confirmationTitle: String {
-        guard let pendingAction else { return String(localized: "Installer ce paquet ?") }
-        return pendingAction.installedPackage == nil
-            ? String(localized: "Installer ce paquet ?")
-            : String(localized: "Mettre à jour ce paquet ?")
-    }
-
-    private func confirmButtonTitle(for request: CatalogActionRequest) -> String {
-        if let installedPackage = request.installedPackage {
-            return String(localized: "Mettre à jour \(installedPackage.displayName)")
-        }
-        return String(localized: "Installer \(request.item.packageID)")
-    }
-
-    private func confirmationMessage(for request: CatalogActionRequest) -> String {
-        if let installedPackage = request.installedPackage {
-            return String(
-                localized: "« \(installedPackage.displayName) » sera mis à jour vers la version \(request.item.version). Le paquet sera téléchargé, installé puis redémarré."
-            )
-        }
-        return String(
-            localized: "« \(request.item.packageID) » version \(request.item.version) sera téléchargé depuis le catalogue officiel, installé puis démarré si le paquet le permet."
-        )
-    }
-
-    private func perform(_ request: CatalogActionRequest) {
-        guard operationTask == nil else { return }
-        operationError = nil
-        let announcement: String
-        if let installedPackage = request.installedPackage {
-            announcement = String(
-                localized: "Mise à jour de \(installedPackage.displayName) en cours…"
-            )
-        } else {
-            announcement = String(
-                localized: "Installation de \(request.item.packageID) en cours…"
-            )
-        }
-        VoiceOver.announce(announcement, category: .progress, priority: .high)
-        operationTask = Task {
-            let outcome: DSMOperationOutcome
-            if let installedPackage = request.installedPackage {
-                outcome = await vm.applyUpdate(installedPackage)
-            } else {
-                outcome = await vm.install(request.item)
-            }
-            if case .failure(let message) = outcome {
-                operationError = message
-                focusStatus = true
-            }
-            if case .cancelled = outcome {
-                operationTask = nil
-                return
-            }
-            VoiceOver.announce(outcome, priority: .high)
-            operationTask = nil
-        }
-    }
-
-    private func stopTrackingOperation() {
-        operationTask?.cancel()
-        VoiceOver.announce(
-            String(
-                localized: "Suivi arrêté dans l’app. L’opération déjà envoyée au NAS peut continuer dans DSM."
-            ),
-            category: .progress,
-            priority: .high
-        )
     }
 }
 
@@ -390,7 +164,7 @@ private struct PackageCatalogRow: View {
     }
 }
 
-private struct CatalogActionRequest {
+struct CatalogActionRequest {
     let item: PackageUpdate
     let installedPackage: PackageInfo?
 }
@@ -416,7 +190,7 @@ private enum CatalogRowAction: Equatable {
     }
 }
 
-private enum CatalogFilter: String, CaseIterable, Identifiable {
+enum CatalogFilter: String, CaseIterable, Identifiable {
     case all
     case notInstalled
     case installed

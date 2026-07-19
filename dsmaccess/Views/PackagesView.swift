@@ -12,14 +12,17 @@ struct PackagesView: View {
     @State private var pendingUpdate: PackageInfo?
     @State private var pendingRepair: PackageInfo?
     @State private var pendingManualPackage: URL?
+    @State private var pendingCatalogAction: CatalogActionRequest?
     @State private var confirmsUpdateAll = false
     @State private var detailsPackage: PackageInfo?
     @State private var showSettings = false
-    @State private var showCatalog = false
     @State private var showPackageSources = false
     @State private var showPackageImporter = false
+    @State private var section = PackageCenterSection.installed
     @State private var searchText = ""
     @State private var filter = PackageFilter.all
+    @State private var catalogFilter = CatalogFilter.all
+    @State private var refreshTask: Task<Void, Never>?
     @State private var operationTask: Task<Void, Never>?
     @State private var operationError: String?
     @AccessibilityFocusState private var focusContent: Bool
@@ -41,14 +44,20 @@ struct PackagesView: View {
             statusBanners
             content
         }
-        .searchable(text: $searchText, prompt: "Rechercher des paquets")
+        .searchable(text: $searchText, prompt: searchPrompt)
         .toolbar {
             packageToolbar
         }
         .task {
             await load(restoresInitialFocus: true)
         }
+        .onChange(of: section) { _, newSection in
+            searchText = ""
+            focusContent = true
+            VoiceOver.announce(newSection.announcement, category: .navigation)
+        }
         .onDisappear {
+            refreshTask?.cancel()
             operationTask?.cancel()
         }
     }
@@ -120,6 +129,21 @@ struct PackagesView: View {
             Text(manualInstallationWarning(for: fileURL))
         }
         .confirmationDialog(
+            catalogConfirmationTitle,
+            isPresented: Binding(
+                get: { pendingCatalogAction != nil },
+                set: { if !$0 { pendingCatalogAction = nil } }
+            ),
+            presenting: pendingCatalogAction
+        ) { request in
+            Button(catalogConfirmButtonTitle(for: request)) {
+                requestCatalogOperation(request)
+            }
+            Button("Annuler", role: .cancel) { }
+        } message: { request in
+            Text(catalogConfirmationMessage(for: request))
+        }
+        .confirmationDialog(
             "Mettre à jour tous les paquets ?",
             isPresented: $confirmsUpdateAll
         ) {
@@ -140,11 +164,6 @@ struct PackagesView: View {
                 canManagePackageSources: vm.capabilities?.canManagePackageSources == true
             )
         }
-        .sheet(isPresented: $showCatalog) {
-            PackageCatalogView(vm: vm) {
-                await load(forceCatalogRefresh: true, announcesResult: false)
-            }
-        }
         .sheet(isPresented: $showPackageSources) {
             PackageSourcesSheet(session: session)
         }
@@ -163,33 +182,49 @@ struct PackagesView: View {
     @ToolbarContentBuilder
     private var packageToolbar: some ToolbarContent {
         ToolbarItem {
-            Picker("Filtrer les paquets", selection: $filter) {
-                ForEach(PackageFilter.allCases) { filter in
-                    Text(filter.title).tag(filter)
+            Picker("Centre de paquets", selection: $section) {
+                ForEach(PackageCenterSection.allCases) { section in
+                    Text(section.title).tag(section)
+                        .disabled(section == .catalog && !vm.canBrowseCatalog)
                 }
             }
-            .pickerStyle(.menu)
-            .help("Filtrer les paquets")
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .accessibilityLabel("Centre de paquets")
+            .disabled(operationTask != nil || refreshTask != nil)
         }
 
         ToolbarItem {
-            Button {
-                showCatalog = true
-            } label: {
-                Label("Catalogue officiel", systemImage: "shippingbox.and.arrow.backward")
+            if section == .installed {
+                Picker("Filtrer les paquets", selection: $filter) {
+                    ForEach(PackageFilter.allCases) { filter in
+                        Text(filter.title).tag(filter)
+                    }
+                }
+                .pickerStyle(.menu)
+                .help("Filtrer les paquets")
+            } else {
+                Picker("Afficher", selection: $catalogFilter) {
+                    ForEach(CatalogFilter.allCases) { filter in
+                        Text(filter.title).tag(filter)
+                    }
+                }
+                .pickerStyle(.menu)
+                .help("Filtrer les paquets")
             }
-            .disabled(!vm.canBrowseCatalog || operationTask != nil)
-            .help("Parcourir le catalogue officiel annoncé par ce NAS")
         }
 
-        ToolbarItem {
-            Button {
-                confirmsUpdateAll = true
-            } label: {
-                Label("Tout mettre à jour", systemImage: "arrow.triangle.2.circlepath")
+        if section == .installed {
+            ToolbarItem {
+                Button {
+                    confirmsUpdateAll = true
+                } label: {
+                    Label("Tout mettre à jour", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(vm.updateCount == 0 || !vm.canApplyUpdates || operationTask != nil)
+                .help("Mettre à jour tous les paquets compatibles")
             }
-            .disabled(vm.updateCount == 0 || !vm.canApplyUpdates || operationTask != nil)
-            .help("Mettre à jour tous les paquets compatibles")
         }
 
         ToolbarItem {
@@ -221,13 +256,23 @@ struct PackagesView: View {
 
         ToolbarItem {
             Button {
-                Task { await load() }
+                startRefresh()
             } label: {
                 Label("Actualiser", systemImage: "arrow.clockwise")
             }
-            .disabled(vm.isLoading || operationTask != nil)
-            .help("Actualiser les paquets")
+            .disabled(vm.isLoading || refreshTask != nil || operationTask != nil)
+            .help(refreshHelp)
         }
+    }
+
+    private var searchPrompt: LocalizedStringKey {
+        section == .installed ? "Rechercher des paquets" : "Rechercher dans le catalogue"
+    }
+
+    private var refreshHelp: String {
+        section == .installed
+            ? String(localized: "Actualiser les paquets")
+            : String(localized: "Forcer l’actualisation du catalogue sur le NAS")
     }
 
     @ViewBuilder
@@ -246,7 +291,7 @@ struct PackagesView: View {
             .background(.quaternary)
             .accessibilityElement(children: .contain)
         }
-        if let catalogError = vm.catalogErrorMessage {
+        if section == .installed, let catalogError = vm.catalogErrorMessage {
             Label(
                 String(localized: "Catalogue indisponible : \(catalogError)"),
                 systemImage: "exclamationmark.triangle"
@@ -274,6 +319,24 @@ struct PackagesView: View {
 
     @ViewBuilder
     private var content: some View {
+        switch section {
+        case .installed:
+            installedContent
+        case .catalog:
+            PackageCatalogView(
+                vm: vm,
+                searchText: searchText,
+                filter: catalogFilter,
+                operationsDisabled: operationTask != nil,
+                retry: startRefresh,
+                requestAction: { pendingCatalogAction = $0 }
+            )
+            .accessibilityFocused($focusContent)
+        }
+    }
+
+    @ViewBuilder
+    private var installedContent: some View {
         if vm.isLoading && vm.packages.isEmpty {
             ModuleLoadingView()
                 .accessibilityFocused($focusContent)
@@ -446,6 +509,29 @@ struct PackagesView: View {
         }
     }
 
+    private func startRefresh() {
+        guard refreshTask == nil else { return }
+        let refreshesCatalog = section == .catalog
+        refreshTask = Task {
+            defer { refreshTask = nil }
+            await load(
+                forceCatalogRefresh: refreshesCatalog,
+                announcesResult: !refreshesCatalog
+            )
+            guard refreshesCatalog, !Task.isCancelled else { return }
+            if let error = vm.errorMessage ?? vm.catalogErrorMessage {
+                focusContent = true
+                VoiceOver.announce(error, category: .error, priority: .high)
+            } else {
+                focusContent = true
+                VoiceOver.announce(
+                    String(localized: "Catalogue actualisé : \(vm.catalog.count) paquets"),
+                    category: .result
+                )
+            }
+        }
+    }
+
     private func setRunning(_ package: PackageInfo, running: Bool) {
         let announcement = running
             ? String(localized: "Démarrage de \(package.displayName) en cours…")
@@ -476,6 +562,53 @@ struct PackagesView: View {
             announcement: String(localized: "Réparation de \(package.displayName) en cours…")
         ) {
             await vm.repair(package)
+        }
+    }
+
+    private var catalogConfirmationTitle: String {
+        guard let pendingCatalogAction else {
+            return String(localized: "Installer ce paquet ?")
+        }
+        return pendingCatalogAction.installedPackage == nil
+            ? String(localized: "Installer ce paquet ?")
+            : String(localized: "Mettre à jour ce paquet ?")
+    }
+
+    private func catalogConfirmButtonTitle(for request: CatalogActionRequest) -> String {
+        if let installedPackage = request.installedPackage {
+            return String(localized: "Mettre à jour \(installedPackage.displayName)")
+        }
+        return String(localized: "Installer \(request.item.packageID)")
+    }
+
+    private func catalogConfirmationMessage(for request: CatalogActionRequest) -> String {
+        if let installedPackage = request.installedPackage {
+            return String(
+                localized: "« \(installedPackage.displayName) » sera mis à jour vers la version \(request.item.version). Le paquet sera téléchargé, installé puis redémarré."
+            )
+        }
+        return String(
+            localized: "« \(request.item.packageID) » version \(request.item.version) sera téléchargé depuis le catalogue officiel, installé puis démarré si le paquet le permet."
+        )
+    }
+
+    private func requestCatalogOperation(_ request: CatalogActionRequest) {
+        if let installedPackage = request.installedPackage {
+            startOperation(
+                announcement: String(
+                    localized: "Mise à jour de \(installedPackage.displayName) en cours…"
+                )
+            ) {
+                await vm.applyUpdate(installedPackage)
+            }
+        } else {
+            startOperation(
+                announcement: String(
+                    localized: "Installation de \(request.item.packageID) en cours…"
+                )
+            ) {
+                await vm.install(request.item)
+            }
         }
     }
 
@@ -608,6 +741,27 @@ struct PackagesView: View {
         operationError = message
         focusOperationError = true
         VoiceOver.announce(message, category: .error, priority: .high)
+    }
+}
+
+private enum PackageCenterSection: CaseIterable, Hashable, Identifiable {
+    case installed
+    case catalog
+
+    var id: Self { self }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .installed: "Installés"
+        case .catalog: "Catalogue officiel"
+        }
+    }
+
+    var announcement: String {
+        switch self {
+        case .installed: String(localized: "Installés")
+        case .catalog: String(localized: "Catalogue officiel")
+        }
     }
 }
 
