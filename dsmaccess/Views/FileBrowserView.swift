@@ -128,7 +128,7 @@ struct FileBrowserView: View {
                 }
             }
             .sheet(item: $infoItem) { item in
-                FileInfoSheet(item: item)
+                FileInfoSheet(vm: vm, selectedItem: item)
             }
             .sheet(isPresented: $showingShareLinks) {
                 ShareLinksView(vm: vm)

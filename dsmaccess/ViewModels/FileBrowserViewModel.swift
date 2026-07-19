@@ -63,12 +63,22 @@ final class FileBrowserViewModel {
     private(set) var currentFolderIsWritable: Bool?
     private(set) var backgroundTasks: [FileStationBackgroundTask] = []
     private(set) var isLoadingBackgroundTasks = false
+    private(set) var inspectorItem: FileStationItem?
+    private(set) var inspectorDirectorySize: FileStationDirectorySize?
+    private(set) var inspectorChecksum: String?
+    private(set) var inspectorThumbnail: Data?
+    private(set) var isLoadingInspector = false
+    private(set) var isLoadingInspectorDetails = false
+    private(set) var isCalculatingInspectorSize = false
+    private(set) var isCalculatingInspectorChecksum = false
 
     var errorMessage: String?
     var shareLinksError: String?
     var favoritesError: String?
     var permissionMessage: String?
     var backgroundTasksError: String?
+    var inspectorError: String?
+    var inspectorDetailErrors: [String] = []
     var sortMode = SortMode.name
     var sortAscending = true
 
@@ -79,6 +89,7 @@ final class FileBrowserViewModel {
     private var shareLinksGeneration = 0
     private var favoritesGeneration = 0
     private var backgroundTasksGeneration = 0
+    private var inspectorGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
@@ -536,6 +547,97 @@ final class FileBrowserViewModel {
         }
     }
 
+    func loadInspector(for selectedItem: FileStationItem) async {
+        inspectorGeneration += 1
+        let generation = inspectorGeneration
+        inspectorItem = nil
+        inspectorDirectorySize = nil
+        inspectorChecksum = nil
+        inspectorThumbnail = nil
+        inspectorError = nil
+        inspectorDetailErrors = []
+        isLoadingInspector = true
+        isLoadingInspectorDetails = false
+
+        do {
+            let information = try await session.withClient {
+                try await $0.fileInformation(paths: [selectedItem.path])
+            }
+            guard generation == inspectorGeneration else { return }
+            guard let item = information.first else { throw DSMError.invalidResponse }
+            inspectorItem = item
+            isLoadingInspector = false
+            await loadInspectorDetails(for: item, generation: generation)
+        } catch {
+            guard generation == inspectorGeneration,
+                  !DSMError.isCancellation(error) else { return }
+            isLoadingInspector = false
+            inspectorError = errorMessage(for: error)
+        }
+    }
+
+    func clearInspector() {
+        inspectorGeneration += 1
+        inspectorItem = nil
+        inspectorDirectorySize = nil
+        inspectorChecksum = nil
+        inspectorThumbnail = nil
+        inspectorError = nil
+        inspectorDetailErrors = []
+        isLoadingInspector = false
+        isLoadingInspectorDetails = false
+        isCalculatingInspectorSize = false
+        isCalculatingInspectorChecksum = false
+    }
+
+    func calculateInspectorDirectorySize() async {
+        guard let item = inspectorItem, item.isdir, supports(.directorySize) else { return }
+        let generation = inspectorGeneration
+        isCalculatingInspectorSize = true
+        defer {
+            if generation == inspectorGeneration {
+                isCalculatingInspectorSize = false
+            }
+        }
+        do {
+            let size = try await session.withClient {
+                try await $0.fileStationDirectorySize(paths: [item.path], progress: { _ in })
+            }
+            guard generation == inspectorGeneration else { return }
+            inspectorDirectorySize = size
+        } catch {
+            guard generation == inspectorGeneration,
+                  !DSMError.isCancellation(error) else { return }
+            appendInspectorDetailError(
+                String(localized: "Taille du dossier indisponible : \(errorMessage(for: error))")
+            )
+        }
+    }
+
+    func calculateInspectorChecksum() async {
+        guard let item = inspectorItem, !item.isdir, supports(.checksum) else { return }
+        let generation = inspectorGeneration
+        isCalculatingInspectorChecksum = true
+        defer {
+            if generation == inspectorGeneration {
+                isCalculatingInspectorChecksum = false
+            }
+        }
+        do {
+            let checksum = try await session.withClient {
+                try await $0.fileStationChecksum(path: item.path, progress: { _ in })
+            }
+            guard generation == inspectorGeneration else { return }
+            inspectorChecksum = checksum
+        } catch {
+            guard generation == inspectorGeneration,
+                  !DSMError.isCancellation(error) else { return }
+            appendInspectorDetailError(
+                String(localized: "Somme MD5 indisponible : \(errorMessage(for: error))")
+            )
+        }
+    }
+
     func copy(_ selectedItems: [FileStationItem]) -> String {
         clipboard = Clipboard(items: selectedItems, movesItems: false)
         return selectedItems.count == 1
@@ -748,6 +850,40 @@ final class FileBrowserViewModel {
                 localized: "Ce compte ne peut pas modifier ce dossier : \(errorMessage(for: error))"
             )
         }
+    }
+
+    private func loadInspectorDetails(for item: FileStationItem, generation: Int) async {
+        isLoadingInspectorDetails = true
+        defer {
+            if generation == inspectorGeneration {
+                isLoadingInspectorDetails = false
+            }
+        }
+
+        if !item.isdir, item.supportsThumbnailPreview, supports(.thumbnails) {
+            do {
+                let data = try await session.withClient {
+                    try await $0.fileThumbnail(
+                        path: item.path,
+                        size: .large,
+                        rotation: .none
+                    )
+                }
+                guard generation == inspectorGeneration else { return }
+                inspectorThumbnail = data
+            } catch {
+                guard generation == inspectorGeneration,
+                      !DSMError.isCancellation(error) else { return }
+                appendInspectorDetailError(
+                    String(localized: "Aperçu indisponible : \(errorMessage(for: error))")
+                )
+            }
+        }
+    }
+
+    private func appendInspectorDetailError(_ message: String) {
+        guard !inspectorDetailErrors.contains(message) else { return }
+        inspectorDetailErrors.append(message)
     }
 
     private func writePermissionHint(for item: FileStationItem) -> Bool? {

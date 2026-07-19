@@ -68,4 +68,24 @@ struct FileStationModelsTests {
         #expect(!body.contains("\r\nX-Injected: oui.txt"))
         #expect(body.contains("\r\n\r\ncontenu\r\n--test-boundary--\r\n"))
     }
+
+    @Test func offersThumbnailPreviewOnlyForSupportedImageFiles() throws {
+        let decoder = JSONDecoder()
+        let image = try decoder.decode(
+            FileStationItem.self,
+            from: Data(#"{"name":"Photo.JPEG","path":"/photo/Photo.JPEG","isdir":false}"#.utf8)
+        )
+        let document = try decoder.decode(
+            FileStationItem.self,
+            from: Data(#"{"name":"report.pdf","path":"/docs/report.pdf","isdir":false}"#.utf8)
+        )
+        let folder = try decoder.decode(
+            FileStationItem.self,
+            from: Data(#"{"name":"photo.png","path":"/photo/photo.png","isdir":true}"#.utf8)
+        )
+
+        #expect(image.supportsThumbnailPreview)
+        #expect(!document.supportsThumbnailPreview)
+        #expect(!folder.supportsThumbnailPreview)
+    }
 }

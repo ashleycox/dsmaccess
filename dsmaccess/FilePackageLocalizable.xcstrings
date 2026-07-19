@@ -481,6 +481,436 @@
         }
       }
     },
+    "Accès au volume" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume access"
+          }
+        }
+      }
+    },
+    "Activée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enabled"
+          }
+        }
+      }
+    },
+    "Ajout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Append"
+          }
+        }
+      }
+    },
+    "Aperçu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        }
+      }
+    },
+    "Aperçu de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview of %@"
+          }
+        }
+      }
+    },
+    "Aperçu indisponible : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview unavailable: %@"
+          }
+        }
+      }
+    },
+    "Calcul de la somme MD5…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculating MD5 checksum…"
+          }
+        }
+      }
+    },
+    "Calcul de la taille du dossier…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculating folder size…"
+          }
+        }
+      }
+    },
+    "Calculer l’empreinte MD5 du fichier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculate the file’s MD5 checksum"
+          }
+        }
+      }
+    },
+    "Calculer la somme MD5" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculate MD5 checksum"
+          }
+        }
+      }
+    },
+    "Calculer la taille du dossier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculate folder size"
+          }
+        }
+      }
+    },
+    "Calculer le nombre d’éléments et leur taille totale" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculate the item count and total size"
+          }
+        }
+      }
+    },
+    "Capacité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Capacity"
+          }
+        }
+      }
+    },
+    "Certains détails ne sont pas disponibles." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some details are unavailable."
+          }
+        }
+      }
+    },
+    "Changement des métadonnées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Metadata changed"
+          }
+        }
+      }
+    },
+    "Chargement des détails du fichier…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading file details…"
+          }
+        }
+      }
+    },
+    "Chargement des informations…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading information…"
+          }
+        }
+      }
+    },
+    "Chargement des informations sur %@…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading information about %@…"
+          }
+        }
+      }
+    },
+    "Contenu du dossier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder contents"
+          }
+        }
+      }
+    },
+    "Désactivée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Disabled"
+          }
+        }
+      }
+    },
+    "Détails indisponibles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable details"
+          }
+        }
+      }
+    },
+    "Droit du dossier partagé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared folder permission"
+          }
+        }
+      }
+    },
+    "Espace disponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available space"
+          }
+        }
+      }
+    },
+    "Exécution" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Execute"
+          }
+        }
+      }
+    },
+    "Informations actualisées sur %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Information about %@ updated"
+          }
+        }
+      }
+    },
+    "Intégrité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integrity"
+          }
+        }
+      }
+    },
+    "Lecture et écriture" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read and write"
+          }
+        }
+      }
+    },
+    "Lecture seule" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Read only"
+          }
+        }
+      }
+    },
+    "Liste de contrôle d’accès" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access control list"
+          }
+        }
+      }
+    },
+    "Liste interdite" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listing prohibited"
+          }
+        }
+      }
+    },
+    "Modification interdite" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modification prohibited"
+          }
+        }
+      }
+    },
+    "Recharger les informations depuis le NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reload information from the NAS"
+          }
+        }
+      }
+    },
+    "Restrictions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restrictions"
+          }
+        }
+      }
+    },
+    "Somme MD5 calculée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MD5 checksum calculated"
+          }
+        }
+      }
+    },
+    "Somme MD5 copiée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MD5 checksum copied"
+          }
+        }
+      }
+    },
+    "Somme MD5 indisponible : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MD5 checksum unavailable: %@"
+          }
+        }
+      }
+    },
+    "Sous-dossiers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subfolders"
+          }
+        }
+      }
+    },
+    "Taille du dossier calculée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder size calculated: %@"
+          }
+        }
+      }
+    },
+    "Taille du dossier indisponible : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder size unavailable: %@"
+          }
+        }
+      }
+    },
+    "Taille totale" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total size"
+          }
+        }
+      }
+    },
+    "Téléchargement interdit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download prohibited"
+          }
+        }
+      }
+    },
+    "Type de montage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mount type"
+          }
+        }
+      }
+    },
+    "Volume" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume"
+          }
+        }
+      }
+    },
     "Échec de l’opération sur un élément (codes %lld et %lld)." : {
       "localizations" : {
         "en" : {

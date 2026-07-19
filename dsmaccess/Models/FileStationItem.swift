@@ -214,6 +214,14 @@ struct FileStationChildren: nonisolated Decodable, Equatable, Sendable {
 }
 
 extension FileStationItem {
+    var supportsThumbnailPreview: Bool {
+        guard !isdir else { return false }
+        let supportedExtensions: Set<String> = [
+            "bmp", "gif", "heic", "jpeg", "jpg", "png", "tif", "tiff", "webp",
+        ]
+        return supportedExtensions.contains((name as NSString).pathExtension.lowercased())
+    }
+
     /// Ligne secondaire d'un fichier : « 2,3 Mo · 12 mars 2024 » (nil pour un dossier).
     var detailText: String? {
         guard !isdir else { return nil }
