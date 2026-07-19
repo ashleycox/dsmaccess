@@ -41,7 +41,17 @@ protocol DSMClientProtocol: AnyObject {
         rotation: FileStationThumbnailRotation
     ) async throws -> Data
     func downloadFile(path: String, to destination: URL) async throws
+    func downloadFile(
+        path: String,
+        to destination: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws
     func downloadFiles(paths: [String], to destination: URL) async throws
+    func downloadFiles(
+        paths: [String],
+        to destination: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws
     func createFolder(in folderPath: String, name: String) async throws
     func createFolders(
         _ folders: [FileStationFolderCreation],
@@ -63,6 +73,12 @@ protocol DSMClientProtocol: AnyObject {
         fileURL: URL,
         to folderPath: String,
         options: FileStationUploadOptions
+    ) async throws
+    func upload(
+        fileURL: URL,
+        to folderPath: String,
+        options: FileStationUploadOptions,
+        progress: @escaping DSMTransferProgressHandler
     ) async throws
     func copyMove(path: String, to destFolder: String, remove: Bool) async throws
     func copyMove(paths: [String], to destFolder: String, remove: Bool) async throws
@@ -319,8 +335,24 @@ final class DSMClient: DSMClientProtocol {
         try await fileStation.download(path: path, to: destination)
     }
 
+    func downloadFile(
+        path: String,
+        to destination: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws {
+        try await fileStation.download(paths: [path], to: destination, progress: progress)
+    }
+
     func downloadFiles(paths: [String], to destination: URL) async throws {
         try await fileStation.download(paths: paths, to: destination)
+    }
+
+    func downloadFiles(
+        paths: [String],
+        to destination: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws {
+        try await fileStation.download(paths: paths, to: destination, progress: progress)
     }
 
     func createFolder(in folderPath: String, name: String) async throws {
@@ -370,6 +402,20 @@ final class DSMClient: DSMClientProtocol {
         options: FileStationUploadOptions
     ) async throws {
         try await fileStation.upload(fileURL: fileURL, to: folderPath, options: options)
+    }
+
+    func upload(
+        fileURL: URL,
+        to folderPath: String,
+        options: FileStationUploadOptions,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws {
+        try await fileStation.upload(
+            fileURL: fileURL,
+            to: folderPath,
+            options: options,
+            progress: progress
+        )
     }
 
     func copyMove(path: String, to destFolder: String, remove: Bool) async throws {

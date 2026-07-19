@@ -51,6 +51,7 @@ final class FileBrowserViewModel {
     private(set) var clipboard: Clipboard?
     private(set) var shareLinks: [SharingLink] = []
     private(set) var isLoadingShareLinks = false
+    private(set) var transfers: [FileTransferRecord] = []
 
     var errorMessage: String?
     var shareLinksError: String?
@@ -76,6 +77,9 @@ final class FileBrowserViewModel {
     var canGoUp: Bool { stack.count > 1 }
     var canWrite: Bool { currentLevel.path != nil }
     var canPaste: Bool { clipboard != nil && canWrite }
+    var hasActiveTransfers: Bool {
+        transfers.contains { $0.state == .queued || $0.state == .running }
+    }
     var breadcrumb: String { stack.map(\.name).joined(separator: " ▸ ") }
 
     var sortedItems: [FileStationItem] {
@@ -202,14 +206,35 @@ final class FileBrowserViewModel {
 
     func download(_ item: FileStationItem, to destination: URL) async -> DSMOperationOutcome {
         defer { destination.stopAccessingSecurityScopedResource() }
+        let transferID = addTransfer(
+            direction: .download,
+            name: item.name,
+            source: item.path,
+            destination: destination.path
+        )
         isDownloading = true
         defer { isDownloading = false }
+        updateTransfer(id: transferID, state: .running)
         do {
-            try await session.withClient { try await $0.downloadFile(path: item.path, to: destination) }
+            try await session.withClient {
+                try await $0.downloadFile(
+                    path: item.path,
+                    to: destination,
+                    progress: { [weak self] progress in
+                        self?.updateTransfer(id: transferID, progress: progress)
+                    }
+                )
+            }
+            updateTransfer(id: transferID, state: .completed)
             return .success(String(localized: "Téléchargement terminé : \(item.name)"))
         } catch {
-            guard !DSMError.isCancellation(error) else { return .cancelled }
-            return .failure(String(localized: "Échec du téléchargement : \(errorMessage(for: error))"))
+            if DSMError.isCancellation(error) {
+                updateTransfer(id: transferID, state: .cancelled)
+                return .cancelled
+            }
+            let message = errorMessage(for: error)
+            updateTransfer(id: transferID, state: .failed(message))
+            return .failure(String(localized: "Échec du téléchargement : \(message)"))
         }
     }
 
@@ -219,16 +244,45 @@ final class FileBrowserViewModel {
         defer { isDownloading = false }
         var completed = 0
         var firstError: String?
-        for item in selectedItems {
+        let queuedTransfers = selectedItems.map { item in
             let destination = directory.appendingPathComponent(suggestedFilename(for: item))
+            return (
+                item,
+                destination,
+                addTransfer(
+                    direction: .download,
+                    name: item.name,
+                    source: item.path,
+                    destination: destination.path
+                )
+            )
+        }
+        for (index, transfer) in queuedTransfers.enumerated() {
+            let (item, destination, transferID) = transfer
             do {
                 try Task.checkCancellation()
-                try await session.withClient { try await $0.downloadFile(path: item.path, to: destination) }
+                updateTransfer(id: transferID, state: .running)
+                try await session.withClient {
+                    try await $0.downloadFile(
+                        path: item.path,
+                        to: destination,
+                        progress: { [weak self] progress in
+                            self?.updateTransfer(id: transferID, progress: progress)
+                        }
+                    )
+                }
+                updateTransfer(id: transferID, state: .completed)
                 completed += 1
             } catch where DSMError.isCancellation(error) {
+                updateTransfer(id: transferID, state: .cancelled)
+                for remaining in queuedTransfers.dropFirst(index + 1) {
+                    updateTransfer(id: remaining.2, state: .cancelled)
+                }
                 return .cancelled
             } catch {
-                if firstError == nil { firstError = errorMessage(for: error) }
+                let message = errorMessage(for: error)
+                updateTransfer(id: transferID, state: .failed(message))
+                if firstError == nil { firstError = message }
             }
         }
         if completed == selectedItems.count {
@@ -274,16 +328,45 @@ final class FileBrowserViewModel {
         var sent = 0
         var firstFailure: String?
         let query = searchQuery
-        for url in fileURLs {
+        let queuedTransfers = fileURLs.map { url in
+            (
+                url,
+                addTransfer(
+                    direction: .upload,
+                    name: url.lastPathComponent,
+                    source: url.path,
+                    destination: parent
+                )
+            )
+        }
+        for (index, transfer) in queuedTransfers.enumerated() {
+            let (url, transferID) = transfer
             defer { url.stopAccessingSecurityScopedResource() }
             do {
                 try Task.checkCancellation()
-                try await session.withClient { try await $0.upload(fileURL: url, to: parent) }
+                updateTransfer(id: transferID, state: .running)
+                try await session.withClient {
+                    try await $0.upload(
+                        fileURL: url,
+                        to: parent,
+                        options: FileStationUploadOptions(),
+                        progress: { [weak self] progress in
+                            self?.updateTransfer(id: transferID, progress: progress)
+                        }
+                    )
+                }
+                updateTransfer(id: transferID, state: .completed)
                 sent += 1
             } catch where DSMError.isCancellation(error) {
+                updateTransfer(id: transferID, state: .cancelled)
+                for remaining in queuedTransfers.dropFirst(index + 1) {
+                    updateTransfer(id: remaining.1, state: .cancelled)
+                }
                 return .cancelled
             } catch {
-                if firstFailure == nil { firstFailure = errorMessage(for: error) }
+                let message = errorMessage(for: error)
+                updateTransfer(id: transferID, state: .failed(message))
+                if firstFailure == nil { firstFailure = message }
             }
         }
         await loadCurrent()
@@ -300,6 +383,17 @@ final class FileBrowserViewModel {
             ? String(localized: "Fichier envoyé : \(fileURLs[0].lastPathComponent)")
             : String(localized: "\(sent) fichiers envoyés")
         return .success(message)
+    }
+
+    func clearFinishedTransfers() {
+        transfers.removeAll { transfer in
+            switch transfer.state {
+            case .queued, .running:
+                false
+            case .completed, .cancelled, .failed:
+                true
+            }
+        }
     }
 
     func copy(_ selectedItems: [FileStationItem]) -> String {
@@ -474,6 +568,39 @@ final class FileBrowserViewModel {
         } catch {
             guard !DSMError.isCancellation(error) else { return .cancelled }
             return .failure(String(localized: "Échec de l’opération : \(errorMessage(for: error))"))
+        }
+    }
+
+    private func addTransfer(
+        direction: FileTransferDirection,
+        name: String,
+        source: String,
+        destination: String
+    ) -> UUID {
+        let transfer = FileTransferRecord(
+            direction: direction,
+            name: name,
+            source: source,
+            destination: destination
+        )
+        transfers.insert(transfer, at: 0)
+        return transfer.id
+    }
+
+    private func updateTransfer(
+        id: UUID,
+        progress: DSMTransferProgress? = nil,
+        state: FileTransferState? = nil
+    ) {
+        guard let index = transfers.firstIndex(where: { $0.id == id }) else { return }
+        if let progress {
+            transfers[index].progress = progress
+        }
+        if let state {
+            transfers[index].state = state
+            if state == .completed, transfers[index].progress == nil {
+                transfers[index].progress = DSMTransferProgress(completedBytes: 1, totalBytes: 1)
+            }
         }
     }
 

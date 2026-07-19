@@ -471,6 +471,7 @@ struct DSMFileStationServiceTests {
             .appending(path: "upload-\(UUID().uuidString).txt")
         try Data("contents".utf8).write(to: fileURL, options: .atomic)
         defer { try? FileManager.default.removeItem(at: fileURL) }
+        var progressUpdates: [DSMTransferProgress] = []
 
         try await service.upload(
             fileURL: fileURL,
@@ -479,7 +480,8 @@ struct DSMFileStationServiceTests {
                 conflictPolicy: .skip,
                 createParentFolders: false,
                 modificationDate: Date(timeIntervalSince1970: 1_700_000_000)
-            )
+            ),
+            progress: { progressUpdates.append($0) }
         )
 
         let request = try #require(await stub.requests.first)
@@ -492,6 +494,7 @@ struct DSMFileStationServiceTests {
         #expect(body.contains("name=\"create_parents\"\r\n\r\nfalse"))
         #expect(body.contains("name=\"mtime\"\r\n\r\n1700000000000"))
         #expect(body.contains("name=\"file\"; filename=\"\(fileURL.lastPathComponent)\""))
+        #expect(progressUpdates.last?.fractionCompleted == 1)
     }
 
     @Test func downloadsMultiplePathsAsOneArchive() async throws {
@@ -510,13 +513,22 @@ struct DSMFileStationServiceTests {
         let destination = FileManager.default.temporaryDirectory
             .appending(path: "download-\(UUID().uuidString).zip")
         defer { try? FileManager.default.removeItem(at: destination) }
+        var progressUpdates: [DSMTransferProgress] = []
 
         try await service.download(
             paths: ["/documents/one.txt", "/documents/two.txt"],
-            to: destination
+            to: destination,
+            progress: { progressUpdates.append($0) }
         )
 
         #expect(try Data(contentsOf: destination) == archiveData)
+        #expect(
+            progressUpdates.last
+                == DSMTransferProgress(
+                    completedBytes: Int64(archiveData.count),
+                    totalBytes: Int64(archiveData.count)
+                )
+        )
         let request = try query(from: try #require(await stub.requests.first))
         #expect(request["mode"] == "download")
         #expect(

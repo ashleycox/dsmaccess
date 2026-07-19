@@ -178,17 +178,25 @@ final class DSMFileStationService {
     }
 
     func download(path: String, to destination: URL) async throws {
-        try await download(paths: [path], to: destination)
+        try await download(paths: [path], to: destination, progress: { _ in })
     }
 
     func download(paths: [String], to destination: URL) async throws {
+        try await download(paths: paths, to: destination, progress: { _ in })
+    }
+
+    func download(
+        paths: [String],
+        to destination: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws {
         guard !paths.isEmpty else { return }
         let url = try await transport.makeURL(
             api: Self.downloadAPI,
             method: "download",
             parameters: ["path": try DSMParameter.json(paths), "mode": .string("download")]
         )
-        let (temporaryURL, response) = try await transport.download(from: url)
+        let (temporaryURL, response) = try await transport.download(from: url, progress: progress)
         guard let httpResponse = response as? HTTPURLResponse,
               (200..<300).contains(httpResponse.statusCode) else {
             throw DSMError.invalidResponse
@@ -300,7 +308,8 @@ final class DSMFileStationService {
     func upload(
         fileURL: URL,
         to folderPath: String,
-        options: FileStationUploadOptions = FileStationUploadOptions()
+        options: FileStationUploadOptions = FileStationUploadOptions(),
+        progress: @escaping DSMTransferProgressHandler = { _ in }
     ) async throws {
         let resolved = try await transport.resolvedAPI(Self.uploadAPI)
         let boundary = "Boundary-\(UUID().uuidString)"
@@ -336,7 +345,11 @@ final class DSMFileStationService {
         var request = URLRequest(url: route.url)
         request.httpMethod = "POST"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        let (data, response) = try await transport.upload(for: request, fromFile: bodyURL)
+        let (data, response) = try await transport.upload(
+            for: request,
+            fromFile: bodyURL,
+            progress: progress
+        )
         guard let httpResponse = response as? HTTPURLResponse,
               (200..<300).contains(httpResponse.statusCode) else {
             throw DSMError.invalidResponse

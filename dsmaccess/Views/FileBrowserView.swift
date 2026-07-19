@@ -18,6 +18,8 @@ struct FileBrowserView: View {
     @State private var shareItem: FileStationItem?
     @State private var infoItem: FileStationItem?
     @State private var showingShareLinks = false
+    @State private var showingTransfers = false
+    @State private var transferTask: Task<Void, Never>?
     @State private var tableFocusRequestID = 0
     @AccessibilityFocusState private var focusEmptyState: Bool
 
@@ -118,6 +120,14 @@ struct FileBrowserView: View {
             .sheet(isPresented: $showingShareLinks) {
                 ShareLinksView(vm: vm)
             }
+            .sheet(isPresented: $showingTransfers) {
+                FileTransfersView(vm: vm) {
+                    transferTask?.cancel()
+                }
+            }
+            .onDisappear {
+                transferTask?.cancel()
+            }
     }
 
     @ViewBuilder
@@ -197,7 +207,7 @@ struct FileBrowserView: View {
             } label: {
                 Label("Ajouter", systemImage: "plus")
             }
-            .disabled(!vm.canWrite || vm.isWorking)
+            .disabled(!vm.canWrite || vm.isWorking || vm.hasActiveTransfers)
             .help("Ajouter des éléments")
         }
 
@@ -218,6 +228,7 @@ struct FileBrowserView: View {
             Button("Télécharger…", systemImage: "square.and.arrow.down") {
                 startDownload(selectedItems)
             }
+            .disabled(vm.hasActiveTransfers)
             .help("Télécharger les éléments sélectionnés")
             Divider()
             Button("Copier", systemImage: "doc.on.doc") {
@@ -279,6 +290,11 @@ struct FileBrowserView: View {
                 showingShareLinks = true
             }
             .help("Gérer les liens de partage")
+
+            Button("Transferts", systemImage: "arrow.up.arrow.down") {
+                showingTransfers = true
+            }
+            .help("Afficher la progression et l’historique des transferts")
 
             Divider()
             Menu("Trier", systemImage: "arrow.up.arrow.down") {
@@ -520,7 +536,7 @@ struct FileBrowserView: View {
     }
 
     private func startDownload(_ items: [FileStationItem]) {
-        guard !items.isEmpty else { return }
+        guard !items.isEmpty, !vm.hasActiveTransfers else { return }
         if items.count == 1, let item = items.first {
             let panel = NSSavePanel()
             panel.nameFieldStringValue = vm.suggestedFilename(for: item)
@@ -531,8 +547,11 @@ struct FileBrowserView: View {
                 category: .progress,
                 priority: .low
             )
-            Task {
-                VoiceOver.announce(await vm.download(item, to: url), priority: .high)
+            showingTransfers = true
+            transferTask = Task {
+                let outcome = await vm.download(item, to: url)
+                VoiceOver.announce(outcome, priority: .high)
+                transferTask = nil
             }
             return
         }
@@ -550,13 +569,16 @@ struct FileBrowserView: View {
             category: .progress,
             priority: .low
         )
-        Task {
-            VoiceOver.announce(await vm.download(items, to: directory), priority: .high)
+        showingTransfers = true
+        transferTask = Task {
+            let outcome = await vm.download(items, to: directory)
+            VoiceOver.announce(outcome, priority: .high)
+            transferTask = nil
         }
     }
 
     private func startUpload() {
-        guard vm.canWrite else { return }
+        guard vm.canWrite, !vm.hasActiveTransfers else { return }
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
@@ -568,8 +590,11 @@ struct FileBrowserView: View {
             category: .progress,
             priority: .low
         )
-        Task {
-            VoiceOver.announce(await vm.upload(fileURLs: panel.urls), priority: .high)
+        showingTransfers = true
+        transferTask = Task {
+            let outcome = await vm.upload(fileURLs: panel.urls)
+            VoiceOver.announce(outcome, priority: .high)
+            transferTask = nil
         }
     }
 

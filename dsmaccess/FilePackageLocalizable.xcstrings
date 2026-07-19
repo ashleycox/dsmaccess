@@ -1,6 +1,196 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
+    "%@ sur %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ of %2$@"
+          }
+        }
+      }
+    },
+    "Afficher la progression et l’historique des transferts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show transfer progress and history"
+          }
+        }
+      }
+    },
+    "Annulation des transferts demandée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer cancellation requested"
+          }
+        }
+      }
+    },
+    "Annulé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelled"
+          }
+        }
+      }
+    },
+    "Annuler les transferts en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel active transfers"
+          }
+        }
+      }
+    },
+    "Annuler le transfert actif et ceux qui restent en attente" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel the active transfer and those still waiting"
+          }
+        }
+      }
+    },
+    "Aucun transfert" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No transfers"
+          }
+        }
+      }
+    },
+    "Conserver uniquement les transferts en attente ou en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep only queued or active transfers"
+          }
+        }
+      }
+    },
+    "Effacer les transferts terminés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear finished transfers"
+          }
+        }
+      }
+    },
+    "En attente" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queued"
+          }
+        }
+      }
+    },
+    "En cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In progress"
+          }
+        }
+      }
+    },
+    "Erreur : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: %@"
+          }
+        }
+      }
+    },
+    "Historique des transferts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfer history"
+          }
+        }
+      }
+    },
+    "Les téléchargements et les envois apparaîtront ici." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads and uploads will appear here."
+          }
+        }
+      }
+    },
+    "Progression de l’envoi de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upload progress for %@"
+          }
+        }
+      }
+    },
+    "Progression du téléchargement de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download progress for %@"
+          }
+        }
+      }
+    },
+    "Terminé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        }
+      }
+    },
+    "Transferts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Transfers"
+          }
+        }
+      }
+    },
+    "Transferts terminés effacés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished transfers cleared"
+          }
+        }
+      }
+    },
     "Échec de l’opération sur un élément (codes %lld et %lld)." : {
       "localizations" : {
         "en" : {

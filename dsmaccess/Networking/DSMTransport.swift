@@ -23,6 +23,8 @@ final class DSMTransport {
     private let requestData: RequestData
     private let downloadFile: DownloadFile
     private let uploadFile: UploadFile
+    private let hasInjectedDownloadFile: Bool
+    private let hasInjectedUploadFile: Bool
 
     private(set) var capabilities = DSMCapabilities()
     private var sessionID: String?
@@ -41,6 +43,8 @@ final class DSMTransport {
         requestData = { try await session.data(for: $0) }
         downloadFile = { try await session.download(from: $0) }
         uploadFile = { try await session.upload(for: $0, fromFile: $1) }
+        hasInjectedDownloadFile = false
+        hasInjectedUploadFile = false
     }
 
     init(
@@ -55,6 +59,8 @@ final class DSMTransport {
         requestData = { try await session.data(for: $0) }
         downloadFile = { try await session.download(from: $0) }
         uploadFile = { try await session.upload(for: $0, fromFile: $1) }
+        hasInjectedDownloadFile = false
+        hasInjectedUploadFile = false
     }
 
     init(
@@ -72,6 +78,8 @@ final class DSMTransport {
         self.requestData = requestData
         self.downloadFile = downloadFile ?? { try await session.download(from: $0) }
         self.uploadFile = uploadFile ?? { try await session.upload(for: $0, fromFile: $1) }
+        hasInjectedDownloadFile = downloadFile != nil
+        hasInjectedUploadFile = uploadFile != nil
     }
 
     convenience init(endpoint: DSMEndpoint, session: URLSession) {
@@ -287,9 +295,59 @@ final class DSMTransport {
         }
     }
 
+    func download(
+        from url: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws -> (URL, URLResponse) {
+        if hasInjectedDownloadFile {
+            let result = try await download(from: url)
+            let size = try await MultipartBodyFile.fileSize(at: result.0)
+            progress(DSMTransferProgress(completedBytes: size, totalBytes: size))
+            return result
+        }
+        let delegate = DSMTransferDelegate(progress: progress)
+        do {
+            let result = try await session.download(
+                for: URLRequest(url: url),
+                delegate: delegate
+            )
+            let size = try await MultipartBodyFile.fileSize(at: result.0)
+            progress(DSMTransferProgress(completedBytes: size, totalBytes: size))
+            return result
+        } catch let error as URLError {
+            throw mappedNetworkError(error)
+        }
+    }
+
     func upload(for request: URLRequest, fromFile fileURL: URL) async throws -> (Data, URLResponse) {
         do {
             return try await uploadFile(request, fileURL)
+        } catch let error as URLError {
+            throw mappedNetworkError(error)
+        }
+    }
+
+    func upload(
+        for request: URLRequest,
+        fromFile fileURL: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws -> (Data, URLResponse) {
+        if hasInjectedUploadFile {
+            let result = try await upload(for: request, fromFile: fileURL)
+            let size = try await MultipartBodyFile.fileSize(at: fileURL)
+            progress(DSMTransferProgress(completedBytes: size, totalBytes: size))
+            return result
+        }
+        let delegate = DSMTransferDelegate(progress: progress)
+        do {
+            let result = try await session.upload(
+                for: request,
+                fromFile: fileURL,
+                delegate: delegate
+            )
+            let size = try await MultipartBodyFile.fileSize(at: fileURL)
+            progress(DSMTransferProgress(completedBytes: size, totalBytes: size))
+            return result
         } catch let error as URLError {
             throw mappedNetworkError(error)
         }
