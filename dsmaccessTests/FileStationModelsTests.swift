@@ -147,4 +147,17 @@ struct FileStationModelsTests {
             try draft.criteria(folderPath: "/documents")
         }
     }
+
+    @Test func formatsAndParsesSharingDatesWithoutLocaleAmbiguity() throws {
+        let source = try #require(
+            Calendar(identifier: .gregorian).date(
+                from: DateComponents(timeZone: TimeZone(secondsFromGMT: 0), year: 2026, month: 7, day: 20)
+            )
+        )
+
+        #expect(sharingDateString(source) == "2026-07-20")
+        #expect(sharingDate("2026-07-20") == source)
+        #expect(sharingDate("0") == nil)
+        #expect(sharingDate(nil) == nil)
+    }
 }

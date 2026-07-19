@@ -135,8 +135,13 @@ struct FileBrowserView: View {
                 Text(deleteMessage)
             }
             .sheet(item: $shareItem) { item in
-                ShareSheet(item: item) { password, dateExpired in
-                    await vm.createShareLink(for: item, password: password, dateExpired: dateExpired)
+                ShareSheet(item: item) { password, expirationDate, availableDate in
+                    await vm.createShareLink(
+                        for: item,
+                        password: password,
+                        expirationDate: expirationDate,
+                        availableDate: availableDate
+                    )
                 }
             }
             .sheet(item: $infoItem) { item in

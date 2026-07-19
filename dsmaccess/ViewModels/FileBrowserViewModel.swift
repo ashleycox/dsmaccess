@@ -61,6 +61,8 @@ final class FileBrowserViewModel {
     private(set) var clipboard: Clipboard?
     private(set) var shareLinks: [SharingLink] = []
     private(set) var isLoadingShareLinks = false
+    private(set) var shareLinkDetails: SharingLink?
+    private(set) var isLoadingShareLinkDetails = false
     private(set) var transfers: [FileTransferRecord] = []
     private(set) var capabilities: FileStationCapabilities?
     private(set) var currentFolderIsWritable: Bool?
@@ -79,6 +81,7 @@ final class FileBrowserViewModel {
 
     var errorMessage: String?
     var shareLinksError: String?
+    var shareLinkDetailsError: String?
     var favoritesError: String?
     var permissionMessage: String?
     var backgroundTasksError: String?
@@ -93,6 +96,8 @@ final class FileBrowserViewModel {
     private var loadGeneration = 0
     private var searchGeneration = 0
     private var shareLinksGeneration = 0
+    private var shareLinkDetailsGeneration = 0
+    private var shareLinksOptions = FileStationSharingListOptions()
     private var favoritesGeneration = 0
     private var backgroundTasksGeneration = 0
     private var inspectorGeneration = 0
@@ -873,18 +878,27 @@ final class FileBrowserViewModel {
         case cancelled
     }
 
-    func createShareLink(for item: FileStationItem, password: String?, dateExpired: String?) async -> ShareOutcome {
+    func createShareLink(
+        for item: FileStationItem,
+        password: String?,
+        expirationDate: String?,
+        availableDate: String?
+    ) async -> ShareOutcome {
         guard canShare else {
             return .failure(unavailableMessage(for: .sharing))
         }
         do {
-            let url = try await session.withClient {
-                try await $0.createShareLink(
-                    path: item.path,
-                    password: password,
-                    dateExpired: dateExpired
+            let links = try await session.withClient {
+                try await $0.createShareLinks(
+                    FileStationShareLinkCreation(
+                        paths: [item.path],
+                        password: password,
+                        expirationDate: expirationDate,
+                        availableDate: availableDate
+                    )
                 )
             }
+            guard let url = links.first?.url else { throw DSMError.invalidResponse }
             return .link(url)
         } catch {
             guard !DSMError.isCancellation(error) else { return .cancelled }
@@ -892,14 +906,19 @@ final class FileBrowserViewModel {
         }
     }
 
-    func loadShareLinks() async {
+    func loadShareLinks(
+        options: FileStationSharingListOptions = FileStationSharingListOptions()
+    ) async {
+        shareLinksOptions = options
         shareLinksGeneration += 1
         let generation = shareLinksGeneration
         isLoadingShareLinks = true
         shareLinksError = nil
         defer { if generation == shareLinksGeneration { isLoadingShareLinks = false } }
         do {
-            let result = try await session.withClient { try await $0.listShareLinks() }
+            let result = try await session.withClient {
+                try await $0.listShareLinks(options: options).elements
+            }
             guard generation == shareLinksGeneration else { return }
             shareLinks = result
         } catch {
@@ -908,15 +927,88 @@ final class FileBrowserViewModel {
         }
     }
 
-    func deleteShareLink(_ link: SharingLink) async -> DSMOperationOutcome {
+    func loadShareLinkDetails(_ link: SharingLink) async {
+        shareLinkDetailsGeneration += 1
+        let generation = shareLinkDetailsGeneration
+        isLoadingShareLinkDetails = true
+        shareLinkDetails = nil
+        shareLinkDetailsError = nil
+        defer {
+            if generation == shareLinkDetailsGeneration {
+                isLoadingShareLinkDetails = false
+            }
+        }
         do {
-            try await session.withClient { try await $0.deleteShareLink(id: link.id) }
-            await loadShareLinks()
-            return .success(String(localized: "Lien supprimé"))
+            let details = try await session.withClient {
+                try await $0.shareLinkInformation(id: link.id)
+            }
+            guard generation == shareLinkDetailsGeneration else { return }
+            shareLinkDetails = details
+        } catch {
+            guard generation == shareLinkDetailsGeneration,
+                  !DSMError.isCancellation(error) else { return }
+            shareLinkDetailsError = errorMessage(for: error)
+        }
+    }
+
+    func clearShareLinkDetails() {
+        shareLinkDetailsGeneration += 1
+        shareLinkDetails = nil
+        shareLinkDetailsError = nil
+        isLoadingShareLinkDetails = false
+    }
+
+    func editShareLink(
+        _ link: SharingLink,
+        changes: FileStationShareLinkChanges
+    ) async -> DSMOperationOutcome {
+        do {
+            try await session.withClient {
+                try await $0.editShareLinks(ids: [link.id], changes: changes)
+            }
+            await loadShareLinks(options: shareLinksOptions)
+            return .success(String(localized: "Lien de partage modifié"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(
+                String(localized: "Échec de la modification du lien : \(errorMessage(for: error))")
+            )
+        }
+    }
+
+    func deleteShareLink(_ link: SharingLink) async -> DSMOperationOutcome {
+        await deleteShareLinks([link])
+    }
+
+    func deleteShareLinks(_ links: [SharingLink]) async -> DSMOperationOutcome {
+        guard !links.isEmpty else {
+            return .failure(String(localized: "Aucun lien sélectionné."))
+        }
+        do {
+            try await session.withClient {
+                try await $0.deleteShareLinks(ids: links.map(\.id))
+            }
+            await loadShareLinks(options: shareLinksOptions)
+            return links.count == 1
+                ? .success(String(localized: "Lien supprimé"))
+                : .success(String(localized: "\(links.count) liens supprimés"))
         } catch {
             guard !DSMError.isCancellation(error) else { return .cancelled }
             return .failure(
                 String(localized: "Échec de la suppression du lien : \(errorMessage(for: error))")
+            )
+        }
+    }
+
+    func clearInvalidShareLinks() async -> DSMOperationOutcome {
+        do {
+            try await session.withClient { try await $0.clearInvalidShareLinks() }
+            await loadShareLinks(options: shareLinksOptions)
+            return .success(String(localized: "Liens invalides effacés"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(
+                String(localized: "Échec de l’effacement des liens invalides : \(errorMessage(for: error))")
             )
         }
     }

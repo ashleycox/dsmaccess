@@ -1,6 +1,616 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
+    "%lld liens supprimés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld links deleted"
+          }
+        }
+      }
+    },
+    "Actualiser les liens depuis File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh links from File Station"
+          }
+        }
+      }
+    },
+    "Afficher les détails du lien" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show link details"
+          }
+        }
+      }
+    },
+    "Aucun lien sélectionné." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No link selected."
+          }
+        }
+      }
+    },
+    "Aucune restriction" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No restrictions"
+          }
+        }
+      }
+    },
+    "Chargement des détails du lien…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading link details…"
+          }
+        }
+      }
+    },
+    "Chemin" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Path"
+          }
+        }
+      }
+    },
+    "Code d’erreur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error code"
+          }
+        }
+      }
+    },
+    "Code QR" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR code"
+          }
+        }
+      }
+    },
+    "Code QR du lien de partage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing-link QR code"
+          }
+        }
+      }
+    },
+    "Création du lien en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creating link…"
+          }
+        }
+      }
+    },
+    "Créez un lien depuis un fichier ou un dossier pour le retrouver ici." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a link from a file or folder to find it here."
+          }
+        }
+      }
+    },
+    "Date d’expiration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expiration date"
+          }
+        }
+      }
+    },
+    "Date de disponibilité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available date"
+          }
+        }
+      }
+    },
+    "Définir une date d’expiration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set an expiration date"
+          }
+        }
+      }
+    },
+    "Détails" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Details"
+          }
+        }
+      }
+    },
+    "Détails du lien de partage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing link details"
+          }
+        }
+      }
+    },
+    "Disponibilité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Availability"
+          }
+        }
+      }
+    },
+    "Disponible à partir d’une date" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available from a specific date"
+          }
+        }
+      }
+    },
+    "Disponible à partir du" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available from"
+          }
+        }
+      }
+    },
+    "Disponible le %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available on %@"
+          }
+        }
+      }
+    },
+    "Échec de l’effacement des liens invalides : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to clear invalid links: %@"
+          }
+        }
+      }
+    },
+    "Échec de la modification du lien : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to update link: %@"
+          }
+        }
+      }
+    },
+    "Effacer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear"
+          }
+        }
+      }
+    },
+    "Effacer les liens invalides ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear invalid links?"
+          }
+        }
+      }
+    },
+    "Effacer les liens invalides…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear invalid links…"
+          }
+        }
+      }
+    },
+    "Élément" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Item"
+          }
+        }
+      }
+    },
+    "Enregistrer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
+      }
+    },
+    "Expire le" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expires on"
+          }
+        }
+      }
+    },
+    "Expire le %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expires on %@"
+          }
+        }
+      }
+    },
+    "Fermer l’erreur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss error"
+          }
+        }
+      }
+    },
+    "Identifiant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identifier"
+          }
+        }
+      }
+    },
+    "La date de disponibilité doit précéder la date d’expiration." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The available date must be before the expiration date."
+          }
+        }
+      }
+    },
+    "Laissez le champ vide pour supprimer le mot de passe." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave the field empty to remove the password."
+          }
+        }
+      }
+    },
+    "Le lien expire à une date" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link expires on a specific date"
+          }
+        }
+      }
+    },
+    "Le lien vers « %@ » cessera de fonctionner immédiatement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The link to “%@” will stop working immediately."
+          }
+        }
+      }
+    },
+    "Les liens sélectionnés cesseront de fonctionner immédiatement. Cette action est irréversible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected links will stop working immediately. This action cannot be undone."
+          }
+        }
+      }
+    },
+    "Lien" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Link"
+          }
+        }
+      }
+    },
+    "Lien de partage modifié" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing link updated"
+          }
+        }
+      }
+    },
+    "Liens de partage : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing links: %lld"
+          }
+        }
+      }
+    },
+    "Liens de partage File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station sharing links"
+          }
+        }
+      }
+    },
+    "Liens invalides effacés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid links cleared"
+          }
+        }
+      }
+    },
+    "Modification du lien en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating link…"
+          }
+        }
+      }
+    },
+    "Modifier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        }
+      }
+    },
+    "Modifier ce lien de partage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit this sharing link"
+          }
+        }
+      }
+    },
+    "Modifier la date d’expiration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change expiration date"
+          }
+        }
+      }
+    },
+    "Modifier la date de disponibilité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change available date"
+          }
+        }
+      }
+    },
+    "Modifier le lien de partage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit sharing link"
+          }
+        }
+      }
+    },
+    "Modifier le mot de passe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change password"
+          }
+        }
+      }
+    },
+    "Nouveau mot de passe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New password"
+          }
+        }
+      }
+    },
+    "Opération sur les liens en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sharing-link operation in progress…"
+          }
+        }
+      }
+    },
+    "Période de disponibilité" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Availability period"
+          }
+        }
+      }
+    },
+    "Protection par mot de passe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password protection"
+          }
+        }
+      }
+    },
+    "Protégé par mot de passe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password protected"
+          }
+        }
+      }
+    },
+    "Statut" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        }
+      }
+    },
+    "Supprimer %lld liens de partage ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete %lld sharing links?"
+          }
+        }
+      }
+    },
+    "Supprimer ce lien de partage ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this sharing link?"
+          }
+        }
+      }
+    },
+    "Supprimer la sélection…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete selection…"
+          }
+        }
+      }
+    },
+    "Supprimer les liens signalés comme invalides par File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete links reported as invalid by File Station"
+          }
+        }
+      }
+    },
+    "Tous les liens que File Station considère comme invalides seront supprimés. Cette action est irréversible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All links File Station considers invalid will be deleted. This action cannot be undone."
+          }
+        }
+      }
+    },
+    "URL" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "URL"
+          }
+        }
+      }
+    },
     "Afficher le dossier parent dans l’archive" : {
       "localizations" : {
         "en" : {
