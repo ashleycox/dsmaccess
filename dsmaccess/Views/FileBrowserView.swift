@@ -8,6 +8,7 @@
 
 import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct FileBrowserView: View {
     @State private var vm: FileBrowserViewModel
@@ -18,6 +19,8 @@ struct FileBrowserView: View {
     @State private var shareItem: FileStationItem?
     @State private var infoItem: FileStationItem?
     @State private var showingShareLinks = false
+    @State private var showingFavorites = false
+    @State private var showingVirtualFolders = false
     @State private var showingTransfers = false
     @State private var showingBackgroundTasks = false
     @State private var showingAdvancedSearch = false
@@ -149,6 +152,24 @@ struct FileBrowserView: View {
             }
             .sheet(isPresented: $showingShareLinks) {
                 ShareLinksView(vm: vm)
+            }
+            .sheet(isPresented: $showingFavorites) {
+                FileStationFavoritesView(vm: vm) { favorite in
+                    searchText = ""
+                    Task {
+                        await vm.openFavorite(favorite)
+                        settleAfterNavigation()
+                    }
+                }
+            }
+            .sheet(isPresented: $showingVirtualFolders) {
+                FileStationVirtualFoldersView(vm: vm) { folder in
+                    searchText = ""
+                    Task {
+                        await vm.openVirtualFolder(folder)
+                        settleAfterNavigation()
+                    }
+                }
             }
             .sheet(isPresented: $showingTransfers) {
                 FileTransfersView(vm: vm) {
@@ -288,6 +309,13 @@ struct FileBrowserView: View {
             }
             .disabled(!vm.canDownload || vm.hasActiveTransfers)
             .help("Télécharger les éléments sélectionnés")
+            if selectedItems.count > 1 {
+                Button("Télécharger dans une archive…", systemImage: "archivebox") {
+                    startArchiveDownload(selectedItems)
+                }
+                .disabled(!vm.canDownload || vm.hasActiveTransfers)
+                .help("Télécharger la sélection dans une seule archive ZIP")
+            }
             Divider()
             Button("Copier", systemImage: "doc.on.doc") {
                 VoiceOver.announce(vm.copy(selectedItems), category: .result)
@@ -344,6 +372,12 @@ struct FileBrowserView: View {
 
             favoritesMenu
 
+            Button("Dossiers virtuels…", systemImage: "externaldrive") {
+                showingVirtualFolders = true
+            }
+            .disabled(vm.availableVirtualFolderTypes.isEmpty)
+            .help("Parcourir les montages NFS, CIFS et ISO de File Station")
+
             Button("Liens de partage", systemImage: "link") {
                 showingShareLinks = true
             }
@@ -397,6 +431,12 @@ struct FileBrowserView: View {
 
     private var favoritesMenu: some View {
         Menu {
+            Button("Gérer les favoris…", systemImage: "star.square") {
+                showingFavorites = true
+            }
+            .help("Renommer, classer ou retirer des favoris")
+            Divider()
+
             if let path = vm.currentLevel.path {
                 Button {
                     Task {
@@ -435,6 +475,7 @@ struct FileBrowserView: View {
         } label: {
             Label("Favoris", systemImage: "star")
         }
+        .disabled(!vm.supports(.favorites))
         .help("Favoris File Station")
     }
 
@@ -689,6 +730,30 @@ struct FileBrowserView: View {
         showingTransfers = true
         transferTask = Task {
             let outcome = await vm.download(items, to: directory)
+            VoiceOver.announce(outcome, priority: .high)
+            transferTask = nil
+        }
+    }
+
+    private func startArchiveDownload(_ items: [FileStationItem]) {
+        guard items.count > 1, !vm.hasActiveTransfers else { return }
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = String(localized: "Archive File Station.zip")
+        panel.canCreateDirectories = true
+        panel.allowedContentTypes = [.zip]
+        panel.message = String(
+            localized: "File Station regroupera les éléments sélectionnés dans une seule archive ZIP."
+        )
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        _ = url.startAccessingSecurityScopedResource()
+        VoiceOver.announce(
+            String(localized: "Téléchargement de l’archive en cours…"),
+            category: .progress,
+            priority: .low
+        )
+        showingTransfers = true
+        transferTask = Task {
+            let outcome = await vm.downloadAsArchive(items, to: url)
             VoiceOver.announce(outcome, priority: .high)
             transferTask = nil
         }

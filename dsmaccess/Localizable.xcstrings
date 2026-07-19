@@ -1,6 +1,666 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
+    "%lld éléments File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld File Station items"
+          }
+        }
+      }
+    },
+    "Actualiser les dossiers virtuels depuis File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh virtual folders from File Station"
+          }
+        }
+      }
+    },
+    "Actualiser les favoris depuis File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh favorites from File Station"
+          }
+        }
+      }
+    },
+    "Afficher" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show"
+          }
+        }
+      }
+    },
+    "Affichez tous les favoris pour modifier leur ordre." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show all favorites to change their order."
+          }
+        }
+      }
+    },
+    "Ajoutez un dossier aux favoris pour le retrouver rapidement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a folder to favorites to find it quickly."
+          }
+        }
+      }
+    },
+    "Archive File Station.zip" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station Archive.zip"
+          }
+        }
+      }
+    },
+    "Archive téléchargée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archive downloaded: %@"
+          }
+        }
+      }
+    },
+    "Aucun dossier %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No %@ folders"
+          }
+        }
+      }
+    },
+    "Aucun favori disponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No available favorites"
+          }
+        }
+      }
+    },
+    "Aucun favori indisponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No unavailable favorites"
+          }
+        }
+      }
+    },
+    "Aucun protocole de dossier virtuel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No virtual-folder protocol"
+          }
+        }
+      }
+    },
+    "Ce NAS ne prend pas en charge les dossiers virtuels %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This NAS does not support %@ virtual folders."
+          }
+        }
+      }
+    },
+    "Ce NAS n’annonce aucun montage NFS, CIFS ou ISO pris en charge." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This NAS reports no supported NFS, CIFS, or ISO mounts."
+          }
+        }
+      }
+    },
+    "Ce favori n’est plus disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This favorite is no longer available."
+          }
+        }
+      }
+    },
+    "Chargement des dossiers virtuels…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading virtual folders…"
+          }
+        }
+      }
+    },
+    "Chargement des favoris…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading favorites…"
+          }
+        }
+      }
+    },
+    "Date de changement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change date"
+          }
+        }
+      }
+    },
+    "Date d’accès" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last accessed"
+          }
+        }
+      }
+    },
+    "Descendre ce favori" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move this favorite down"
+          }
+        }
+      }
+    },
+    "Disponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available"
+          }
+        }
+      }
+    },
+    "Dossiers virtuels" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual folders"
+          }
+        }
+      }
+    },
+    "Dossiers virtuels : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual folders: %lld"
+          }
+        }
+      }
+    },
+    "Dossiers virtuels File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station virtual folders"
+          }
+        }
+      }
+    },
+    "Dossiers virtuels…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Virtual folders…"
+          }
+        }
+      }
+    },
+    "Effacer les favoris indisponibles ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear unavailable favorites?"
+          }
+        }
+      }
+    },
+    "Effacer les favoris indisponibles…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear unavailable favorites…"
+          }
+        }
+      }
+    },
+    "Favori renommé : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorite renamed: %@"
+          }
+        }
+      }
+    },
+    "Favoris : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites: %lld"
+          }
+        }
+      }
+    },
+    "Favoris disponibles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Available favorites"
+          }
+        }
+      }
+    },
+    "Favoris indisponibles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable favorites"
+          }
+        }
+      }
+    },
+    "Favoris indisponibles effacés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unavailable favorites cleared"
+          }
+        }
+      }
+    },
+    "File Station n’a renvoyé aucun montage pour ce protocole." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station returned no mounts for this protocol."
+          }
+        }
+      }
+    },
+    "File Station regroupera les éléments sélectionnés dans une seule archive ZIP." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station will combine the selected items into one ZIP archive."
+          }
+        }
+      }
+    },
+    "Gérer les favoris" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage favorites"
+          }
+        }
+      }
+    },
+    "Gérer les favoris…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage favorites…"
+          }
+        }
+      }
+    },
+    "Libre : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free: %@"
+          }
+        }
+      }
+    },
+    "Monter ce favori" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move this favorite up"
+          }
+        }
+      }
+    },
+    "Nom du favori" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorite name"
+          }
+        }
+      }
+    },
+    "Opération sur les favoris en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorite operation in progress…"
+          }
+        }
+      }
+    },
+    "Ordre des favoris modifié" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorite order updated"
+          }
+        }
+      }
+    },
+    "Ouvrir ce dossier virtuel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open this virtual folder"
+          }
+        }
+      }
+    },
+    "Ouvrir ce favori" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open this favorite"
+          }
+        }
+      }
+    },
+    "Parcourir les montages NFS, CIFS et ISO de File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse File Station NFS, CIFS, and ISO mounts"
+          }
+        }
+      }
+    },
+    "Protocole" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Protocol"
+          }
+        }
+      }
+    },
+    "Renommer ce favori" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename this favorite"
+          }
+        }
+      }
+    },
+    "Renommer le favori" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename favorite"
+          }
+        }
+      }
+    },
+    "Renommer le favori « %@ »" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename favorite “%@”"
+          }
+        }
+      }
+    },
+    "Renommer, classer ou retirer des favoris" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename, reorder, or remove favorites"
+          }
+        }
+      }
+    },
+    "Retirer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        }
+      }
+    },
+    "Retirer ce favori" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove this favorite"
+          }
+        }
+      }
+    },
+    "Retirer ce favori ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove this favorite?"
+          }
+        }
+      }
+    },
+    "Retirer tous les favoris dont le dossier n’existe plus" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove every favorite whose folder no longer exists"
+          }
+        }
+      }
+    },
+    "Saisissez un nom pour le favori." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a name for the favorite."
+          }
+        }
+      }
+    },
+    "Sélectionnez au moins deux éléments à archiver." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select at least two items to archive."
+          }
+        }
+      }
+    },
+    "Tous les favoris" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All favorites"
+          }
+        }
+      }
+    },
+    "Tous les favoris qui ne correspondent plus à un dossier seront retirés. Aucun fichier ne sera supprimé." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every favorite that no longer points to a folder will be removed. No files will be deleted."
+          }
+        }
+      }
+    },
+    "Téléchargement de l’archive en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading archive…"
+          }
+        }
+      }
+    },
+    "Télécharger dans une archive…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download as an archive…"
+          }
+        }
+      }
+    },
+    "Télécharger la sélection dans une seule archive ZIP" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download the selection as one ZIP archive"
+          }
+        }
+      }
+    },
+    "« %@ » sera retiré des favoris. Le dossier et son contenu ne seront pas supprimés." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” will be removed from favorites. The folder and its contents will not be deleted."
+          }
+        }
+      }
+    },
+    "Échec de la suppression du favori : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove favorite: %@"
+          }
+        }
+      }
+    },
+    "Échec de l’effacement des favoris indisponibles : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to clear unavailable favorites: %@"
+          }
+        }
+      }
+    },
+    "Échec du classement des favoris : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to reorder favorites: %@"
+          }
+        }
+      }
+    },
+    "Échec du renommage du favori : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to rename favorite: %@"
+          }
+        }
+      }
+    },
+    "Échec du téléchargement de l’archive : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to download archive: %@"
+          }
+        }
+      }
+    },
     "%lld liens supprimés" : {
       "localizations" : {
         "en" : {

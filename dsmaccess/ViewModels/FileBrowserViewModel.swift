@@ -49,6 +49,8 @@ final class FileBrowserViewModel {
     private(set) var stack: [Level]
     private(set) var items: [FileStationItem] = []
     private(set) var favorites: [FileStationFavorite] = []
+    private(set) var managedFavorites: [FileStationFavorite] = []
+    private(set) var virtualFolders: [FileStationItem] = []
     private(set) var isLoading = false
     private(set) var isSearching = false
     private(set) var isWorking = false
@@ -78,11 +80,15 @@ final class FileBrowserViewModel {
     private(set) var isCalculatingInspectorChecksum = false
     private(set) var archiveItems: [FileStationArchiveItem] = []
     private(set) var isLoadingArchive = false
+    private(set) var isLoadingManagedFavorites = false
+    private(set) var isLoadingVirtualFolders = false
 
     var errorMessage: String?
     var shareLinksError: String?
     var shareLinkDetailsError: String?
     var favoritesError: String?
+    var managedFavoritesError: String?
+    var virtualFoldersError: String?
     var permissionMessage: String?
     var backgroundTasksError: String?
     var inspectorError: String?
@@ -99,6 +105,9 @@ final class FileBrowserViewModel {
     private var shareLinkDetailsGeneration = 0
     private var shareLinksOptions = FileStationSharingListOptions()
     private var favoritesGeneration = 0
+    private var managedFavoritesGeneration = 0
+    private var virtualFoldersGeneration = 0
+    private var managedFavoriteStatus = FileStationFavoriteStatus.all
     private var backgroundTasksGeneration = 0
     private var inspectorGeneration = 0
     private var archiveGeneration = 0
@@ -134,6 +143,16 @@ final class FileBrowserViewModel {
         canWrite
             && supports(.sharing)
             && capabilities?.information?.supportsSharing != false
+    }
+
+    var availableVirtualFolderTypes: [FileStationVirtualFolderType] {
+        guard supports(.virtualFolders) else { return [] }
+        guard let information = capabilities?.information else {
+            return FileStationVirtualFolderType.allCases
+        }
+        return FileStationVirtualFolderType.allCases.filter {
+            information.supportedVirtualProtocols.contains($0.rawValue)
+        }
     }
 
     func supports(_ feature: FileStationFeature) -> Bool {
@@ -211,6 +230,71 @@ final class FileBrowserViewModel {
             guard generation == favoritesGeneration, !DSMError.isCancellation(error) else { return }
             favorites = []
             favoritesError = errorMessage(for: error)
+        }
+    }
+
+    func loadManagedFavorites(status: FileStationFavoriteStatus) async {
+        managedFavoriteStatus = status
+        managedFavoritesGeneration += 1
+        let generation = managedFavoritesGeneration
+        isLoadingManagedFavorites = true
+        managedFavoritesError = nil
+        defer {
+            if generation == managedFavoritesGeneration {
+                isLoadingManagedFavorites = false
+            }
+        }
+        guard supports(.favorites) else {
+            managedFavorites = []
+            managedFavoritesError = unavailableMessage(for: .favorites)
+            return
+        }
+        do {
+            let result = try await session.withClient {
+                try await $0.fileStationFavorites(status: status, offset: 0, limit: 0)
+            }
+            guard generation == managedFavoritesGeneration,
+                  status == managedFavoriteStatus else { return }
+            managedFavorites = result.elements
+        } catch {
+            guard generation == managedFavoritesGeneration,
+                  !DSMError.isCancellation(error) else { return }
+            managedFavorites = []
+            managedFavoritesError = errorMessage(for: error)
+        }
+    }
+
+    func loadVirtualFolders(
+        type: FileStationVirtualFolderType,
+        options: FileStationListOptions = FileStationListOptions()
+    ) async {
+        virtualFoldersGeneration += 1
+        let generation = virtualFoldersGeneration
+        isLoadingVirtualFolders = true
+        virtualFoldersError = nil
+        defer {
+            if generation == virtualFoldersGeneration {
+                isLoadingVirtualFolders = false
+            }
+        }
+        guard availableVirtualFolderTypes.contains(type) else {
+            virtualFolders = []
+            virtualFoldersError = String(
+                localized: "Ce NAS ne prend pas en charge les dossiers virtuels \(type.rawValue.uppercased())."
+            )
+            return
+        }
+        do {
+            let result = try await session.withClient {
+                try await $0.virtualFolders(type: type, options: options)
+            }
+            guard generation == virtualFoldersGeneration else { return }
+            virtualFolders = result.elements
+        } catch {
+            guard generation == virtualFoldersGeneration,
+                  !DSMError.isCancellation(error) else { return }
+            virtualFolders = []
+            virtualFoldersError = errorMessage(for: error)
         }
     }
 
@@ -340,6 +424,23 @@ final class FileBrowserViewModel {
         await loadCurrent()
     }
 
+    func openVirtualFolder(_ folder: FileStationItem) async {
+        guard folder.isdir else { return }
+        advancedSearchCriteria = nil
+        searchProgress = nil
+        searchQuery = ""
+        stack = [
+            Level(name: String(localized: "Fichiers"), path: nil),
+            Level(
+                name: folder.name,
+                path: folder.path,
+                writePermissionHint: writePermissionHint(for: folder)
+            ),
+        ]
+        currentFolderIsWritable = stack.last?.writePermissionHint
+        await loadCurrent()
+    }
+
     func goUp() async {
         guard canGoUp else { return }
         advancedSearchCriteria = nil
@@ -443,6 +544,49 @@ final class FileBrowserViewModel {
         return .failure(
             String(localized: "\(completed) téléchargés, \(selectedItems.count - completed) en échec. \(firstError ?? "")")
         )
+    }
+
+    func downloadAsArchive(
+        _ selectedItems: [FileStationItem],
+        to destination: URL
+    ) async -> DSMOperationOutcome {
+        guard canDownload else { return unavailableOutcome(for: .download) }
+        guard selectedItems.count > 1 else {
+            return .failure(String(localized: "Sélectionnez au moins deux éléments à archiver."))
+        }
+        defer { destination.stopAccessingSecurityScopedResource() }
+        let transferID = addTransfer(
+            direction: .download,
+            name: destination.lastPathComponent,
+            source: String(localized: "\(selectedItems.count) éléments File Station"),
+            destination: destination.path
+        )
+        isDownloading = true
+        defer { isDownloading = false }
+        updateTransfer(id: transferID, state: .running)
+        do {
+            try await session.withClient {
+                try await $0.downloadFiles(
+                    paths: selectedItems.map(\.path),
+                    to: destination,
+                    progress: { [weak self] progress in
+                        self?.updateTransfer(id: transferID, progress: progress)
+                    }
+                )
+            }
+            updateTransfer(id: transferID, state: .completed)
+            return .success(
+                String(localized: "Archive téléchargée : \(destination.lastPathComponent)")
+            )
+        } catch {
+            if DSMError.isCancellation(error) {
+                updateTransfer(id: transferID, state: .cancelled)
+                return .cancelled
+            }
+            let message = errorMessage(for: error)
+            updateTransfer(id: transferID, state: .failed(message))
+            return .failure(String(localized: "Échec du téléchargement de l’archive : \(message)"))
+        }
     }
 
     func createFolder(named name: String) async -> DSMOperationOutcome {
@@ -870,6 +1014,94 @@ final class FileBrowserViewModel {
                 String(localized: "Échec de la modification du favori : \(errorMessage(for: error))")
             )
         }
+    }
+
+    func renameFavorite(
+        _ favorite: FileStationFavorite,
+        to proposedName: String
+    ) async -> DSMOperationOutcome {
+        guard supports(.favorites) else { return unavailableOutcome(for: .favorites) }
+        let name = proposedName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else {
+            return .failure(String(localized: "Saisissez un nom pour le favori."))
+        }
+        do {
+            try await session.withClient {
+                try await $0.editFileStationFavorite(path: favorite.path, name: name)
+            }
+            await reloadFavoriteLists()
+            return .success(String(localized: "Favori renommé : \(name)"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(
+                String(localized: "Échec du renommage du favori : \(errorMessage(for: error))")
+            )
+        }
+    }
+
+    func removeFavorite(_ favorite: FileStationFavorite) async -> DSMOperationOutcome {
+        guard supports(.favorites) else { return unavailableOutcome(for: .favorites) }
+        do {
+            try await session.withClient {
+                try await $0.removeFileStationFavorite(path: favorite.path)
+            }
+            await reloadFavoriteLists()
+            return .success(String(localized: "Favori supprimé : \(favorite.name)"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(
+                String(localized: "Échec de la suppression du favori : \(errorMessage(for: error))")
+            )
+        }
+    }
+
+    func clearBrokenFavorites() async -> DSMOperationOutcome {
+        guard supports(.favorites) else { return unavailableOutcome(for: .favorites) }
+        do {
+            try await session.withClient { try await $0.clearBrokenFileStationFavorites() }
+            await reloadFavoriteLists()
+            return .success(String(localized: "Favoris indisponibles effacés"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(
+                String(localized: "Échec de l’effacement des favoris indisponibles : \(errorMessage(for: error))")
+            )
+        }
+    }
+
+    func moveFavorite(_ favorite: FileStationFavorite, by offset: Int) async -> DSMOperationOutcome {
+        guard supports(.favorites) else { return unavailableOutcome(for: .favorites) }
+        guard managedFavoriteStatus == .all else {
+            return .failure(
+                String(localized: "Affichez tous les favoris pour modifier leur ordre.")
+            )
+        }
+        guard let sourceIndex = managedFavorites.firstIndex(where: { $0.id == favorite.id }) else {
+            return .failure(String(localized: "Ce favori n’est plus disponible."))
+        }
+        let destinationIndex = sourceIndex + offset
+        guard managedFavorites.indices.contains(destinationIndex) else { return .cancelled }
+        var reordered = managedFavorites
+        let moved = reordered.remove(at: sourceIndex)
+        reordered.insert(moved, at: destinationIndex)
+        do {
+            try await session.withClient {
+                try await $0.replaceFileStationFavorites(reordered)
+            }
+            await reloadFavoriteLists()
+            return .success(String(localized: "Ordre des favoris modifié"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(
+                String(localized: "Échec du classement des favoris : \(errorMessage(for: error))")
+            )
+        }
+    }
+
+    private func reloadFavoriteLists() async {
+        let status = managedFavoriteStatus
+        await loadFavorites()
+        await loadManagedFavorites(status: status)
     }
 
     enum ShareOutcome {
