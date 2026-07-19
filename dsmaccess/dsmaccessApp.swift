@@ -19,7 +19,9 @@ struct dsmaccessApp: App {
     init() {
         // Les tests unitaires sont hébergés par l'app, mais ils ne testent pas ses fenêtres.
         // Empêcher l'activation évite qu'ils interrompent l'utilisateur à chaque lancement.
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil {
+        let environment = ProcessInfo.processInfo.environment
+        if environment["DSM_ACCESS_BACKGROUND_TESTS"] == "YES"
+            || environment["XCTestConfigurationFilePath"] != nil {
             NSApplication.shared.setActivationPolicy(.prohibited)
         }
     }
