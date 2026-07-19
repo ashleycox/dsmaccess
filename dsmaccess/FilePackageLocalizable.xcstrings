@@ -1,6 +1,26 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
+    "%@. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@. %2$@"
+          }
+        }
+      }
+    },
+    "%lld tâches File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld File Station tasks"
+          }
+        }
+      }
+    },
     "%@ sur %@" : {
       "localizations" : {
         "en" : {
@@ -17,6 +37,56 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Show transfer progress and history"
+          }
+        }
+      }
+    },
+    "Afficher et gérer les opérations exécutées par le NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show and manage operations run by the NAS"
+          }
+        }
+      }
+    },
+    "Arrêter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        }
+      }
+    },
+    "Arrêter la tâche %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop the %@ task"
+          }
+        }
+      }
+    },
+    "Actualiser les tâches File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh File Station tasks"
+          }
+        }
+      }
+    },
+    "Aucune tâche File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No File Station tasks"
           }
         }
       }
@@ -81,12 +151,112 @@
         }
       }
     },
+    "Calcul de taille" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size calculation"
+          }
+        }
+      }
+    },
+    "Calcul MD5" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MD5 calculation"
+          }
+        }
+      }
+    },
+    "Ce compte ne peut pas modifier ce dossier." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account cannot modify this folder."
+          }
+        }
+      }
+    },
+    "Ce compte ne peut pas modifier ce dossier : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account cannot modify this folder: %@"
+          }
+        }
+      }
+    },
+    "Ce type de tâche ne peut pas être arrêté depuis l’application." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This type of task cannot be stopped from the app."
+          }
+        }
+      }
+    },
+    "Cette opération n’est pas disponible sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This operation is not available on this NAS."
+          }
+        }
+      }
+    },
+    "Chargement des tâches File Station…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading File Station tasks…"
+          }
+        }
+      }
+    },
+    "Compression" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compression"
+          }
+        }
+      }
+    },
+    "Copie ou déplacement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy or move"
+          }
+        }
+      }
+    },
     "Effacer les transferts terminés" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clear finished transfers"
+          }
+        }
+      }
+    },
+    "Effacer les tâches terminées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear finished tasks"
           }
         }
       }
@@ -121,6 +291,36 @@
         }
       }
     },
+    "Échec de l’arrêt de la tâche : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to stop the task: %@"
+          }
+        }
+      }
+    },
+    "Échec de l’effacement des tâches : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to clear tasks: %@"
+          }
+        }
+      }
+    },
+    "Favoris indisponibles : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites unavailable: %@"
+          }
+        }
+      }
+    },
     "Historique des transferts" : {
       "localizations" : {
         "en" : {
@@ -131,12 +331,42 @@
         }
       }
     },
+    "Historique des tâches File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station task history"
+          }
+        }
+      }
+    },
     "Les téléchargements et les envois apparaîtront ici." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Downloads and uploads will appear here."
+          }
+        }
+      }
+    },
+    "Les opérations de copie, compression, extraction et suppression apparaîtront ici." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy, compression, extraction, and deletion operations will appear here."
+          }
+        }
+      }
+    },
+    "Les tâches File Station ne sont pas disponibles sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station tasks are not available on this NAS."
           }
         }
       }
@@ -161,12 +391,72 @@
         }
       }
     },
+    "Progression de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ progress"
+          }
+        }
+      }
+    },
+    "Retirer de l’historique les opérations terminées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove completed operations from history"
+          }
+        }
+      }
+    },
     "Terminé" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Completed"
+          }
+        }
+      }
+    },
+    "Terminée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        }
+      }
+    },
+    "Tâche File Station arrêtée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station task stopped"
+          }
+        }
+      }
+    },
+    "Tâches File Station" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Station Tasks"
+          }
+        }
+      }
+    },
+    "Tâches File Station terminées effacées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finished File Station tasks cleared"
           }
         }
       }

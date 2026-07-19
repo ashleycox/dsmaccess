@@ -14,6 +14,13 @@ final class FileBrowserViewModel {
     struct Level: Equatable {
         let name: String
         let path: String?
+        let writePermissionHint: Bool?
+
+        init(name: String, path: String?, writePermissionHint: Bool? = nil) {
+            self.name = name
+            self.path = path
+            self.writePermissionHint = writePermissionHint
+        }
     }
 
     struct Clipboard {
@@ -52,9 +59,16 @@ final class FileBrowserViewModel {
     private(set) var shareLinks: [SharingLink] = []
     private(set) var isLoadingShareLinks = false
     private(set) var transfers: [FileTransferRecord] = []
+    private(set) var capabilities: FileStationCapabilities?
+    private(set) var currentFolderIsWritable: Bool?
+    private(set) var backgroundTasks: [FileStationBackgroundTask] = []
+    private(set) var isLoadingBackgroundTasks = false
 
     var errorMessage: String?
     var shareLinksError: String?
+    var favoritesError: String?
+    var permissionMessage: String?
+    var backgroundTasksError: String?
     var sortMode = SortMode.name
     var sortAscending = true
 
@@ -63,6 +77,8 @@ final class FileBrowserViewModel {
     private var loadGeneration = 0
     private var searchGeneration = 0
     private var shareLinksGeneration = 0
+    private var favoritesGeneration = 0
+    private var backgroundTasksGeneration = 0
 
     init(session: SessionStore) {
         self.session = session
@@ -75,12 +91,30 @@ final class FileBrowserViewModel {
 
     var title: String { currentLevel.name }
     var canGoUp: Bool { stack.count > 1 }
-    var canWrite: Bool { currentLevel.path != nil }
+    var canWrite: Bool { currentLevel.path != nil && currentFolderIsWritable != false }
     var canPaste: Bool { clipboard != nil && canWrite }
     var hasActiveTransfers: Bool {
         transfers.contains { $0.state == .queued || $0.state == .running }
     }
     var breadcrumb: String { stack.map(\.name).joined(separator: " ▸ ") }
+
+    var canDownload: Bool { supports(.download) }
+    var canUpload: Bool { canWrite && supports(.upload) }
+    var canCreateFolder: Bool { canWrite && supports(.createFolder) }
+    var canRename: Bool { canWrite && supports(.rename) }
+    var canCopyMove: Bool { canWrite && supports(.copyMove) }
+    var canDelete: Bool { canWrite && supports(.delete) }
+    var canCompress: Bool { canWrite && supports(.compress) }
+    var canExtractArchives: Bool { canWrite && supports(.extract) }
+    var canShare: Bool {
+        canWrite
+            && supports(.sharing)
+            && capabilities?.information?.supportsSharing != false
+    }
+
+    func supports(_ feature: FileStationFeature) -> Bool {
+        capabilities?.supports(feature) == true
+    }
 
     var sortedItems: [FileStationItem] {
         items.sorted { left, right in
@@ -110,8 +144,15 @@ final class FileBrowserViewModel {
         let level = currentLevel
         isLoading = true
         errorMessage = nil
+        permissionMessage = nil
         defer { if generation == loadGeneration { isLoading = false } }
         do {
+            if capabilities == nil {
+                capabilities = try await session.withClient { try await $0.fileStationCapabilities() }
+            }
+            guard supports(.browsing) else {
+                throw DSMError.unsupportedAPI(FileStationFeature.browsing.requiredAPI.name)
+            }
             let result = try await session.withClient { client in
                 if let path = level.path {
                     return try await client.list(folderPath: path)
@@ -123,6 +164,7 @@ final class FileBrowserViewModel {
             directoryItems = result
             items = result
             isShowingSearchResults = false
+            await loadWritePermission(for: level, generation: generation)
         } catch {
             guard generation == loadGeneration, !DSMError.isCancellation(error) else { return }
             errorMessage = errorMessage(for: error)
@@ -130,11 +172,21 @@ final class FileBrowserViewModel {
     }
 
     func loadFavorites() async {
-        do {
-            favorites = try await session.withClient { try await $0.fileStationFavorites() }
-        } catch {
-            // Les favoris sont un complément : leur absence ne masque jamais les fichiers.
+        favoritesGeneration += 1
+        let generation = favoritesGeneration
+        favoritesError = nil
+        guard supports(.favorites) else {
             favorites = []
+            return
+        }
+        do {
+            let result = try await session.withClient { try await $0.fileStationFavorites() }
+            guard generation == favoritesGeneration else { return }
+            favorites = result
+        } catch {
+            guard generation == favoritesGeneration, !DSMError.isCancellation(error) else { return }
+            favorites = []
+            favoritesError = errorMessage(for: error)
         }
     }
 
@@ -160,6 +212,13 @@ final class FileBrowserViewModel {
         }
 
         guard let path = currentLevel.path else { return }
+        guard supports(.search) else {
+            items = directoryItems.filter {
+                $0.name.localizedStandardContains(pattern)
+            }
+            isShowingSearchResults = true
+            return
+        }
         isSearching = true
         defer { if generation == searchGeneration { isSearching = false } }
         errorMessage = nil
@@ -179,7 +238,14 @@ final class FileBrowserViewModel {
     func open(_ item: FileStationItem) async {
         guard item.isdir else { return }
         searchQuery = ""
-        stack.append(Level(name: item.name, path: item.path))
+        stack.append(
+            Level(
+                name: item.name,
+                path: item.path,
+                writePermissionHint: writePermissionHint(for: item)
+            )
+        )
+        currentFolderIsWritable = stack.last?.writePermissionHint
         await loadCurrent()
     }
 
@@ -188,8 +254,13 @@ final class FileBrowserViewModel {
         searchQuery = ""
         stack = [
             Level(name: String(localized: "Fichiers"), path: nil),
-            Level(name: favorite.name, path: favorite.path),
+            Level(
+                name: favorite.name,
+                path: favorite.path,
+                writePermissionHint: writePermissionHint(for: favorite.additional)
+            ),
         ]
+        currentFolderIsWritable = stack.last?.writePermissionHint
         await loadCurrent()
     }
 
@@ -197,6 +268,7 @@ final class FileBrowserViewModel {
         guard canGoUp else { return }
         searchQuery = ""
         stack.removeLast()
+        currentFolderIsWritable = currentLevel.writePermissionHint
         await loadCurrent()
     }
 
@@ -205,6 +277,7 @@ final class FileBrowserViewModel {
     }
 
     func download(_ item: FileStationItem, to destination: URL) async -> DSMOperationOutcome {
+        guard canDownload else { return unavailableOutcome(for: .download) }
         defer { destination.stopAccessingSecurityScopedResource() }
         let transferID = addTransfer(
             direction: .download,
@@ -239,6 +312,7 @@ final class FileBrowserViewModel {
     }
 
     func download(_ selectedItems: [FileStationItem], to directory: URL) async -> DSMOperationOutcome {
+        guard canDownload else { return unavailableOutcome(for: .download) }
         defer { directory.stopAccessingSecurityScopedResource() }
         isDownloading = true
         defer { isDownloading = false }
@@ -294,6 +368,7 @@ final class FileBrowserViewModel {
     }
 
     func createFolder(named name: String) async -> DSMOperationOutcome {
+        guard canCreateFolder else { return unavailableOutcome(for: .createFolder) }
         guard let parent = currentLevel.path else {
             return .failure(String(localized: "Impossible de créer le dossier ici."))
         }
@@ -304,6 +379,7 @@ final class FileBrowserViewModel {
     }
 
     func rename(_ item: FileStationItem, to name: String) async -> DSMOperationOutcome {
+        guard canRename else { return unavailableOutcome(for: .rename) }
         return await performAndReload {
             try await self.session.withClient { try await $0.rename(path: item.path, to: name) }
             return String(localized: "Renommé en : \(name)")
@@ -311,6 +387,7 @@ final class FileBrowserViewModel {
     }
 
     func delete(_ selectedItems: [FileStationItem]) async -> DSMOperationOutcome {
+        guard canDelete else { return unavailableOutcome(for: .delete) }
         return await performAndReload {
             try await self.session.withClient { try await $0.delete(paths: selectedItems.map(\.path)) }
             return selectedItems.count == 1
@@ -320,6 +397,7 @@ final class FileBrowserViewModel {
     }
 
     func upload(fileURLs: [URL]) async -> DSMOperationOutcome {
+        guard canUpload else { return unavailableOutcome(for: .upload) }
         guard let parent = currentLevel.path else {
             return .failure(String(localized: "Impossible d’envoyer ici."))
         }
@@ -396,6 +474,68 @@ final class FileBrowserViewModel {
         }
     }
 
+    func loadBackgroundTasks() async {
+        backgroundTasksGeneration += 1
+        let generation = backgroundTasksGeneration
+        guard supports(.backgroundTasks) else {
+            backgroundTasks = []
+            backgroundTasksError = String(localized: "Les tâches File Station ne sont pas disponibles sur ce NAS.")
+            return
+        }
+        isLoadingBackgroundTasks = true
+        backgroundTasksError = nil
+        defer {
+            if generation == backgroundTasksGeneration {
+                isLoadingBackgroundTasks = false
+            }
+        }
+        do {
+            let result = try await session.withClient {
+                try await $0.fileStationBackgroundTasks()
+            }
+            guard generation == backgroundTasksGeneration else { return }
+            backgroundTasks = result
+        } catch {
+            guard generation == backgroundTasksGeneration,
+                  !DSMError.isCancellation(error) else { return }
+            backgroundTasksError = errorMessage(for: error)
+        }
+    }
+
+    func stopBackgroundTask(_ task: FileStationBackgroundTask) async -> DSMOperationOutcome {
+        guard let kind = FileOperationKind(rawValue: task.api) else {
+            return .failure(String(localized: "Ce type de tâche ne peut pas être arrêté depuis l’application."))
+        }
+        do {
+            try await session.withClient {
+                try await $0.stopFileStationOperation(kind: kind, taskID: task.taskID)
+            }
+            await loadBackgroundTasks()
+            return .success(String(localized: "Tâche File Station arrêtée"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(
+                String(localized: "Échec de l’arrêt de la tâche : \(errorMessage(for: error))")
+            )
+        }
+    }
+
+    func clearFinishedBackgroundTasks() async -> DSMOperationOutcome {
+        do {
+            let taskIDs = backgroundTasks.filter(\.finished).map(\.taskID)
+            try await session.withClient {
+                try await $0.clearFinishedFileStationBackgroundTasks(taskIDs: taskIDs)
+            }
+            await loadBackgroundTasks()
+            return .success(String(localized: "Tâches File Station terminées effacées"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            return .failure(
+                String(localized: "Échec de l’effacement des tâches : \(errorMessage(for: error))")
+            )
+        }
+    }
+
     func copy(_ selectedItems: [FileStationItem]) -> String {
         clipboard = Clipboard(items: selectedItems, movesItems: false)
         return selectedItems.count == 1
@@ -411,6 +551,7 @@ final class FileBrowserViewModel {
     }
 
     func paste() async -> DSMOperationOutcome {
+        guard canCopyMove else { return unavailableOutcome(for: .copyMove) }
         guard let clipboard else { return .failure(String(localized: "Rien à coller.")) }
         guard let destination = currentLevel.path else {
             return .failure(String(localized: "Impossible de coller ici."))
@@ -431,6 +572,7 @@ final class FileBrowserViewModel {
     }
 
     func compress(_ selectedItems: [FileStationItem], archiveName: String) async -> DSMOperationOutcome {
+        guard canCompress else { return unavailableOutcome(for: .compress) }
         guard let folder = currentLevel.path else {
             return .failure(String(localized: "Impossible de créer une archive ici."))
         }
@@ -446,6 +588,7 @@ final class FileBrowserViewModel {
     }
 
     func extract(_ item: FileStationItem) async -> DSMOperationOutcome {
+        guard canExtractArchives else { return unavailableOutcome(for: .extract) }
         guard let folder = currentLevel.path else {
             return .failure(String(localized: "Impossible d’extraire l’archive ici."))
         }
@@ -468,6 +611,7 @@ final class FileBrowserViewModel {
     }
 
     func toggleCurrentFavorite() async -> DSMOperationOutcome {
+        guard supports(.favorites) else { return unavailableOutcome(for: .favorites) }
         guard let path = currentLevel.path else {
             return .failure(String(localized: "Impossible d’ajouter ce dossier aux favoris."))
         }
@@ -497,6 +641,9 @@ final class FileBrowserViewModel {
     }
 
     func createShareLink(for item: FileStationItem, password: String?, dateExpired: String?) async -> ShareOutcome {
+        guard canShare else {
+            return .failure(unavailableMessage(for: .sharing))
+        }
         do {
             let url = try await session.withClient {
                 try await $0.createShareLink(
@@ -549,7 +696,9 @@ final class FileBrowserViewModel {
         case 1: count = String(localized: "1 élément")
         default: count = String(localized: "\(sortedItems.count) éléments")
         }
-        return String(localized: "\(title), \(count)")
+        let base = String(localized: "\(title), \(count)")
+        guard let permissionMessage else { return base }
+        return String(localized: "\(base). \(permissionMessage)")
     }
 
     private func performAndReload(
@@ -569,6 +718,65 @@ final class FileBrowserViewModel {
             guard !DSMError.isCancellation(error) else { return .cancelled }
             return .failure(String(localized: "Échec de l’opération : \(errorMessage(for: error))"))
         }
+    }
+
+    private func loadWritePermission(for level: Level, generation: Int) async {
+        guard generation == loadGeneration, currentLevel == level else { return }
+        currentFolderIsWritable = level.writePermissionHint
+        guard let path = level.path else {
+            currentFolderIsWritable = false
+            return
+        }
+        guard supports(.writePermission) else { return }
+        do {
+            try await session.withClient {
+                try await $0.checkFileStationWritePermission(
+                    in: path,
+                    filename: ".dsm-access-permission-\(UUID().uuidString)",
+                    conflictPolicy: .skip,
+                    createOnly: true
+                )
+            }
+            guard generation == loadGeneration, currentLevel == level else { return }
+            currentFolderIsWritable = true
+        } catch {
+            guard generation == loadGeneration,
+                  currentLevel == level,
+                  !DSMError.isCancellation(error) else { return }
+            currentFolderIsWritable = false
+            permissionMessage = String(
+                localized: "Ce compte ne peut pas modifier ce dossier : \(errorMessage(for: error))"
+            )
+        }
+    }
+
+    private func writePermissionHint(for item: FileStationItem) -> Bool? {
+        if item.additional?.volumeStatus?.isReadOnly == true
+            || item.additional?.permission?.advancedRight?.disablesModify == true {
+            return false
+        }
+        return item.additional?.permission?.acl?.write
+    }
+
+    private func writePermissionHint(for additional: FileStationItem.Additional?) -> Bool? {
+        if additional?.volumeStatus?.isReadOnly == true
+            || additional?.permission?.advancedRight?.disablesModify == true {
+            return false
+        }
+        return additional?.permission?.acl?.write
+    }
+
+    private func unavailableOutcome(for feature: FileStationFeature) -> DSMOperationOutcome {
+        .failure(unavailableMessage(for: feature))
+    }
+
+    private func unavailableMessage(for feature: FileStationFeature) -> String {
+        if currentFolderIsWritable == false {
+            return permissionMessage
+                ?? String(localized: "Ce compte ne peut pas modifier ce dossier.")
+        }
+        return DSMError.unsupportedAPI(feature.requiredAPI.name).errorDescription
+            ?? String(localized: "Cette opération n’est pas disponible sur ce NAS.")
     }
 
     private func addTransfer(

@@ -19,6 +19,7 @@ struct FileBrowserView: View {
     @State private var infoItem: FileStationItem?
     @State private var showingShareLinks = false
     @State private var showingTransfers = false
+    @State private var showingBackgroundTasks = false
     @State private var transferTask: Task<Void, Never>?
     @State private var tableFocusRequestID = 0
     @AccessibilityFocusState private var focusEmptyState: Bool
@@ -42,7 +43,19 @@ struct FileBrowserView: View {
     }
 
     var body: some View {
-        content
+        VStack(spacing: 0) {
+            if let permissionMessage = vm.permissionMessage {
+                Label(permissionMessage, systemImage: "lock.fill")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.quaternary)
+                    .accessibilityLabel(permissionMessage)
+            }
+            content
+        }
             .navigationTitle(vm.title)
             .searchable(text: $searchText, prompt: "Rechercher dans ce dossier")
             .toolbar { fileToolbar }
@@ -125,6 +138,9 @@ struct FileBrowserView: View {
                     transferTask?.cancel()
                 }
             }
+            .sheet(isPresented: $showingBackgroundTasks) {
+                FileStationTasksView(vm: vm)
+            }
             .onDisappear {
                 transferTask?.cancel()
             }
@@ -157,7 +173,7 @@ struct FileBrowserView: View {
                 items: vm.sortedItems,
                 selection: $selection,
                 focusRequestID: tableFocusRequestID,
-                canWrite: vm.canWrite && !vm.isWorking,
+                actionAvailability: actionAvailability,
                 showsPath: vm.isShowingSearchResults,
                 canExtract: vm.canExtract,
                 onActivate: activate,
@@ -199,15 +215,17 @@ struct FileBrowserView: View {
                 Button("Nouveau dossier", systemImage: "folder.badge.plus") {
                     activeSheet = .createFolder
                 }
+                .disabled(!vm.canCreateFolder)
                 .help("Créer un nouveau dossier")
                 Button("Envoyer des fichiers…", systemImage: "square.and.arrow.up") {
                     startUpload()
                 }
+                .disabled(!vm.canUpload || vm.hasActiveTransfers)
                 .help("Envoyer des fichiers dans ce dossier")
             } label: {
                 Label("Ajouter", systemImage: "plus")
             }
-            .disabled(!vm.canWrite || vm.isWorking || vm.hasActiveTransfers)
+            .disabled((!vm.canCreateFolder && !vm.canUpload) || vm.isWorking)
             .help("Ajouter des éléments")
         }
 
@@ -228,44 +246,44 @@ struct FileBrowserView: View {
             Button("Télécharger…", systemImage: "square.and.arrow.down") {
                 startDownload(selectedItems)
             }
-            .disabled(vm.hasActiveTransfers)
+            .disabled(!vm.canDownload || vm.hasActiveTransfers)
             .help("Télécharger les éléments sélectionnés")
             Divider()
             Button("Copier", systemImage: "doc.on.doc") {
                 VoiceOver.announce(vm.copy(selectedItems), category: .result)
             }
-            .disabled(!vm.canWrite)
+            .disabled(!vm.canCopyMove)
             .help("Copier les éléments sélectionnés")
             Button("Déplacer (couper)", systemImage: "scissors") {
                 VoiceOver.announce(vm.cut(selectedItems), category: .result)
             }
-            .disabled(!vm.canWrite)
+            .disabled(!vm.canCopyMove)
             .help("Déplacer les éléments sélectionnés")
             Button("Créer un lien de partage", systemImage: "link") {
                 shareItem = singleSelectedItem
             }
-            .disabled(singleSelectedItem == nil || !vm.canWrite)
+            .disabled(singleSelectedItem == nil || !vm.canShare)
             .help("Créer un lien vers l’élément sélectionné")
             Button("Renommer…", systemImage: "pencil") {
                 if let item = singleSelectedItem { activeSheet = .rename(item) }
             }
-            .disabled(singleSelectedItem == nil || !vm.canWrite)
+            .disabled(singleSelectedItem == nil || !vm.canRename)
             .help("Renommer l’élément sélectionné")
             Divider()
             Button("Compresser…", systemImage: "archivebox") {
                 activeSheet = .compress(selectedItems)
             }
-            .disabled(!vm.canWrite)
+            .disabled(!vm.canCompress)
             .help("Compresser les éléments sélectionnés")
             Button("Extraire", systemImage: "archivebox.fill") {
                 if let item = singleSelectedItem { extract(item) }
             }
-            .disabled(singleSelectedItem.map(vm.canExtract) != true || !vm.canWrite)
+            .disabled(singleSelectedItem.map(vm.canExtract) != true || !vm.canExtractArchives)
             .help("Extraire l’archive sélectionnée")
             Button("Supprimer…", systemImage: "trash", role: .destructive) {
                 pendingDeleteItems = selectedItems
             }
-            .disabled(!vm.canWrite)
+            .disabled(!vm.canDelete)
             .help("Supprimer les éléments sélectionnés")
             Divider()
             Button("Lire les informations", systemImage: "info.circle") {
@@ -295,6 +313,12 @@ struct FileBrowserView: View {
                 showingTransfers = true
             }
             .help("Afficher la progression et l’historique des transferts")
+
+            Button("Tâches File Station", systemImage: "list.bullet.rectangle") {
+                showingBackgroundTasks = true
+            }
+            .disabled(!vm.supports(.backgroundTasks))
+            .help("Afficher et gérer les opérations exécutées par le NAS")
 
             Divider()
             Menu("Trier", systemImage: "arrow.up.arrow.down") {
@@ -343,7 +367,11 @@ struct FileBrowserView: View {
             }
 
             if vm.favorites.isEmpty {
-                Text("Aucun favori")
+                if let error = vm.favoritesError {
+                    Text(String(localized: "Favoris indisponibles : \(error)"))
+                } else {
+                    Text("Aucun favori")
+                }
             } else {
                 ForEach(vm.favorites) { favorite in
                     Button(favorite.name) {
@@ -428,9 +456,18 @@ struct FileBrowserView: View {
             canGoUp: vm.canGoUp,
             hasSelection: !selectedItems.isEmpty,
             hasSingleSelection: selectedItems.count == 1,
-            canWrite: vm.canWrite && !vm.isWorking,
+            canCreateFolder: vm.canCreateFolder && !vm.isWorking,
+            canUpload: vm.canUpload && !vm.isWorking && !vm.hasActiveTransfers,
+            canDownload: vm.canDownload && !vm.hasActiveTransfers,
+            canCopyMove: vm.canCopyMove && !vm.isWorking,
+            canRename: vm.canRename && !vm.isWorking,
+            canCompress: vm.canCompress && !vm.isWorking,
+            canDelete: vm.canDelete && !vm.isWorking,
             canPaste: vm.canPaste && !vm.isWorking,
-            canExtract: selectedItems.count == 1 && vm.canExtract(selectedItems[0]),
+            canExtract: selectedItems.count == 1
+                && vm.canExtract(selectedItems[0])
+                && vm.canExtractArchives
+                && !vm.isWorking,
             refresh: { Task { await refresh() } },
             goUp: goUp,
             open: activateSelection,
@@ -450,6 +487,18 @@ struct FileBrowserView: View {
 
     private var selectedItems: [FileStationItem] {
         vm.sortedItems.filter { selection.contains($0.path) }
+    }
+
+    private var actionAvailability: FileActionAvailability {
+        FileActionAvailability(
+            canDownload: vm.canDownload && !vm.hasActiveTransfers,
+            canRename: vm.canRename && !vm.isWorking,
+            canDelete: vm.canDelete && !vm.isWorking,
+            canCopyMove: vm.canCopyMove && !vm.isWorking,
+            canShare: vm.canShare && !vm.isWorking,
+            canCompress: vm.canCompress && !vm.isWorking,
+            canExtract: vm.canExtractArchives && !vm.isWorking
+        )
     }
 
     private var singleSelectedItem: FileStationItem? {
