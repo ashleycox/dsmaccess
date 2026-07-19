@@ -4,15 +4,20 @@
 //  Gestion des paquets installés sur DSM.
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct PackagesView: View {
     @State private var vm: PackagesViewModel
     @State private var pendingUninstall: PackageInfo?
     @State private var pendingUpdate: PackageInfo?
+    @State private var pendingRepair: PackageInfo?
+    @State private var pendingManualPackage: URL?
     @State private var confirmsUpdateAll = false
     @State private var detailsPackage: PackageInfo?
     @State private var showSettings = false
     @State private var showCatalog = false
+    @State private var showPackageSources = false
+    @State private var showPackageImporter = false
     @State private var searchText = ""
     @State private var filter = PackageFilter.all
     @State private var operationTask: Task<Void, Never>?
@@ -28,65 +33,28 @@ struct PackagesView: View {
     }
 
     var body: some View {
+        presentationContent
+    }
+
+    private var baseContent: some View {
         VStack(spacing: 0) {
             statusBanners
             content
         }
         .searchable(text: $searchText, prompt: "Rechercher des paquets")
         .toolbar {
-            ToolbarItem {
-                Picker("Filtrer les paquets", selection: $filter) {
-                    ForEach(PackageFilter.allCases) { filter in
-                        Text(filter.title).tag(filter)
-                    }
-                }
-                .pickerStyle(.menu)
-                .help("Filtrer les paquets")
-            }
-
-            ToolbarItem {
-                Button {
-                    showCatalog = true
-                } label: {
-                    Label("Catalogue officiel", systemImage: "shippingbox.and.arrow.backward")
-                }
-                .disabled(!vm.canBrowseCatalog)
-                .help("Parcourir le catalogue officiel annoncé par ce NAS")
-            }
-
-            ToolbarItem {
-                Button {
-                    confirmsUpdateAll = true
-                } label: {
-                    Label("Tout mettre à jour", systemImage: "arrow.triangle.2.circlepath")
-                }
-                .disabled(vm.updateCount == 0 || !vm.canApplyUpdates || operationTask != nil)
-                .help("Mettre à jour tous les paquets compatibles")
-            }
-
-            ToolbarItem {
-                Button {
-                    showSettings = true
-                } label: {
-                    Label("Réglages du Centre de paquets", systemImage: "gearshape")
-                }
-                .disabled(vm.capabilities?.canManageSettings != true)
-                .help("Réglages du Centre de paquets")
-            }
-
-            ToolbarItem {
-                Button {
-                    Task { await load() }
-                } label: {
-                    Label("Actualiser", systemImage: "arrow.clockwise")
-                }
-                .disabled(vm.isLoading || operationTask != nil)
-                .help("Actualiser les paquets")
-            }
+            packageToolbar
         }
         .task {
             await load(restoresInitialFocus: true)
         }
+        .onDisappear {
+            operationTask?.cancel()
+        }
+    }
+
+    private var confirmationContent: some View {
+        baseContent
         .confirmationDialog(
             "Désinstaller ce paquet ?",
             isPresented: Binding(
@@ -122,6 +90,36 @@ struct PackagesView: View {
             Text(updateWarning(for: package))
         }
         .confirmationDialog(
+            "Réparer ce paquet ?",
+            isPresented: Binding(
+                get: { pendingRepair != nil },
+                set: { if !$0 { pendingRepair = nil } }
+            ),
+            presenting: pendingRepair
+        ) { package in
+            Button("Réparer \(package.displayName)") {
+                requestRepair(package)
+            }
+            Button("Annuler", role: .cancel) { }
+        } message: { package in
+            Text(repairWarning(for: package))
+        }
+        .confirmationDialog(
+            "Installer ce fichier SPK ?",
+            isPresented: Binding(
+                get: { pendingManualPackage != nil },
+                set: { if !$0 { pendingManualPackage = nil } }
+            ),
+            presenting: pendingManualPackage
+        ) { fileURL in
+            Button("Installer \(fileURL.lastPathComponent)") {
+                requestManualInstallation(fileURL)
+            }
+            Button("Annuler", role: .cancel) { }
+        } message: { fileURL in
+            Text(manualInstallationWarning(for: fileURL))
+        }
+        .confirmationDialog(
             "Mettre à jour tous les paquets ?",
             isPresented: $confirmsUpdateAll
         ) {
@@ -132,19 +130,103 @@ struct PackagesView: View {
                 "\(vm.updateCount) paquets seront mis à jour l’un après l’autre. Chaque téléchargement et chaque installation est lancé une seule fois."
             )
         }
+    }
+
+    private var presentationContent: some View {
+        confirmationContent
         .sheet(isPresented: $showSettings) {
-            PackageSettingsSheet(session: session)
+            PackageSettingsSheet(
+                session: session,
+                canManagePackageSources: vm.capabilities?.canManagePackageSources == true
+            )
         }
         .sheet(isPresented: $showCatalog) {
             PackageCatalogView(vm: vm) {
                 await load(forceCatalogRefresh: true, announcesResult: false)
             }
         }
+        .sheet(isPresented: $showPackageSources) {
+            PackageSourcesSheet(session: session)
+        }
         .sheet(item: $detailsPackage) { package in
             PackageDetailsSheet(vm: vm, package: package)
         }
-        .onDisappear {
-            operationTask?.cancel()
+        .fileImporter(
+            isPresented: $showPackageImporter,
+            allowedContentTypes: [.data],
+            allowsMultipleSelection: false
+        ) { result in
+            handlePackageSelection(result)
+        }
+    }
+
+    @ToolbarContentBuilder
+    private var packageToolbar: some ToolbarContent {
+        ToolbarItem {
+            Picker("Filtrer les paquets", selection: $filter) {
+                ForEach(PackageFilter.allCases) { filter in
+                    Text(filter.title).tag(filter)
+                }
+            }
+            .pickerStyle(.menu)
+            .help("Filtrer les paquets")
+        }
+
+        ToolbarItem {
+            Button {
+                showCatalog = true
+            } label: {
+                Label("Catalogue officiel", systemImage: "shippingbox.and.arrow.backward")
+            }
+            .disabled(!vm.canBrowseCatalog || operationTask != nil)
+            .help("Parcourir le catalogue officiel annoncé par ce NAS")
+        }
+
+        ToolbarItem {
+            Button {
+                confirmsUpdateAll = true
+            } label: {
+                Label("Tout mettre à jour", systemImage: "arrow.triangle.2.circlepath")
+            }
+            .disabled(vm.updateCount == 0 || !vm.canApplyUpdates || operationTask != nil)
+            .help("Mettre à jour tous les paquets compatibles")
+        }
+
+        ToolbarItem {
+            Menu {
+                Button("Installation manuelle…", systemImage: "shippingbox.and.arrow.forward") {
+                    showPackageImporter = true
+                }
+                .disabled(
+                    vm.capabilities?.canInstallManualPackages != true || operationTask != nil
+                )
+                Button("Sources de paquets…", systemImage: "link") {
+                    showPackageSources = true
+                }
+                .disabled(
+                    vm.capabilities?.canManagePackageSources != true || operationTask != nil
+                )
+                Divider()
+                Button("Réglages du Centre de paquets…", systemImage: "gearshape") {
+                    showSettings = true
+                }
+                .disabled(
+                    vm.capabilities?.canManageSettings != true || operationTask != nil
+                )
+            } label: {
+                Label("Plus d’actions", systemImage: "ellipsis.circle")
+            }
+            .help("Installation manuelle, sources et réglages du Centre de paquets")
+        }
+
+        ToolbarItem {
+            Button {
+                Task { await load() }
+            } label: {
+                Label("Actualiser", systemImage: "arrow.clockwise")
+            }
+            .disabled(vm.isLoading || operationTask != nil)
+            .help("Actualiser les paquets")
         }
     }
 
@@ -204,7 +286,7 @@ struct PackagesView: View {
             EmptyModuleView(
                 title: "Aucun paquet installé",
                 systemImage: "shippingbox",
-                description: "Installez des paquets depuis DSM pour les gérer ici."
+                description: "Installez un paquet depuis le catalogue officiel ou un fichier SPK."
             )
             .accessibilityFocused($focusContent)
         } else if filteredPackages.isEmpty {
@@ -242,7 +324,7 @@ struct PackagesView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 if package.requiresAttention {
-                    Text("Réparation requise dans DSM")
+                    Text("Réparation requise")
                         .font(.caption)
                         .foregroundStyle(.red)
                 } else if package.hasUninstallOptions {
@@ -258,6 +340,11 @@ struct PackagesView: View {
             control(for: package)
         }
         .contextMenu {
+            if vm.canRepair(package) {
+                Button("Réparer…") { pendingRepair = package }
+                    .disabled(vm.busy.contains(package.id) || operationTask != nil)
+                Divider()
+            }
             if let version = vm.updateVersion(for: package) {
                 Button("Mettre à jour…") { pendingUpdate = package }
                     .disabled(
@@ -327,6 +414,12 @@ struct PackagesView: View {
                         )
                     )
             }
+            if vm.canRepair(package) {
+                Button("Réparer") { pendingRepair = package }
+                    .disabled(isBusy || operationTask != nil)
+                    .accessibilityLabel("Réparer \(package.displayName)")
+                    .help(String(localized: "Réparer \(package.displayName)"))
+            }
             if package.canStartStop, vm.capabilities?.canControlPackages == true {
                 if package.isRunning {
                     Button("Arrêter") { setRunning(package, running: false) }
@@ -375,6 +468,24 @@ struct PackagesView: View {
             announcement: String(localized: "Mise à jour de \(package.displayName) en cours…")
         ) {
             await vm.applyUpdate(package)
+        }
+    }
+
+    private func requestRepair(_ package: PackageInfo) {
+        startOperation(
+            announcement: String(localized: "Réparation de \(package.displayName) en cours…")
+        ) {
+            await vm.repair(package)
+        }
+    }
+
+    private func requestManualInstallation(_ fileURL: URL) {
+        startOperation(
+            announcement: String(
+                localized: "Installation de \(fileURL.lastPathComponent) en cours…"
+            )
+        ) {
+            await vm.installManualPackage(at: fileURL)
         }
     }
 
@@ -454,6 +565,49 @@ struct PackagesView: View {
         return String(
             localized: "« \(package.displayName) » sera mis à jour vers la version \(version). Le paquet sera téléchargé, installé puis redémarré. L’opération peut prendre plusieurs minutes. Si DSM exige un redémarrage du NAS, vous devrez l’effectuer depuis DSM."
         )
+    }
+
+    private func repairWarning(for package: PackageInfo) -> String {
+        let catalogVersion = vm.catalogItem(for: package)?.version ?? ""
+        if vm.update(for: package) != nil {
+            return String(
+                localized: "« \(package.displayName) » sera réparé avec la version \(catalogVersion) du catalogue officiel. Cette opération mettra aussi le paquet à jour et pourra le redémarrer."
+            )
+        }
+        return String(
+            localized: "« \(package.displayName) » sera réinstallé depuis le catalogue officiel afin de remplacer ses fichiers endommagés. Le paquet pourra être redémarré."
+        )
+    }
+
+    private func manualInstallationWarning(for fileURL: URL) -> String {
+        String(
+            localized: "Le fichier « \(fileURL.lastPathComponent) » sera envoyé au NAS puis installé. Un paquet peut exécuter du logiciel avec accès aux ressources du NAS. Continuez uniquement si vous faites confiance à sa provenance."
+        )
+    }
+
+    private func handlePackageSelection(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let fileURL = urls.first,
+                  fileURL.pathExtension.caseInsensitiveCompare("spk") == .orderedSame else {
+                presentOperationError(
+                    String(localized: "Sélectionnez un fichier de paquet portant l’extension .spk.")
+                )
+                return
+            }
+            pendingManualPackage = fileURL
+        case .failure(let error):
+            if (error as? CocoaError)?.code == .userCancelled { return }
+            presentOperationError(
+                String(localized: "Impossible d’ouvrir le fichier de paquet : \(error.localizedDescription)")
+            )
+        }
+    }
+
+    private func presentOperationError(_ message: String) {
+        operationError = message
+        focusOperationError = true
+        VoiceOver.announce(message, category: .error, priority: .high)
     }
 }
 

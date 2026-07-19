@@ -17,6 +17,7 @@ final class PackagesViewModel {
     private(set) var capabilities: PackageCenterCapabilities?
     private(set) var isLoading = false
     private(set) var operationProgress: PackageOperationProgress?
+    private(set) var transferProgress: DSMTransferProgress?
     private(set) var activeOperationName: String?
     var errorMessage: String?
     var catalogErrorMessage: String?
@@ -188,6 +189,112 @@ final class PackagesViewModel {
         }
     }
 
+    func install(_ catalogItem: PackageUpdate) async -> DSMOperationOutcome {
+        guard capabilities?.canInstallCatalogPackages == true else {
+            return .failure(
+                String(localized: "L’installation depuis le catalogue n’est pas disponible sur ce NAS.")
+            )
+        }
+        guard installedPackage(for: catalogItem) == nil else {
+            return .failure(
+                String(localized: "Le paquet \(catalogItem.packageID) est déjà installé.")
+            )
+        }
+        guard !catalogItem.requirements.requiresInteractiveInstaller else {
+            return .failure(
+                String(
+                    localized: "Le paquet \(catalogItem.packageID) exige une licence ou un assistant de configuration propre à DSM. Installez-le depuis le Centre de paquets DSM pour effectuer ces choix explicitement."
+                )
+            )
+        }
+        return await runCatalogOperation(
+            packageID: catalogItem.packageID,
+            operationName: String(localized: "Installation de \(catalogItem.packageID)"),
+            successMessage: String(localized: "\(catalogItem.packageID) installé")
+        ) { client, progress in
+            try await client.installPackage(catalogItem, progress: progress)
+        }
+    }
+
+    func repair(_ package: PackageInfo) async -> DSMOperationOutcome {
+        guard capabilities?.canRepairPackages == true, package.requiresAttention else {
+            return .failure(
+                String(localized: "La réparation de ce paquet n’est pas disponible sur ce NAS.")
+            )
+        }
+        guard let catalogItem = catalogItem(for: package) else {
+            return .failure(
+                String(
+                    localized: "Aucun paquet officiel correspondant à \(package.displayName) n’est disponible pour la réparation."
+                )
+            )
+        }
+        guard !catalogItem.requirements.requiresInteractiveInstaller else {
+            return .failure(
+                String(
+                    localized: "Le paquet \(package.displayName) exige une licence ou un assistant de configuration propre à DSM. Réparez-le depuis le Centre de paquets DSM pour effectuer ces choix explicitement."
+                )
+            )
+        }
+        let installsNewerVersion = update(for: package) != nil
+        return await runCatalogOperation(
+            packageID: package.pkgId,
+            operationName: String(localized: "Réparation de \(package.displayName)"),
+            successMessage: installsNewerVersion
+                ? String(localized: "\(package.displayName) réparé et mis à jour")
+                : String(localized: "\(package.displayName) réparé")
+        ) { client, progress in
+            try await client.repairPackage(
+                catalogItem,
+                installsNewerVersion: installsNewerVersion,
+                progress: progress
+            )
+        }
+    }
+
+    func installManualPackage(at fileURL: URL) async -> DSMOperationOutcome {
+        guard capabilities?.canInstallManualPackages == true else {
+            return .failure(
+                String(localized: "L’installation manuelle de paquets n’est pas disponible sur ce NAS.")
+            )
+        }
+        let filename = fileURL.lastPathComponent
+        let operationID = "manual:\(filename.lowercased())"
+        guard busy.insert(operationID).inserted else {
+            return .failure(String(localized: "Une installation manuelle est déjà en cours."))
+        }
+        activeOperationName = String(localized: "Installation de \(filename)")
+        operationProgress = nil
+        transferProgress = nil
+        let hasSecurityScope = fileURL.startAccessingSecurityScopedResource()
+        defer {
+            if hasSecurityScope { fileURL.stopAccessingSecurityScopedResource() }
+            busy.remove(operationID)
+            activeOperationName = nil
+            operationProgress = nil
+            transferProgress = nil
+        }
+        do {
+            let installedName = try await session.withClient {
+                try await $0.installManualPackage(
+                    at: fileURL,
+                    progress: { [weak self] progress in
+                        self?.transferProgress = progress
+                    }
+                )
+            }
+            await load(forceCatalogRefresh: true)
+            return .success(String(localized: "\(installedName) installé"))
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            let reason = Self.errorDescription(for: error)
+            await load()
+            return .failure(
+                String(localized: "Échec de l’installation de \(filename) : \(reason)")
+            )
+        }
+    }
+
     func applyAllUpdates() async -> DSMOperationOutcome {
         guard capabilities?.canInstallVerifiedUpdates == true else {
             return .failure(
@@ -266,6 +373,24 @@ final class PackagesViewModel {
         packages.first { $0.pkgId.caseInsensitiveCompare(catalogItem.packageID) == .orderedSame }
     }
 
+    func catalogItem(for package: PackageInfo) -> PackageUpdate? {
+        catalog.first {
+            $0.packageID.caseInsensitiveCompare(package.pkgId) == .orderedSame
+        }
+    }
+
+    func canInstall(_ catalogItem: PackageUpdate) -> Bool {
+        capabilities?.canInstallCatalogPackages == true
+            && installedPackage(for: catalogItem) == nil
+            && !catalogItem.requirements.requiresInteractiveInstaller
+    }
+
+    func canRepair(_ package: PackageInfo) -> Bool {
+        capabilities?.canRepairPackages == true
+            && package.requiresAttention
+            && catalogItem(for: package)?.requirements.requiresInteractiveInstaller == false
+    }
+
     func canSafelyUninstall(_ package: PackageInfo) -> Bool {
         capabilities?.canUninstallPackages == true
             && package.canUninstall
@@ -282,12 +407,57 @@ final class PackagesViewModel {
 
     var operationStatusText: String? {
         guard let activeOperationName else { return nil }
+        if let transferProgress {
+            if let fraction = transferProgress.fractionCompleted, fraction < 1 {
+                return String(
+                    localized: "\(activeOperationName), envoi \(fraction.formatted(.percent.precision(.fractionLength(0))))"
+                )
+            }
+            return String(localized: "\(activeOperationName), installation par le NAS")
+        }
         guard let operationProgress else {
             return String(localized: "\(activeOperationName), préparation par le NAS")
         }
         return String(
             localized: "\(activeOperationName), vérification de l’état \(operationProgress.statusChecks)"
         )
+    }
+
+    private func runCatalogOperation(
+        packageID: String,
+        operationName: String,
+        successMessage: String,
+        operation: (
+            DSMClientProtocol,
+            @escaping @MainActor (PackageOperationProgress) -> Void
+        ) async throws -> Void
+    ) async -> DSMOperationOutcome {
+        guard busy.insert(packageID).inserted else {
+            return .failure(String(localized: "Une opération est déjà en cours pour ce paquet."))
+        }
+        activeOperationName = operationName
+        operationProgress = nil
+        transferProgress = nil
+        defer {
+            busy.remove(packageID)
+            activeOperationName = nil
+            operationProgress = nil
+            transferProgress = nil
+        }
+        do {
+            try await session.withClient { client in
+                try await operation(client) { [weak self] progress in
+                    self?.operationProgress = progress
+                }
+            }
+            await load(forceCatalogRefresh: true)
+            return .success(successMessage)
+        } catch {
+            guard !DSMError.isCancellation(error) else { return .cancelled }
+            let reason = Self.errorDescription(for: error)
+            await load()
+            return .failure(String(localized: "Échec pour \(packageID) : \(reason)"))
+        }
     }
 
     static func isVersion(_ candidate: String, newerThan current: String) -> Bool {

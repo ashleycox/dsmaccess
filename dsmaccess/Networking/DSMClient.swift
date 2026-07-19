@@ -189,10 +189,27 @@ protocol DSMClientProtocol: AnyObject {
         _ update: PackageUpdate,
         progress: (PackageOperationProgress) -> Void
     ) async throws
+    func installPackage(
+        _ update: PackageUpdate,
+        progress: (PackageOperationProgress) -> Void
+    ) async throws
+    func repairPackage(
+        _ update: PackageUpdate,
+        installsNewerVersion: Bool,
+        progress: (PackageOperationProgress) -> Void
+    ) async throws
+    func installManualPackage(
+        at fileURL: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws -> String
     func setPackageRunning(id: String, running: Bool) async throws
     func uninstallPackage(id: String) async throws
     func packageSettings() async throws -> PackageSettings
     func setPackageSettings(_ settings: PackageSettings) async throws
+    func packageSources() async throws -> [PackageSource]
+    func addPackageSource(_ source: PackageSource) async throws
+    func updatePackageSource(_ source: PackageSource, originalFeed: String) async throws
+    func deletePackageSources(feeds: [String]) async throws
     func listUsers() async throws -> [DSMUser]
     func listGroups() async throws -> [DSMGroup]
     func createUser(_ draft: DSMUserDraft) async throws
@@ -714,6 +731,32 @@ final class DSMClient: DSMClientProtocol {
         try await packages.upgrade(update, progress: progress)
     }
 
+    func installPackage(
+        _ update: PackageUpdate,
+        progress: (PackageOperationProgress) -> Void
+    ) async throws {
+        try await packages.install(update, progress: progress)
+    }
+
+    func repairPackage(
+        _ update: PackageUpdate,
+        installsNewerVersion: Bool,
+        progress: (PackageOperationProgress) -> Void
+    ) async throws {
+        try await packages.repair(
+            update,
+            installsNewerVersion: installsNewerVersion,
+            progress: progress
+        )
+    }
+
+    func installManualPackage(
+        at fileURL: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws -> String {
+        try await packages.installManualPackage(at: fileURL, progress: progress)
+    }
+
     func setPackageRunning(id: String, running: Bool) async throws {
         try await packages.setRunning(running, packageID: id)
     }
@@ -728,6 +771,22 @@ final class DSMClient: DSMClientProtocol {
 
     func setPackageSettings(_ settings: PackageSettings) async throws {
         try await packages.setSettings(settings)
+    }
+
+    func packageSources() async throws -> [PackageSource] {
+        try await packages.packageSources()
+    }
+
+    func addPackageSource(_ source: PackageSource) async throws {
+        try await packages.addPackageSource(source)
+    }
+
+    func updatePackageSource(_ source: PackageSource, originalFeed: String) async throws {
+        try await packages.updatePackageSource(source, originalFeed: originalFeed)
+    }
+
+    func deletePackageSources(feeds: [String]) async throws {
+        try await packages.deletePackageSources(feeds: feeds)
     }
 
     func listUsers() async throws -> [DSMUser] {

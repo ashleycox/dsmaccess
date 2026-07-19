@@ -23,4 +23,25 @@ struct PackagesViewModelTests {
             )
         )
     }
+
+    @Test func validatesOnlyNamedHTTPSPackageSources() {
+        #expect(
+            PackageSourcesViewModel.validatedSource(
+                name: "  Community  ",
+                feed: "  https://packages.example.com/feed  "
+            ) == PackageSource(name: "Community", feed: "https://packages.example.com/feed")
+        )
+        #expect(
+            PackageSourcesViewModel.validatedSource(
+                name: "Community",
+                feed: "http://packages.example.com/feed"
+            ) == nil
+        )
+        #expect(
+            PackageSourcesViewModel.validatedSource(
+                name: "   ",
+                feed: "https://packages.example.com/feed"
+            ) == nil
+        )
+    }
 }

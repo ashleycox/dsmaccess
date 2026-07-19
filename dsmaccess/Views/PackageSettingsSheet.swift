@@ -11,11 +11,17 @@ import SwiftUI
 
 struct PackageSettingsSheet: View {
     @State private var vm: PackageSettingsViewModel
+    @State private var showPackageSources = false
     @AccessibilityFocusState private var focusTitle: Bool
     @AccessibilityFocusState private var focusStatus: Bool
     @Environment(\.dismiss) private var dismiss
 
-    init(session: SessionStore) {
+    private let session: SessionStore
+    private let canManagePackageSources: Bool
+
+    init(session: SessionStore, canManagePackageSources: Bool) {
+        self.session = session
+        self.canManagePackageSources = canManagePackageSources
         _vm = State(initialValue: PackageSettingsViewModel(session: session))
     }
 
@@ -52,6 +58,10 @@ struct PackageSettingsSheet: View {
             focusTitle = true
             await load()
         }
+        .sheet(isPresented: $showPackageSources) {
+            PackageSourcesSheet(session: session)
+        }
+        .interactiveDismissDisabled(vm.isSaving)
     }
 
     @ViewBuilder
@@ -133,10 +143,20 @@ struct PackageSettingsSheet: View {
                         Text(settings.trustLevel, format: .number.grouping(.never))
                     }
                 }
-                Text("DSM Access conserve ces valeurs lors de chaque enregistrement. Pour modifier le niveau de confiance, les sources ou les certificats d’éditeur, utilisez le Centre de paquets DSM : ce NAS ne permet pas à DSM Access de les gérer en toute sécurité.")
+                Text("DSM Access conserve ces valeurs lors de chaque enregistrement. Les API de ce NAS n’exposent pas de commande vérifiée permettant de modifier ici le niveau de confiance ou les certificats d’éditeur.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                if canManagePackageSources {
+                    Button("Gérer les sources de paquets…") {
+                        showPackageSources = true
+                    }
+                    .help("Ajouter, modifier ou supprimer les sources tierces du Centre de paquets")
+                } else {
+                    Text("La gestion des sources de paquets n’est pas disponible sur ce NAS.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .disabled(vm.isSaving)

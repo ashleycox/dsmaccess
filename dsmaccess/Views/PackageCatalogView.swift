@@ -16,6 +16,9 @@ struct PackageCatalogView: View {
     @State private var filter = CatalogFilter.all
     @State private var isRefreshing = false
     @State private var refreshTask: Task<Void, Never>?
+    @State private var operationTask: Task<Void, Never>?
+    @State private var pendingAction: CatalogActionRequest?
+    @State private var operationError: String?
     @AccessibilityFocusState private var focusHeading: Bool
     @AccessibilityFocusState private var focusStatus: Bool
 
@@ -25,22 +28,41 @@ struct PackageCatalogView: View {
             Divider()
             controls
             Divider()
+            operationBanner
             content
             Divider()
             HStack {
                 Spacer()
                 Button("Fermer", role: .cancel) { dismiss() }
                     .keyboardShortcut(.cancelAction)
+                    .disabled(isRefreshing || operationTask != nil)
             }
             .padding()
         }
         .frame(width: 760, height: 560)
+        .interactiveDismissDisabled(operationTask != nil)
         .onAppear {
             focusHeading = true
             VoiceOver.announce("Catalogue officiel", category: .navigation)
         }
         .onDisappear {
             refreshTask?.cancel()
+            operationTask?.cancel()
+        }
+        .confirmationDialog(
+            confirmationTitle,
+            isPresented: Binding(
+                get: { pendingAction != nil },
+                set: { if !$0 { pendingAction = nil } }
+            ),
+            presenting: pendingAction
+        ) { request in
+            Button(confirmButtonTitle(for: request)) {
+                perform(request)
+            }
+            Button("Annuler", role: .cancel) { }
+        } message: { request in
+            Text(confirmationMessage(for: request))
         }
     }
 
@@ -58,7 +80,7 @@ struct PackageCatalogView: View {
             }
             Button("Fermer", role: .cancel) { dismiss() }
                 .keyboardShortcut(.cancelAction)
-                .disabled(isRefreshing)
+                .disabled(isRefreshing || operationTask != nil)
         }
         .padding()
     }
@@ -78,11 +100,40 @@ struct PackageCatalogView: View {
             Button("Actualiser", systemImage: "arrow.clockwise") {
                 startRefresh()
             }
-            .disabled(isRefreshing)
+            .disabled(isRefreshing || operationTask != nil)
             .help("Forcer l’actualisation du catalogue sur le NAS")
         }
         .padding(.horizontal)
         .padding(.vertical, 10)
+    }
+
+    @ViewBuilder
+    private var operationBanner: some View {
+        if let status = vm.operationStatusText {
+            HStack(spacing: 10) {
+                ProgressView()
+                    .controlSize(.small)
+                Text(status)
+                Spacer()
+                Button("Arrêter le suivi") { stopTrackingOperation() }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            .background(.quaternary)
+            .accessibilityElement(children: .contain)
+        }
+        if let operationError {
+            HStack {
+                Label(operationError, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red)
+                    .accessibilityFocused($focusStatus)
+                Spacer()
+                Button("Fermer l’erreur") { self.operationError = nil }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            .background(.quaternary)
+        }
     }
 
     @ViewBuilder
@@ -132,8 +183,26 @@ struct PackageCatalogView: View {
         return PackageCatalogRow(
             item: item,
             installedPackage: installedPackage,
-            updateAvailable: installedPackage.map { vm.update(for: $0) != nil } == true
+            updateAvailable: installedPackage.map { vm.update(for: $0) != nil } == true,
+            action: action(for: item, installedPackage: installedPackage),
+            isDisabled: operationTask != nil || vm.busy.contains(item.packageID),
+            requestAction: {
+                pendingAction = CatalogActionRequest(
+                    item: item,
+                    installedPackage: installedPackage
+                )
+            }
         )
+    }
+
+    private func action(
+        for item: PackageUpdate,
+        installedPackage: PackageInfo?
+    ) -> CatalogRowAction? {
+        if let installedPackage {
+            return vm.update(for: installedPackage) != nil && vm.canApplyUpdates ? .update : nil
+        }
+        return vm.canInstall(item) ? .install : nil
     }
 
     private func refreshCatalog() async {
@@ -165,12 +234,85 @@ struct PackageCatalogView: View {
             refreshTask = nil
         }
     }
+
+    private var confirmationTitle: String {
+        guard let pendingAction else { return String(localized: "Installer ce paquet ?") }
+        return pendingAction.installedPackage == nil
+            ? String(localized: "Installer ce paquet ?")
+            : String(localized: "Mettre à jour ce paquet ?")
+    }
+
+    private func confirmButtonTitle(for request: CatalogActionRequest) -> String {
+        if let installedPackage = request.installedPackage {
+            return String(localized: "Mettre à jour \(installedPackage.displayName)")
+        }
+        return String(localized: "Installer \(request.item.packageID)")
+    }
+
+    private func confirmationMessage(for request: CatalogActionRequest) -> String {
+        if let installedPackage = request.installedPackage {
+            return String(
+                localized: "« \(installedPackage.displayName) » sera mis à jour vers la version \(request.item.version). Le paquet sera téléchargé, installé puis redémarré."
+            )
+        }
+        return String(
+            localized: "« \(request.item.packageID) » version \(request.item.version) sera téléchargé depuis le catalogue officiel, installé puis démarré si le paquet le permet."
+        )
+    }
+
+    private func perform(_ request: CatalogActionRequest) {
+        guard operationTask == nil else { return }
+        operationError = nil
+        let announcement: String
+        if let installedPackage = request.installedPackage {
+            announcement = String(
+                localized: "Mise à jour de \(installedPackage.displayName) en cours…"
+            )
+        } else {
+            announcement = String(
+                localized: "Installation de \(request.item.packageID) en cours…"
+            )
+        }
+        VoiceOver.announce(announcement, category: .progress, priority: .high)
+        operationTask = Task {
+            let outcome: DSMOperationOutcome
+            if let installedPackage = request.installedPackage {
+                outcome = await vm.applyUpdate(installedPackage)
+            } else {
+                outcome = await vm.install(request.item)
+            }
+            if case .failure(let message) = outcome {
+                operationError = message
+                focusStatus = true
+            }
+            if case .cancelled = outcome {
+                operationTask = nil
+                return
+            }
+            VoiceOver.announce(outcome, priority: .high)
+            operationTask = nil
+        }
+    }
+
+    private func stopTrackingOperation() {
+        operationTask?.cancel()
+        VoiceOver.announce(
+            String(
+                localized: "Suivi arrêté dans l’app. L’opération déjà envoyée au NAS peut continuer dans DSM."
+            ),
+            category: .progress,
+            priority: .high
+        )
+    }
 }
 
 private struct PackageCatalogRow: View {
     let item: PackageUpdate
     let installedPackage: PackageInfo?
     let updateAvailable: Bool
+    let action: CatalogRowAction?
+    let isDisabled: Bool
+    let requestAction: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -185,6 +327,11 @@ private struct PackageCatalogRow: View {
                 Spacer()
                 Text(formattedFileSize)
                     .foregroundStyle(.secondary)
+                if let action {
+                    Button(action.title, action: requestAction)
+                        .disabled(isDisabled)
+                        .accessibilityLabel(action.accessibilityLabel(for: item))
+                }
             }
             Text("Version du catalogue : \(item.version)")
                 .font(.caption)
@@ -212,10 +359,26 @@ private struct PackageCatalogRow: View {
             Text("Non installé")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-            Text("L’installation depuis le catalogue n’est pas disponible dans DSM Access sur ce NAS. Installez ce paquet depuis le Centre de paquets DSM.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            if let unavailableInstallDescription {
+                Text(unavailableInstallDescription)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
+    }
+
+    private var unavailableInstallDescription: String? {
+        if item.requirements.requiresInteractiveInstaller {
+            return String(
+                localized: "Une licence ou un assistant de configuration DSM est requis pour ce paquet."
+            )
+        }
+        if action == nil {
+            return String(
+                localized: "L’installation depuis le catalogue n’est pas disponible sur ce NAS."
+            )
+        }
+        return nil
     }
 
     private var formattedFileSize: String {
@@ -224,6 +387,32 @@ private struct PackageCatalogRow: View {
 
     private func installedVersion(for package: PackageInfo) -> String {
         package.version ?? String(localized: "Inconnue")
+    }
+}
+
+private struct CatalogActionRequest {
+    let item: PackageUpdate
+    let installedPackage: PackageInfo?
+}
+
+private enum CatalogRowAction: Equatable {
+    case install
+    case update
+
+    var title: String {
+        switch self {
+        case .install: String(localized: "Installer")
+        case .update: String(localized: "Mettre à jour")
+        }
+    }
+
+    func accessibilityLabel(for item: PackageUpdate) -> String {
+        switch self {
+        case .install:
+            String(localized: "Installer \(item.packageID) version \(item.version)")
+        case .update:
+            String(localized: "Mettre à jour \(item.packageID) vers la version \(item.version)")
+        }
     }
 }
 
@@ -266,7 +455,6 @@ struct PackageDetailsSheet: View {
                 actionsSection
                 catalogSection
                 apiSection
-                unavailableMetadataSection
             }
             .formStyle(.grouped)
             Divider()
@@ -316,8 +504,9 @@ struct PackageDetailsSheet: View {
                     .foregroundStyle(.secondary)
             }
             if package.requiresAttention {
-                Text("DSM signale que ce paquet nécessite une réparation. La réparation n’est pas disponible dans DSM Access sur ce NAS ; utilisez le Centre de paquets DSM.")
-                    .foregroundStyle(.red)
+                LabeledContent("Réparation", value: yesNo(vm.canRepair(package)))
+                Text(repairAvailabilityDescription)
+                .foregroundStyle(.red)
             }
         }
     }
@@ -349,13 +538,6 @@ struct PackageDetailsSheet: View {
         }
     }
 
-    private var unavailableMetadataSection: some View {
-        Section {
-            Text("Ce NAS ne fournit pas à DSM Access les dépendances, licences, sources tierces ni pages de configuration de ce paquet.")
-                .foregroundStyle(.secondary)
-        }
-    }
-
     private var catalogItem: PackageUpdate? {
         vm.catalog.first {
             $0.packageID.caseInsensitiveCompare(package.pkgId) == .orderedSame
@@ -366,6 +548,16 @@ struct PackageDetailsSheet: View {
         (vm.capabilities?.maximumVersions ?? [:])
             .map { (name: $0.key, version: $0.value) }
             .sorted { $0.name < $1.name }
+    }
+
+    private var repairAvailabilityDescription: String {
+        vm.canRepair(package)
+            ? String(
+                localized: "Ce paquet peut être réparé depuis la liste des paquets installés."
+            )
+            : String(
+                localized: "Aucun paquet officiel compatible n’est disponible pour une réparation directe. Utilisez le Centre de paquets DSM."
+            )
     }
 
     private func yesNo(_ value: Bool) -> String {

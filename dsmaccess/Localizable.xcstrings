@@ -12628,6 +12628,916 @@
         }
       }
     },
+    "%@ installé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ installed"
+          }
+        }
+      }
+    },
+    "%@ réparé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ repaired"
+          }
+        }
+      }
+    },
+    "%@ réparé et mis à jour" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ repaired and updated"
+          }
+        }
+      }
+    },
+    "%@, envoi %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, upload %2$@"
+          }
+        }
+      }
+    },
+    "%@, installation par le NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@, installing on the NAS"
+          }
+        }
+      }
+    },
+    "%lld sources de paquets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld package sources"
+          }
+        }
+      }
+    },
+    "Adresse HTTPS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTTPS address"
+          }
+        }
+      }
+    },
+    "Ajouter une source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Source"
+          }
+        }
+      }
+    },
+    "Ajouter une source HTTPS au Centre de paquets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add an HTTPS source to Package Center"
+          }
+        }
+      }
+    },
+    "Ajouter une source…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Source…"
+          }
+        }
+      }
+    },
+    "Ajouter, modifier ou supprimer les sources tierces du Centre de paquets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add, edit, or remove third-party Package Center sources"
+          }
+        }
+      }
+    },
+    "Ajoutez une source HTTPS pour afficher ses paquets dans le Centre de paquets." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add an HTTPS source to show its packages in Package Center."
+          }
+        }
+      }
+    },
+    "Aucun paquet officiel compatible n’est disponible pour une réparation directe. Utilisez le Centre de paquets DSM." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No compatible official package is available for a direct repair. Use DSM Package Center."
+          }
+        }
+      }
+    },
+    "Aucun paquet officiel correspondant à %@ n’est disponible pour la réparation." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No matching official package is available to repair %@."
+          }
+        }
+      }
+    },
+    "Aucune source tierce" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Third-Party Sources"
+          }
+        }
+      }
+    },
+    "Ce paquet peut être réparé depuis la liste des paquets installés." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This package can be repaired from the installed packages list."
+          }
+        }
+      }
+    },
+    "Chargement des sources de paquets…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading package sources…"
+          }
+        }
+      }
+    },
+    "Chargement des sources…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading sources…"
+          }
+        }
+      }
+    },
+    "DSM Access conserve ces valeurs lors de chaque enregistrement. Les API de ce NAS n’exposent pas de commande vérifiée permettant de modifier ici le niveau de confiance ou les certificats d’éditeur." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DSM Access preserves these values whenever settings are saved. This NAS’s APIs do not expose a verified way to change the trust level or publisher certificates here."
+          }
+        }
+      }
+    },
+    "DSM exige des opérations supplémentaires sur d’autres paquets. Effectuez cette installation dans le Centre de paquets DSM pour les vérifier explicitement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DSM requires additional operations on other packages. Complete this installation in DSM Package Center so you can review them explicitly."
+          }
+        }
+      }
+    },
+    "DSM n’a pas pu télécharger le paquet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DSM could not download the package."
+          }
+        }
+      }
+    },
+    "Enregistrement de la source…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saving source…"
+          }
+        }
+      }
+    },
+    "Gérer les sources de paquets…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Package Sources…"
+          }
+        }
+      }
+    },
+    "Impossible d’ouvrir le fichier de paquet : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to open the package file: %@"
+          }
+        }
+      }
+    },
+    "Installation de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installing %@"
+          }
+        }
+      }
+    },
+    "Installation de %@ en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installing %@…"
+          }
+        }
+      }
+    },
+    "Installation manuelle, sources et réglages du Centre de paquets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual installation, sources, and Package Center settings"
+          }
+        }
+      }
+    },
+    "Installation manuelle…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual Installation…"
+          }
+        }
+      }
+    },
+    "Installer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Install"
+          }
+        }
+      }
+    },
+    "Installer %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Install %@"
+          }
+        }
+      }
+    },
+    "Installer %@ version %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Install %1$@ version %2$@"
+          }
+        }
+      }
+    },
+    "Installer ce fichier SPK ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Install This SPK File?"
+          }
+        }
+      }
+    },
+    "Installer ce paquet ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Install This Package?"
+          }
+        }
+      }
+    },
+    "Installez un paquet depuis le catalogue officiel ou un fichier SPK." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Install a package from the official catalog or an SPK file."
+          }
+        }
+      }
+    },
+    "La gestion des sources de paquets n’est pas disponible sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package source management is not available on this NAS."
+          }
+        }
+      }
+    },
+    "La réparation de ce paquet n’est pas disponible sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package repair is not available on this NAS."
+          }
+        }
+      }
+    },
+    "La source « %@ » sera retirée du Centre de paquets. Les paquets déjà installés ne seront ni arrêtés ni désinstallés." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The “%@” source will be removed from Package Center. Installed packages will not be stopped or uninstalled."
+          }
+        }
+      }
+    },
+    "Le fichier « %@ » sera envoyé au NAS puis installé. Un paquet peut exécuter du logiciel avec accès aux ressources du NAS. Continuez uniquement si vous faites confiance à sa provenance." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The “%@” file will be uploaded to the NAS and installed. A package can run software with access to NAS resources. Continue only if you trust its source."
+          }
+        }
+      }
+    },
+    "Le paquet %@ est déjà installé." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The %@ package is already installed."
+          }
+        }
+      }
+    },
+    "Le paquet %@ exige une licence ou un assistant de configuration propre à DSM. Installez-le depuis le Centre de paquets DSM pour effectuer ces choix explicitement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The %@ package requires a DSM licence or configuration wizard. Install it in DSM Package Center so you can make those choices explicitly."
+          }
+        }
+      }
+    },
+    "Le paquet %@ exige une licence ou un assistant de configuration propre à DSM. Réparez-le depuis le Centre de paquets DSM pour effectuer ces choix explicitement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The %@ package requires a DSM licence or configuration wizard. Repair it in DSM Package Center so you can make those choices explicitly."
+          }
+        }
+      }
+    },
+    "L’ajout d’une source rend ses paquets visibles mais n’en installe aucun. N’ajoutez que des sources que vous jugez fiables." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adding a source makes its packages visible but does not install them. Add only sources you trust."
+          }
+        }
+      }
+    },
+    "L’installation a expiré." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The installation timed out."
+          }
+        }
+      }
+    },
+    "L’installation depuis le catalogue n’est pas disponible sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installation from the catalog is not available on this NAS."
+          }
+        }
+      }
+    },
+    "L’installation manuelle de paquets n’est pas disponible sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual package installation is not available on this NAS."
+          }
+        }
+      }
+    },
+    "Modifier la source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Source"
+          }
+        }
+      }
+    },
+    "Modifier la source %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit the %@ source"
+          }
+        }
+      }
+    },
+    "Plus d’actions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More Actions"
+          }
+        }
+      }
+    },
+    "Réglages du Centre de paquets…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package Center Settings…"
+          }
+        }
+      }
+    },
+    "Réparation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repair"
+          }
+        }
+      }
+    },
+    "Réparation de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repairing %@"
+          }
+        }
+      }
+    },
+    "Réparation de %@ en cours…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repairing %@…"
+          }
+        }
+      }
+    },
+    "Réparer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repair"
+          }
+        }
+      }
+    },
+    "Réparer %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repair %@"
+          }
+        }
+      }
+    },
+    "Réparer ce paquet ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repair This Package?"
+          }
+        }
+      }
+    },
+    "Réparer…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repair…"
+          }
+        }
+      }
+    },
+    "Saisissez un nom et une adresse HTTPS valides pour la source." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid name and HTTPS address for the source."
+          }
+        }
+      }
+    },
+    "Source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source"
+          }
+        }
+      }
+    },
+    "Source %@ ajoutée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source %@ added"
+          }
+        }
+      }
+    },
+    "Source %@ mise à jour" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source %@ updated"
+          }
+        }
+      }
+    },
+    "Source %@ supprimée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source %@ removed"
+          }
+        }
+      }
+    },
+    "Sources de paquets" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package Sources"
+          }
+        }
+      }
+    },
+    "Sources de paquets configurées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configured package sources"
+          }
+        }
+      }
+    },
+    "Sources de paquets…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Package Sources…"
+          }
+        }
+      }
+    },
+    "Suivi arrêté dans l’app. L’opération déjà envoyée au NAS peut continuer dans DSM." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracking stopped in the app. An operation already sent to the NAS may continue in DSM."
+          }
+        }
+      }
+    },
+    "Suppression de la source %@…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Removing the %@ source…"
+          }
+        }
+      }
+    },
+    "Supprimer cette source ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove This Source?"
+          }
+        }
+      }
+    },
+    "Supprimer la source %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove the %@ source"
+          }
+        }
+      }
+    },
+    "Sélectionnez un fichier de paquet SPK valide." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a valid SPK package file."
+          }
+        }
+      }
+    },
+    "Sélectionnez un fichier de paquet portant l’extension .spk." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a package file with the .spk extension."
+          }
+        }
+      }
+    },
+    "Tout mettre à jour" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update All"
+          }
+        }
+      }
+    },
+    "Type d’installation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installation type"
+          }
+        }
+      }
+    },
+    "Une installation manuelle est déjà en cours." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A manual installation is already in progress."
+          }
+        }
+      }
+    },
+    "Une licence ou un assistant de configuration DSM est requis pour ce paquet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This package requires a DSM licence or configuration wizard."
+          }
+        }
+      }
+    },
+    "Une opération est déjà en cours pour ce paquet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An operation is already in progress for this package."
+          }
+        }
+      }
+    },
+    "Une opération est déjà en cours pour un paquet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A package operation is already in progress."
+          }
+        }
+      }
+    },
+    "Version bêta" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beta version"
+          }
+        }
+      }
+    },
+    "Version du catalogue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catalog version"
+          }
+        }
+      }
+    },
+    "Version du catalogue : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catalog version: %@"
+          }
+        }
+      }
+    },
+    "Version installée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed version"
+          }
+        }
+      }
+    },
+    "Version installée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed version: %@"
+          }
+        }
+      }
+    },
+    "Volume par défaut" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Default volume"
+          }
+        }
+      }
+    },
+    "« %@ » sera mis à jour vers la version %@. Le paquet sera téléchargé, installé puis redémarré." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” will be updated to version %2$@. The package will be downloaded, installed, and restarted."
+          }
+        }
+      }
+    },
+    "« %@ » sera réinstallé depuis le catalogue officiel afin de remplacer ses fichiers endommagés. Le paquet pourra être redémarré." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%@” will be reinstalled from the official catalog to replace its damaged files. The package may be restarted."
+          }
+        }
+      }
+    },
+    "« %@ » sera réparé avec la version %@ du catalogue officiel. Cette opération mettra aussi le paquet à jour et pourra le redémarrer." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” will be repaired using version %2$@ from the official catalog. This will also update the package and may restart it."
+          }
+        }
+      }
+    },
+    "« %@ » version %@ sera téléchargé depuis le catalogue officiel, installé puis démarré si le paquet le permet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“%1$@” version %2$@ will be downloaded from the official catalog, installed, and started if supported by the package."
+          }
+        }
+      }
+    },
+    "À jour" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Up to date"
+          }
+        }
+      }
+    },
+    "À réparer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Needs repair"
+          }
+        }
+      }
+    },
+    "Échec de la suppression de %@ : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to remove %1$@: %2$@"
+          }
+        }
+      }
+    },
+    "Échec de l’enregistrement de la source : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to save the source: %@"
+          }
+        }
+      }
+    },
+    "Échec de l’installation de %@ : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to install %1$@: %2$@"
+          }
+        }
+      }
+    },
     "État indisponible" : {
       "localizations" : {
         "en" : {

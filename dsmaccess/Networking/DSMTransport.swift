@@ -148,6 +148,7 @@ final class DSMTransport {
         authenticated: Bool = true,
         httpMethod: DSMHTTPMethod = .get,
         requestPolicy: DSMRequestPolicy = .singleAttempt,
+        timeoutInterval: TimeInterval? = nil,
         as type: Value.Type
     ) async throws -> DSMResponse<Value> {
         let resolved = try await resolve(api)
@@ -161,7 +162,8 @@ final class DSMTransport {
             path: resolved.path,
             parameters: query,
             httpMethod: httpMethod,
-            requestPolicy: requestPolicy
+            requestPolicy: requestPolicy,
+            timeoutInterval: timeoutInterval
         )
     }
 
@@ -172,6 +174,7 @@ final class DSMTransport {
         parameters: [String: DSMParameter] = [:],
         authenticated: Bool = true,
         httpMethod: DSMHTTPMethod = .get,
+        timeoutInterval: TimeInterval? = nil,
         as type: Value.Type
     ) async throws -> Value {
         try await value(
@@ -181,6 +184,7 @@ final class DSMTransport {
             authenticated: authenticated,
             httpMethod: httpMethod,
             requestPolicy: .idempotent,
+            timeoutInterval: timeoutInterval,
             as: type
         )
     }
@@ -193,6 +197,7 @@ final class DSMTransport {
         authenticated: Bool = true,
         httpMethod: DSMHTTPMethod = .get,
         requestPolicy: DSMRequestPolicy = .singleAttempt,
+        timeoutInterval: TimeInterval? = nil,
         as type: Value.Type
     ) async throws -> Value {
         let response = try await response(
@@ -202,6 +207,7 @@ final class DSMTransport {
             authenticated: authenticated,
             httpMethod: httpMethod,
             requestPolicy: requestPolicy,
+            timeoutInterval: timeoutInterval,
             as: type
         )
         guard response.success, let data = response.data else {
@@ -214,13 +220,17 @@ final class DSMTransport {
         api: DSMAPI,
         method: String,
         parameters: [String: DSMParameter] = [:],
-        authenticated: Bool = true
+        authenticated: Bool = true,
+        httpMethod: DSMHTTPMethod = .get,
+        timeoutInterval: TimeInterval? = nil
     ) async throws {
         let response = try await response(
             api: api,
             method: method,
             parameters: parameters,
             authenticated: authenticated,
+            httpMethod: httpMethod,
+            timeoutInterval: timeoutInterval,
             as: EmptyData.self
         )
         guard response.success else {
@@ -390,12 +400,14 @@ final class DSMTransport {
         path: String,
         parameters: [String: String],
         httpMethod: DSMHTTPMethod = .get,
-        requestPolicy: DSMRequestPolicy
+        requestPolicy: DSMRequestPolicy,
+        timeoutInterval: TimeInterval? = nil
     ) async throws -> DSMResponse<Value> {
         let request = try makeRequest(
             path: path,
             parameters: parameters,
-            httpMethod: httpMethod
+            httpMethod: httpMethod,
+            timeoutInterval: timeoutInterval
         )
         do {
             return try await sendOnce(request)
@@ -415,13 +427,17 @@ final class DSMTransport {
     private func makeRequest(
         path: String,
         parameters: [String: String],
-        httpMethod: DSMHTTPMethod
+        httpMethod: DSMHTTPMethod,
+        timeoutInterval: TimeInterval?
     ) throws -> URLRequest {
         switch httpMethod {
         case .get:
-            return URLRequest(url: try makeURL(path: path, parameters: parameters))
+            var request = URLRequest(url: try makeURL(path: path, parameters: parameters))
+            if let timeoutInterval { request.timeoutInterval = timeoutInterval }
+            return request
         case .post:
             var request = URLRequest(url: try makeURL(path: path, parameters: [:]))
+            if let timeoutInterval { request.timeoutInterval = timeoutInterval }
             var body = URLComponents()
             body.queryItems = parameters
                 .sorted { $0.key < $1.key }
