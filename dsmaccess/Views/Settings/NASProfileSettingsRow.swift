@@ -33,7 +33,7 @@ struct NASProfileSettingsRow: View {
                     .onSubmit(rename)
                     .accessibilityLabel("Nom du NAS")
                     .help("Modifier le nom affiché pour ce NAS")
-                Text("\(profile.account) — \(profile.host):\(profile.port)")
+                connectionDescription
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
@@ -61,5 +61,15 @@ struct NASProfileSettingsRow: View {
             String(localized: "NAS renommé \(name)"),
             category: .result
         )
+    }
+
+    @ViewBuilder
+    private var connectionDescription: some View {
+        switch profile.connection {
+        case .direct(let endpoint):
+            Text("\(profile.account) — \(endpoint.host):\(endpoint.port)")
+        case .quickConnect(let id):
+            Text("\(profile.account) — QuickConnect \(id)")
+        }
     }
 }

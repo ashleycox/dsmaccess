@@ -7,17 +7,17 @@
 
 import Foundation
 
-/// Point d'accès d'un NAS Synology sur le réseau local.
-struct DSMEndpoint: Equatable, Sendable {
+/// Point d'accès réseau utilisé pour joindre un NAS Synology.
+nonisolated struct DSMEndpoint: Equatable, Sendable {
     var useHTTPS: Bool
     var host: String
     var port: Int
 
-    nonisolated var scheme: String { useHTTPS ? "https" : "http" }
+    var scheme: String { useHTTPS ? "https" : "http" }
 
-    nonisolated var trustStoreKey: String { "\(host.lowercased()):\(port)" }
+    var trustStoreKey: String { "\(host.lowercased()):\(port)" }
 
-    nonisolated func credentialStoreKey(account: String) -> String {
+    func credentialStoreKey(account: String) -> String {
         "\(account)@\(scheme)://\(host.lowercased()):\(port)"
     }
 

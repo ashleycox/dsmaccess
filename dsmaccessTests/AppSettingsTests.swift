@@ -88,7 +88,7 @@ struct AppSettingsTests {
         let session = SessionStore()
 
         #expect(session.connectionProfile == profile)
-        #expect(Preferences.lastHost == profile.host)
+        #expect(Preferences.lastHost == profile.connection.directEndpoint?.host)
         #expect(Preferences.lastAccount == profile.account)
     }
 
@@ -127,5 +127,42 @@ struct AppSettingsTests {
         #expect(session.connectionProfile == nil)
         #expect(Preferences.lastHost.isEmpty)
         #expect(Preferences.lastAccount.isEmpty)
+    }
+
+    @Test func restoresASelectedQuickConnectProfileWithoutSavingARelayHost() {
+        let previousProfiles = Preferences.nasProfiles
+        let previousSelection = Preferences.selectedNASProfileID
+        let previousHost = Preferences.lastHost
+        let previousPort = Preferences.lastPort
+        let previousHTTPS = Preferences.lastUseHTTPS
+        let previousAccount = Preferences.lastAccount
+        let previousRememberPassword = Preferences.rememberPassword
+        defer {
+            Preferences.nasProfiles = previousProfiles
+            Preferences.selectedNASProfileID = previousSelection
+            Preferences.lastHost = previousHost
+            Preferences.lastPort = previousPort
+            Preferences.lastUseHTTPS = previousHTTPS
+            Preferences.lastAccount = previousAccount
+            Preferences.rememberPassword = previousRememberPassword
+        }
+
+        let profile = NASProfile(
+            name: "Studio NAS",
+            connection: .quickConnect(id: "My-NAS"),
+            account: "alex",
+            remembersPassword: false
+        )
+        Preferences.nasProfiles = [profile]
+        Preferences.selectedNASProfileID = profile.id
+
+        let session = SessionStore()
+        let model = ConnectionViewModel(session: session)
+
+        #expect(session.connectionProfile == profile)
+        #expect(Preferences.lastHost.isEmpty)
+        #expect(Preferences.lastPort == nil)
+        #expect(model.connectionMethod == .quickConnect)
+        #expect(model.quickConnectID == "My-NAS")
     }
 }
