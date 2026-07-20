@@ -61,12 +61,20 @@ final class ConnectionViewModel {
         self.rememberPassword = profile?.remembersPassword ?? Preferences.rememberPassword
         self.errorMessage = session.consumeDisconnectionMessage()
         // Reconnexion possible au lancement si un mot de passe est mémorisé pour ce NAS.
-        if Preferences.rememberPassword, !host.isEmpty, !account.isEmpty {
+        if Preferences.rememberPassword, !host.isEmpty, !account.isEmpty, !Self.isRunningHostedTests {
             let endpoint = DSMEndpoint(useHTTPS: https, host: host, port: effectivePort)
             self.isRestoring = CredentialStore.password(account: account, endpoint: endpoint) != nil
         } else {
             self.isRestoring = false
         }
+    }
+
+    // Les tests unitaires hébergés par l'app ne doivent toucher ni au Trousseau ni au NAS :
+    // la lecture du Trousseau déclenche l'invite système et suspend le lanceur de tests.
+    private static var isRunningHostedTests: Bool {
+        let environment = ProcessInfo.processInfo.environment
+        return environment["DSM_ACCESS_BACKGROUND_TESTS"] == "YES"
+            || environment["XCTestConfigurationFilePath"] != nil
     }
 
     /// Port validé. Une saisie non numérique ou hors plage n'est jamais remplacée en silence.
