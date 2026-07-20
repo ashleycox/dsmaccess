@@ -51,7 +51,7 @@ struct DSMGroup: nonisolated Decodable, Identifiable, Hashable, Sendable {
     let name: String
     let description: String?
     let gid: Int?
-    let members: [String]
+    var members: [String]
 
     var id: String { name }
 
@@ -81,6 +81,23 @@ struct DSMUserList: nonisolated Decodable, Sendable {
     nonisolated init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         users = try values.decodeIfPresent([DSMUser].self, forKey: .users) ?? []
+    }
+}
+
+/// Réponse de `SYNO.Core.Group.Member list` : les comptes appartenant à un groupe.
+struct DSMGroupMemberList: nonisolated Decodable, Sendable {
+    let names: [String]
+
+    enum CodingKeys: String, CodingKey { case users }
+
+    private struct Member: nonisolated Decodable {
+        let name: String
+    }
+
+    nonisolated init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        let users = try values.decodeIfPresent([Member].self, forKey: .users) ?? []
+        names = users.map(\.name)
     }
 }
 

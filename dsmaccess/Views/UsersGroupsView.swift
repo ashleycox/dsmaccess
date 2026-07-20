@@ -22,6 +22,7 @@ struct UsersGroupsView: View {
     @State private var showCreateGroup = false
     @State private var userToDelete: DSMUser?
     @State private var groupToDelete: DSMGroup?
+    @State private var operationFailure: String?
     @AccessibilityFocusState private var contentFocused: Bool
 
     init(session: SessionStore) {
@@ -51,6 +52,20 @@ struct UsersGroupsView: View {
             .sheet(item: $groupToDelete) { group in
                 AccountDeletionSheet(name: group.name, kind: .group) {
                     Task { await announce(viewModel.deleteGroup(group)) }
+                }
+            }
+            .alert(
+                "Erreur",
+                isPresented: Binding(
+                    get: { operationFailure != nil },
+                    set: { if !$0 { operationFailure = nil } }
+                )
+            ) {
+                Button("OK", role: .cancel) { }
+                    .help("Fermer le message d’erreur")
+            } message: {
+                if let operationFailure {
+                    Text(operationFailure)
                 }
             }
     }
@@ -299,7 +314,13 @@ struct UsersGroupsView: View {
     }
 
     private func announce(_ outcome: DSMOperationOutcome) async {
-        VoiceOver.announce(outcome, priority: .high)
+        // Un échec s'affiche dans une alerte, que VoiceOver lit de lui-même ; une annonce
+        // en plus ferait double narration.
+        if case .failure(let message) = outcome {
+            operationFailure = message
+        } else {
+            VoiceOver.announce(outcome, priority: .high)
+        }
     }
 }
 

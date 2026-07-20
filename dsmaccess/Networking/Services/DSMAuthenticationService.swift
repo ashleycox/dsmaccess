@@ -9,7 +9,10 @@ import Foundation
 
 @MainActor
 final class DSMAuthenticationService {
-    private static let api = DSMAPI("SYNO.API.Auth", preferredVersion: 6, minimumVersion: 3)
+    // DSM 7.4 accorde aux sessions ouvertes en v6 des droits réduits : les mutations de
+    // SYNO.Core.User/Group échouent en 402 même pour un administrateur. Le login v7 obtient
+    // une session complète ; les NAS plus anciens retombent sur leur version maximale.
+    private static let api = DSMAPI("SYNO.API.Auth", preferredVersion: 7, minimumVersion: 3)
     private static let sessionName = "DSMAccess"
 
     private let transport: DSMTransport

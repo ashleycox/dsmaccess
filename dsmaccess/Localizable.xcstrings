@@ -4450,6 +4450,16 @@
         }
       }
     },
+    "Fermer le message d’erreur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dismiss the error message"
+          }
+        }
+      }
+    },
     "Fermer les informations" : {
       "localizations" : {
         "en" : {
@@ -6244,6 +6254,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Serial number"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }

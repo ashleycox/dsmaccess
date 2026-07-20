@@ -11,6 +11,7 @@ import Foundation
 final class DSMAccountService {
     private static let userAPI = DSMAPI("SYNO.Core.User")
     private static let groupAPI = DSMAPI("SYNO.Core.Group")
+    private static let groupMemberAPI = DSMAPI("SYNO.Core.Group.Member")
 
     private let transport: DSMTransport
 
@@ -39,11 +40,23 @@ final class DSMAccountService {
             parameters: [
                 "offset": .integer(0),
                 "limit": .integer(-1),
-                "additional": try DSMParameter.json(["description", "members"]),
+                "additional": try DSMParameter.json(["description"]),
             ],
             as: DSMGroupList.self
         )
-        return result.groups.filter { !$0.name.isEmpty }
+        var groups = result.groups.filter { !$0.name.isEmpty }
+        // DSM ignore « members » dans l'additional de la liste ; les membres ne s'obtiennent
+        // que groupe par groupe, via SYNO.Core.Group.Member.
+        for index in groups.indices {
+            let members = try await transport.read(
+                api: Self.groupMemberAPI,
+                method: "list",
+                parameters: ["group": .string(groups[index].name)],
+                as: DSMGroupMemberList.self
+            )
+            groups[index].members = members.names
+        }
+        return groups
     }
 
     func createUser(_ draft: DSMUserDraft) async throws {
