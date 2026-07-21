@@ -40,6 +40,9 @@ final class ConnectionViewModel {
     private var lastError: DSMError?
     /// Empêche de relancer la reconnexion automatique plus d'une fois.
     private var hasRunStartup = false
+    /// Non nul quand cet écran de connexion fait suite à une expiration de session :
+    /// si la reconnexion automatique aboutit, l'interface connectée doit le signaler.
+    private let expiredSessionMessage: String?
 
     private let session: SessionStore
     private var client: DSMClient?
@@ -59,7 +62,9 @@ final class ConnectionViewModel {
         self.useHTTPS = https
         self.portText = String(effectivePort)
         self.rememberPassword = profile?.remembersPassword ?? Preferences.rememberPassword
-        self.errorMessage = session.consumeDisconnectionMessage()
+        let disconnectionMessage = session.consumeDisconnectionMessage()
+        self.expiredSessionMessage = disconnectionMessage
+        self.errorMessage = disconnectionMessage
         // Reconnexion possible au lancement si un mot de passe est mémorisé pour ce NAS.
         if Preferences.rememberPassword, !host.isEmpty, !account.isEmpty, !Self.isRunningHostedTests {
             let endpoint = DSMEndpoint(useHTTPS: https, host: host, port: effectivePort)
@@ -198,6 +203,9 @@ final class ConnectionViewModel {
             }
         }
         isRestoring = false
+        if session.isLoggedIn, expiredSessionMessage != nil {
+            session.publishAutomaticReconnectionNotice()
+        }
 
         if !session.isLoggedIn, lastError?.isCredentialFailure == true {
             CredentialStore.forget(account: cleanedAccount, endpoint: endpoint)

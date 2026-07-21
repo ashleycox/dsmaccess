@@ -28,6 +28,11 @@ final class SessionStore {
     /// Motif d'une déconnexion imposée, consommé par l'écran de connexion.
     private(set) var disconnectionMessage: String?
 
+    /// Avis présenté dans l'interface connectée quand la session a été rétablie
+    /// automatiquement après une expiration : sans lui, l'utilisateur revient sur la vue
+    /// d'ensemble sans savoir que son opération a été interrompue.
+    private(set) var reconnectionNotice: String?
+
     var isLoggedIn: Bool { client != nil }
 
     var activeProfile: NASProfile? {
@@ -171,6 +176,18 @@ final class SessionStore {
         return disconnectionMessage
     }
 
+    /// À appeler après une reconnexion automatique consécutive à une expiration,
+    /// quand l'écran de connexion n'a été qu'un état transitoire invisible.
+    func publishAutomaticReconnectionNotice() {
+        reconnectionNotice = String(
+            localized: "La session avait expiré et la connexion a été rétablie automatiquement. Si une opération était en cours, elle a été interrompue : vérifiez son état avant de la relancer."
+        )
+    }
+
+    func dismissReconnectionNotice() {
+        reconnectionNotice = nil
+    }
+
     /// Réinitialise l'état (après logout ou expiration de session).
     func clear() {
         generation += 1
@@ -178,6 +195,7 @@ final class SessionStore {
         self.client = nil
         capabilities = DSMCapabilities()
         activeProfileID = nil
+        reconnectionNotice = nil
     }
 
     private func expireSession() {

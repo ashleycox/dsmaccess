@@ -15,6 +15,7 @@ struct MainView: View {
     @State private var isRenamingNAS = false
     @State private var proposedNASName = ""
     @AccessibilityFocusState private var sidebarFocusedModule: AppModule?
+    @AccessibilityFocusState private var focusReconnectionNotice: Bool
 
     init(session: SessionStore) {
         self.session = session
@@ -84,8 +85,10 @@ struct MainView: View {
             // Let SwiftUI finish replacing the destination and its toolbar before
             // restoring the VoiceOver cursor to the row that initiated navigation.
             await Task.yield()
+            guard session.reconnectionNotice == nil else { return }
             sidebarFocusedModule = selection
         }
+        .safeAreaInset(edge: .top, spacing: 0) { reconnectionNoticeBanner }
         .alert("Renommer le NAS", isPresented: $isRenamingNAS) {
             TextField("Nom du NAS", text: $proposedNASName)
                 .help("Saisir le nouveau nom du NAS")
@@ -96,6 +99,33 @@ struct MainView: View {
                 .help("Annuler le changement de nom")
         } message: {
             Text("Choisissez le nom affiché dans DSM Access.")
+        }
+    }
+
+    /// Signale qu'une expiration de session a interrompu le travail en cours, car la
+    /// reconnexion automatique ramène ici sans passage visible par l'écran de connexion.
+    @ViewBuilder
+    private var reconnectionNoticeBanner: some View {
+        if let notice = session.reconnectionNotice {
+            HStack {
+                Label(notice, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                    .accessibilityFocused($focusReconnectionNotice)
+                Spacer()
+                Button("Fermer l’avis") {
+                    session.dismissReconnectionNotice()
+                    sidebarFocusedModule = selection
+                }
+                .help("Masquer l’avis de reconnexion")
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            // Fond opaque : l'encart flotte au-dessus des colonnes de la fenêtre.
+            .background(.bar)
+            .onAppear {
+                VoiceOver.announce(notice, category: .error, priority: .high)
+                focusReconnectionNotice = true
+            }
         }
     }
 
