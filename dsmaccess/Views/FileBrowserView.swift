@@ -90,12 +90,17 @@ struct FileBrowserView: View {
                 announceSummary()
             }
             .task(id: searchText) {
+                // Au premier affichage cette tâche part avec un champ vide, avant la fin
+                // du chargement : sans recherche à lancer ni à effacer, ne rien annoncer
+                // (sinon VoiceOver entend « Dossier vide » puis le vrai contenu).
+                let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+                if query.isEmpty && !vm.isShowingSearchResults { return }
                 do {
-                    if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    if !query.isEmpty {
                         try await Task.sleep(for: .milliseconds(300))
                     }
                     try Task.checkCancellation()
-                    if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    if !query.isEmpty {
                         VoiceOver.announce(
                             String(localized: "Recherche en cours…"),
                             category: .progress,
