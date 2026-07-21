@@ -56,6 +56,33 @@ final class dsmaccessUITests: XCTestCase {
     }
 
     @MainActor
+    func testQuickConnectFormSupportsKeyboardEntryAndAccessibility() throws {
+        let connectionMethod = app.segmentedControls["login.connection-method"]
+        XCTAssertTrue(connectionMethod.exists)
+        connectionMethod.buttons["QuickConnect"].click()
+
+        let quickConnectID = app.textFields["login.quickconnect-id"]
+        let account = app.textFields["login.account"]
+        let password = app.secureTextFields["login.password"]
+        let submit = app.buttons["login.submit"]
+        XCTAssertTrue(quickConnectID.waitForExistence(timeout: 2))
+        XCTAssertFalse(app.textFields["login.host"].exists)
+        XCTAssertFalse(app.textFields["login.port"].exists)
+
+        replaceText(in: quickConnectID, with: "my.nas")
+        XCTAssertTrue(app.staticTexts["login.quickconnect-error"].waitForExistence(timeout: 2))
+
+        replaceText(in: quickConnectID, with: "My-NAS")
+        replaceText(in: account, with: "tester")
+        password.click()
+        password.typeText("not-a-real-password")
+
+        XCTAssertTrue(app.staticTexts["login.quickconnect-error"].waitForNonExistence(timeout: 2))
+        XCTAssertTrue(submit.isEnabled)
+        try performAccessibilityAudit()
+    }
+
+    @MainActor
     func testEnglishLoginLocalization() throws {
         app.terminate()
         app = makeApplication(language: "en", locale: "en_GB")

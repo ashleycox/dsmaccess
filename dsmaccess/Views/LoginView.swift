@@ -2,8 +2,8 @@
 //  LoginView.swift
 //  dsmaccess
 //
-//  Écran de connexion : adresse du NAS, HTTPS, port, identifiants. Bascule vers la
-//  saisie du code de vérification si DSM le réclame (état needsOTP).
+//  Écran de connexion directe ou QuickConnect. Bascule vers la saisie du code de
+//  vérification si DSM le réclame (état needsOTP).
 //
 
 import SwiftUI
@@ -13,7 +13,7 @@ struct LoginView: View {
     @AccessibilityFocusState private var focusError: Bool
     @AccessibilityFocusState private var focusRestoring: Bool
     @AccessibilityFocusState private var focusHost: Bool
-    @FocusState private var hostFocused: Bool
+    @FocusState private var connectionFieldFocused: Bool
 
     init(session: SessionStore) {
         _vm = State(initialValue: ConnectionViewModel(session: session))
@@ -61,7 +61,7 @@ struct LoginView: View {
         VStack(spacing: 16) {
             ProgressView()
                 .accessibilityLabel("Reconnexion en cours")
-            Text("Reconnexion à \(vm.host)…")
+            Text("Reconnexion à \(vm.connectionLabel)…")
                 .font(.title2.bold())
                 .accessibilityAddTraits(.isHeader)
                 .accessibilityFocused($focusRestoring)
@@ -88,28 +88,55 @@ struct LoginView: View {
                     .accessibilityIdentifier("login.title")
 
                 VStack(alignment: .leading, spacing: 12) {
-                    LabeledField(label: "Adresse du NAS (IP ou nom)") {
-                        TextField("192.168.1.10", text: $vm.host)
-                            .textContentType(.URL)
-                            .focused($hostFocused)
-                            .accessibilityFocused($focusHost)
-                            .accessibilityIdentifier("login.host")
-                            .help("Adresse IP ou nom réseau du NAS")
+                    Picker("Méthode de connexion", selection: $vm.connectionMethod) {
+                        Text("Adresse directe").tag(ConnectionViewModel.ConnectionMethod.direct)
+                        Text("QuickConnect").tag(ConnectionViewModel.ConnectionMethod.quickConnect)
                     }
-                    Toggle("Utiliser HTTPS (connexion sécurisée)", isOn: $vm.useHTTPS)
-                        .onChange(of: vm.useHTTPS) { _, _ in vm.syncDefaultPortIfNeeded() }
-                        .accessibilityIdentifier("login.https")
-                        .help("Utiliser une connexion HTTPS chiffrée")
-                    LabeledField(label: "Port") {
-                        TextField("5000", text: $vm.portText)
-                            .accessibilityIdentifier("login.port")
-                            .help("Port réseau utilisé par DSM")
-                    }
-                    if let portError = vm.portValidationMessage {
-                        Text(portError)
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                            .accessibilityIdentifier("login.port-error")
+                    .pickerStyle(.segmented)
+                    .accessibilityIdentifier("login.connection-method")
+                    .help("Choisir comment rechercher le NAS")
+
+                    if vm.connectionMethod == .direct {
+                        LabeledField(label: "Adresse du NAS (IP ou nom)") {
+                            TextField("192.168.1.10", text: $vm.host)
+                                .textContentType(.URL)
+                                .focused($connectionFieldFocused)
+                                .accessibilityFocused($focusHost)
+                                .accessibilityIdentifier("login.host")
+                                .help("Adresse IP ou nom réseau du NAS")
+                        }
+                        Toggle("Utiliser HTTPS (connexion sécurisée)", isOn: $vm.useHTTPS)
+                            .onChange(of: vm.useHTTPS) { _, _ in vm.syncDefaultPortIfNeeded() }
+                            .accessibilityIdentifier("login.https")
+                            .help("Utiliser une connexion HTTPS chiffrée")
+                        LabeledField(label: "Port") {
+                            TextField("5000", text: $vm.portText)
+                                .accessibilityIdentifier("login.port")
+                                .help("Port réseau utilisé par DSM")
+                        }
+                        if let portError = vm.portValidationMessage {
+                            Text(portError)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .accessibilityIdentifier("login.port-error")
+                        }
+                    } else {
+                        LabeledField(label: "Identifiant QuickConnect") {
+                            TextField("MonNAS", text: $vm.quickConnectID)
+                                .focused($connectionFieldFocused)
+                                .accessibilityFocused($focusHost)
+                                .accessibilityIdentifier("login.quickconnect-id")
+                                .help("Identifiant QuickConnect configuré dans DSM")
+                        }
+                        if let quickConnectError = vm.quickConnectValidationMessage {
+                            Text(quickConnectError)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .accessibilityIdentifier("login.quickconnect-error")
+                        }
+                        Text("Compatibilité non officielle : Synology peut modifier ce service sans préavis.")
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
                     }
                     LabeledField(label: "Nom d'utilisateur") {
                         TextField("", text: $vm.account)
@@ -128,6 +155,7 @@ struct LoginView: View {
                         .accessibilityIdentifier("login.remember-password")
                         .help("Mémoriser le mot de passe dans le Trousseau pour les prochaines ouvertures")
                 }
+                .disabled(vm.state != .editing)
 
                 if let error = vm.errorMessage {
                     Text(error)
@@ -136,11 +164,11 @@ struct LoginView: View {
                 }
 
                 HStack(spacing: 12) {
-                    if vm.state == .connecting {
+                    if let progress = vm.progressMessage {
                         ProgressView()
                             .controlSize(.small)
-                            .accessibilityLabel("Connexion en cours")
-                        Text("Connexion en cours…")
+                            .accessibilityLabel(Text(verbatim: progress))
+                        Text(verbatim: progress)
                             .foregroundStyle(.secondary)
                             .accessibilityHidden(true)
                     }
@@ -158,12 +186,17 @@ struct LoginView: View {
             .frame(maxWidth: 460)
         }
         .onChange(of: vm.state) { _, newValue in
-            if newValue == .connecting {
+            if newValue == .connecting || newValue == .resolvingQuickConnect,
+               let progress = vm.progressMessage {
                 VoiceOver.announce(
-                    String(localized: "Connexion en cours"),
+                    progress,
                     category: .progress
                 )
             }
+        }
+        .onChange(of: vm.connectionMethod) { _, _ in
+            connectionFieldFocused = true
+            focusHost = true
         }
         .onChange(of: vm.errorMessage) { _, newValue in
             if let newValue {
@@ -176,7 +209,7 @@ struct LoginView: View {
                 focusError = true
                 VoiceOver.announce(error, category: .error, priority: .high)
             } else {
-                hostFocused = true
+                connectionFieldFocused = true
                 focusHost = true
             }
         }

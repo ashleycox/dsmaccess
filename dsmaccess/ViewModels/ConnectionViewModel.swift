@@ -12,14 +12,22 @@ import Observation
 @MainActor
 @Observable
 final class ConnectionViewModel {
+    enum ConnectionMethod: Hashable {
+        case direct
+        case quickConnect
+    }
+
     enum State: Equatable {
         case editing      // saisie des identifiants
+        case resolvingQuickConnect
         case connecting   // tentative en cours
         case needsOTP     // DSM réclame un code de vérification
     }
 
     // Champs du formulaire (pré-remplis depuis les préférences si disponibles).
+    var connectionMethod: ConnectionMethod
     var host: String
+    var quickConnectID: String
     var useHTTPS: Bool
     var portText: String
     var account: String
@@ -45,18 +53,33 @@ final class ConnectionViewModel {
     private let expiredSessionMessage: String?
 
     private let session: SessionStore
+    private let quickConnectResolver: QuickConnectResolver
     private var client: DSMClient?
     private var pendingEndpoint: DSMEndpoint?
+    private var pendingTarget: NASConnectionTarget?
 
-    init(session: SessionStore) {
+    init(
+        session: SessionStore,
+        quickConnectResolver: QuickConnectResolver = QuickConnectResolver()
+    ) {
         self.session = session
+        self.quickConnectResolver = quickConnectResolver
         let profile = session.connectionProfile
-        let https = profile?.useHTTPS ?? Preferences.lastUseHTTPS
-        let host = profile?.host ?? Preferences.lastHost
+        let savedTarget = profile?.connection
+        let directEndpoint = savedTarget?.directEndpoint
+        let https = directEndpoint?.useHTTPS ?? Preferences.lastUseHTTPS
+        let host = directEndpoint?.host ?? Preferences.lastHost
         let account = profile?.account ?? Preferences.lastAccount
-        let effectivePort = profile?.port
+        let effectivePort = directEndpoint?.port
             ?? Preferences.lastPort
             ?? DSMEndpoint.defaultPort(useHTTPS: https)
+        if case .quickConnect(let id) = savedTarget {
+            self.connectionMethod = .quickConnect
+            self.quickConnectID = id
+        } else {
+            self.connectionMethod = .direct
+            self.quickConnectID = ""
+        }
         self.host = host
         self.account = account
         self.useHTTPS = https
@@ -66,9 +89,15 @@ final class ConnectionViewModel {
         self.expiredSessionMessage = disconnectionMessage
         self.errorMessage = disconnectionMessage
         // Reconnexion possible au lancement si un mot de passe est mémorisé pour ce NAS.
-        if Preferences.rememberPassword, !host.isEmpty, !account.isEmpty, !Self.isRunningHostedTests {
-            let endpoint = DSMEndpoint(useHTTPS: https, host: host, port: effectivePort)
-            self.isRestoring = CredentialStore.password(account: account, endpoint: endpoint) != nil
+        if Preferences.rememberPassword,
+           !account.isEmpty,
+           !Self.isRunningHostedTests,
+           let target = savedTarget ?? Self.directTarget(
+               host: host,
+               useHTTPS: https,
+               port: effectivePort
+           ) {
+            self.isRestoring = CredentialStore.password(account: account, target: target) != nil
         } else {
             self.isRestoring = false
         }
@@ -89,16 +118,43 @@ final class ConnectionViewModel {
     }
 
     var canSubmit: Bool {
-        !host.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        connectionTarget != nil
             && !account.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && !password.isEmpty
-            && port != nil
-            && state != .connecting
+            && state == .editing
     }
 
     var portValidationMessage: String? {
+        guard connectionMethod == .direct else { return nil }
         guard port == nil else { return nil }
         return String(localized: "Le port doit être un nombre compris entre 1 et 65535.")
+    }
+
+    var quickConnectValidationMessage: String? {
+        guard connectionMethod == .quickConnect else { return nil }
+        let id = quickConnectID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !id.isEmpty, !QuickConnectResolver.isValid(id: id) else { return nil }
+        return String(localized: "L’identifiant QuickConnect n’est pas valide.")
+    }
+
+    var connectionLabel: String {
+        switch connectionMethod {
+        case .direct:
+            host.trimmingCharacters(in: .whitespacesAndNewlines)
+        case .quickConnect:
+            quickConnectID.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+    }
+
+    var progressMessage: String? {
+        switch state {
+        case .resolvingQuickConnect:
+            String(localized: "Recherche du NAS avec QuickConnect…")
+        case .connecting:
+            String(localized: "Connexion en cours…")
+        case .editing, .needsOTP:
+            nil
+        }
     }
 
     /// Ajuste le port par défaut quand on bascule HTTP/HTTPS, si l'utilisateur n'a pas
@@ -119,41 +175,52 @@ final class ConnectionViewModel {
     }
 
     private func connect(reusingPendingClient: Bool) async {
-        let cleanedHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanedAccount = account.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleanedHost.isEmpty, !cleanedAccount.isEmpty, !password.isEmpty else {
-            errorMessage = String(localized: "Veuillez renseigner l'adresse, le nom d'utilisateur et le mot de passe.")
+        guard !cleanedAccount.isEmpty, !password.isEmpty else {
+            errorMessage = String(localized: "Veuillez renseigner le nom d’utilisateur et le mot de passe.")
             return
         }
 
-        guard let port else {
-            errorMessage = String(localized: "Le port doit être un nombre compris entre 1 et 65535.")
+        guard let target = connectionTarget else {
+            errorMessage = connectionValidationMessage
             return
         }
-        let endpoint = DSMEndpoint(useHTTPS: useHTTPS, host: cleanedHost, port: port)
-        let activeClient: DSMClient
-        if reusingPendingClient,
-           pendingEndpoint == endpoint,
-           let client {
-            activeClient = client
-        } else {
-            activeClient = DSMClient(endpoint: endpoint)
-            client = activeClient
-            pendingEndpoint = endpoint
-        }
 
-        state = .connecting
+        state = connectionMethod == .quickConnect && !reusingPendingClient
+            ? .resolvingQuickConnect
+            : .connecting
         errorMessage = nil
         lastError = nil
 
-        let deviceID = CredentialStore.deviceID(account: cleanedAccount, endpoint: endpoint)
-
         do {
+            let endpoint: DSMEndpoint
+            let activeClient: DSMClient
+            if reusingPendingClient,
+               pendingTarget == target,
+               let pendingEndpoint,
+               let client {
+                endpoint = pendingEndpoint
+                activeClient = client
+            } else {
+                endpoint = try await resolvedEndpoint(for: target)
+                try Task.checkCancellation()
+                activeClient = DSMClient(endpoint: endpoint)
+                client = activeClient
+                pendingEndpoint = endpoint
+                pendingTarget = target
+            }
+            state = .connecting
+            let deviceID = CredentialStore.deviceID(account: cleanedAccount, target: target)
             let result = try await activeClient.login(
                 account: cleanedAccount, password: password,
                 otpCode: nil, deviceID: deviceID, rememberDevice: false
             )
-            try await finish(with: result, account: cleanedAccount, endpoint: endpoint)
+            try await finish(
+                with: result,
+                account: cleanedAccount,
+                target: target,
+                endpoint: endpoint
+            )
         } catch DSMError.needsOTP {
             state = .needsOTP
             errorMessage = nil
@@ -161,6 +228,8 @@ final class ConnectionViewModel {
             state = .editing
             pendingCertificateFingerprint = fingerprint
             errorMessage = nil
+        } catch where DSMError.isCancellation(error) {
+            state = .editing
         } catch {
             state = .editing
             lastError = error as? DSMError
@@ -175,22 +244,24 @@ final class ConnectionViewModel {
         guard isRestoring, !hasRunStartup else { return }
         hasRunStartup = true
 
-        let cleanedHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanedAccount = account.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let port else {
+        guard let target = connectionTarget else {
             isRestoring = false
-            errorMessage = String(localized: "Le port doit être un nombre compris entre 1 et 65535.")
+            errorMessage = connectionValidationMessage
             return
         }
-        let endpoint = DSMEndpoint(useHTTPS: useHTTPS, host: cleanedHost, port: port)
-        guard let saved = CredentialStore.password(account: cleanedAccount, endpoint: endpoint) else {
+        guard let saved = CredentialStore.password(account: cleanedAccount, target: target) else {
             isRestoring = false
             return
         }
 
         for attempt in 0..<3 {
             password = saved
-            await connect()
+            if connectionMethod == .quickConnect, pendingTarget == target {
+                await connect(reusingPendingClient: true)
+            } else {
+                await connect()
+            }
             if session.isLoggedIn || !hasTransientNetworkFailure || attempt == 2 {
                 break
             }
@@ -208,7 +279,7 @@ final class ConnectionViewModel {
         }
 
         if !session.isLoggedIn, lastError?.isCredentialFailure == true {
-            CredentialStore.forget(account: cleanedAccount, endpoint: endpoint)
+            CredentialStore.forget(account: cleanedAccount, target: target)
             rememberPassword = false
             password = ""
         }
@@ -216,7 +287,9 @@ final class ConnectionViewModel {
 
     /// Soumission du code de vérification après un 403.
     func submitOTP() async {
-        guard let client, let endpoint = pendingEndpoint else { return }
+        guard let client,
+              let endpoint = pendingEndpoint,
+              let target = pendingTarget else { return }
         let cleanedAccount = account.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !otpCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             errorMessage = String(localized: "Saisissez le code de vérification.")
@@ -232,7 +305,12 @@ final class ConnectionViewModel {
                 otpCode: otpCode.trimmingCharacters(in: .whitespacesAndNewlines),
                 deviceID: nil, rememberDevice: rememberDevice
             )
-            try await finish(with: result, account: cleanedAccount, endpoint: endpoint)
+            try await finish(
+                with: result,
+                account: cleanedAccount,
+                target: target,
+                endpoint: endpoint
+            )
         } catch DSMError.badOTP {
             state = .needsOTP
             otpCode = ""
@@ -275,12 +353,18 @@ final class ConnectionViewModel {
         pendingCertificateFingerprint = nil
         client = nil
         pendingEndpoint = nil
+        pendingTarget = nil
         state = .editing
     }
 
     // MARK: - Interne
 
-    private func finish(with result: LoginResult, account: String, endpoint: DSMEndpoint) async throws {
+    private func finish(
+        with result: LoginResult,
+        account: String,
+        target: NASConnectionTarget,
+        endpoint: DSMEndpoint
+    ) async throws {
         guard let client else { return }
         let capabilities: DSMCapabilities
         do {
@@ -290,7 +374,7 @@ final class ConnectionViewModel {
             throw error
         }
         if rememberDevice, let did = result.did, !did.isEmpty {
-            CredentialStore.remember(deviceID: did, account: account, endpoint: endpoint)
+            CredentialStore.remember(deviceID: did, account: account, target: target)
         }
         // Mémoriser (ou oublier) le mot de passe selon le choix « Rester connecté ».
         let remembersPassword: Bool
@@ -298,15 +382,16 @@ final class ConnectionViewModel {
             remembersPassword = CredentialStore.remember(
                 password: password,
                 account: account,
-                endpoint: endpoint
+                target: target
             )
             rememberPassword = remembersPassword
         } else {
-            CredentialStore.forget(account: account, endpoint: endpoint)
+            CredentialStore.forget(account: account, target: target)
             remembersPassword = false
         }
-        persistPreferences(account: account, endpoint: endpoint)
+        persistPreferences(account: account, target: target)
         session.establish(
+            target: target,
             endpoint: endpoint,
             client: client,
             capabilities: capabilities,
@@ -326,10 +411,58 @@ final class ConnectionViewModel {
         return false
     }
 
-    private func persistPreferences(account: String, endpoint: DSMEndpoint) {
-        Preferences.lastHost = endpoint.host
-        Preferences.lastPort = endpoint.port
-        Preferences.lastUseHTTPS = endpoint.useHTTPS
+    private var connectionTarget: NASConnectionTarget? {
+        switch connectionMethod {
+        case .direct:
+            guard let port else { return nil }
+            return Self.directTarget(host: host, useHTTPS: useHTTPS, port: port)
+        case .quickConnect:
+            let id = quickConnectID.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard QuickConnectResolver.isValid(id: id) else { return nil }
+            return .quickConnect(id: id)
+        }
+    }
+
+    private var connectionValidationMessage: String {
+        switch connectionMethod {
+        case .direct where host.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty:
+            String(localized: "Veuillez renseigner l’adresse du NAS.")
+        case .direct:
+            String(localized: "Le port doit être un nombre compris entre 1 et 65535.")
+        case .quickConnect:
+            String(localized: "L’identifiant QuickConnect n’est pas valide.")
+        }
+    }
+
+    private func resolvedEndpoint(for target: NASConnectionTarget) async throws -> DSMEndpoint {
+        switch target {
+        case .direct(let endpoint):
+            endpoint
+        case .quickConnect(let id):
+            try await quickConnectResolver.resolve(id: id).endpoint
+        }
+    }
+
+    private static func directTarget(
+        host: String,
+        useHTTPS: Bool,
+        port: Int
+    ) -> NASConnectionTarget? {
+        let cleanedHost = host.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanedHost.isEmpty else { return nil }
+        return .direct(DSMEndpoint(useHTTPS: useHTTPS, host: cleanedHost, port: port))
+    }
+
+    private func persistPreferences(account: String, target: NASConnectionTarget) {
+        if let endpoint = target.directEndpoint {
+            Preferences.lastHost = endpoint.host
+            Preferences.lastPort = endpoint.port
+            Preferences.lastUseHTTPS = endpoint.useHTTPS
+        } else {
+            Preferences.lastHost = ""
+            Preferences.lastPort = nil
+            Preferences.lastUseHTTPS = true
+        }
         Preferences.lastAccount = account
     }
 }

@@ -4,6 +4,7 @@ actor DSMRequestStub {
     enum Result: Sendable {
         case timeout
         case response(Data)
+        case responseAtURL(Data, URL)
         case HTTPResponse(data: Data, statusCode: Int, contentType: String)
     }
 
@@ -28,6 +29,14 @@ actor DSMRequestStub {
             throw URLError(.timedOut)
         case .response(let data):
             return try response(data: data, statusCode: 200, contentType: "application/json", for: request)
+        case .responseAtURL(let data, let url):
+            return try response(
+                data: data,
+                statusCode: 200,
+                contentType: "application/json",
+                for: request,
+                responseURL: url
+            )
         case .HTTPResponse(let data, let statusCode, let contentType):
             return try response(
                 data: data,
@@ -55,9 +64,10 @@ actor DSMRequestStub {
         data: Data,
         statusCode: Int,
         contentType: String,
-        for request: URLRequest
+        for request: URLRequest,
+        responseURL: URL? = nil
     ) throws -> (Data, URLResponse) {
-            guard let url = request.url,
+            guard let url = responseURL ?? request.url,
                   let response = HTTPURLResponse(
                     url: url,
                     statusCode: statusCode,

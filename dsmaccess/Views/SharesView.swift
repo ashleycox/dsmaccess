@@ -111,9 +111,11 @@ struct SharesView: View {
             .help(String(localized: "Supprimer \(share.displayName)"))
         }
         .contextMenu {
-            Button("Copier le chemin SMB") { copySMBPath(for: share) }
-                .help("Copier le chemin SMB de ce dossier partagé")
-            Divider()
+            if session.connectionTarget?.directEndpoint != nil {
+                Button("Copier le chemin SMB") { copySMBPath(for: share) }
+                    .help("Copier le chemin SMB de ce dossier partagé")
+                Divider()
+            }
             Button("Supprimer…", role: .destructive) { pendingDelete = share }
                 .help("Supprimer ce dossier partagé")
         }
@@ -129,7 +131,7 @@ struct SharesView: View {
     }
 
     private func copySMBPath(for share: SharedFolder) {
-        guard let host = session.endpoint?.host else { return }
+        guard let host = session.connectionTarget?.directEndpoint?.host else { return }
         let path = "smb://\(host)/\(share.displayName)"
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(path, forType: .string)

@@ -13758,6 +13758,202 @@
         }
       }
     },
+    "%@ — QuickConnect %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ — QuickConnect %@"
+          }
+        }
+      }
+    },
+    "Adresse directe" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direct address"
+          }
+        }
+      }
+    },
+    "Cet identifiant QuickConnect est introuvable." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This QuickConnect ID could not be found."
+          }
+        }
+      }
+    },
+    "Choisir comment rechercher le NAS" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how to find the NAS"
+          }
+        }
+      }
+    },
+    "Compatibilité non officielle : Synology peut modifier ce service sans préavis." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unofficial compatibility: Synology may change this service without notice."
+          }
+        }
+      }
+    },
+    "Identifiant QuickConnect" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickConnect ID"
+          }
+        }
+      }
+    },
+    "Identifiant QuickConnect configuré dans DSM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickConnect ID configured in DSM"
+          }
+        }
+      }
+    },
+    "Impossible de joindre QuickConnect : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not reach QuickConnect: %@"
+          }
+        }
+      }
+    },
+    "L’accès à DSM par QuickConnect n’est pas activé sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickConnect access to DSM is not enabled on this NAS."
+          }
+        }
+      }
+    },
+    "L’identifiant QuickConnect n’est pas valide." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The QuickConnect ID is invalid."
+          }
+        }
+      }
+    },
+    "La réponse de QuickConnect n’a pas pu être vérifiée." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The QuickConnect response could not be verified."
+          }
+        }
+      }
+    },
+    "Le NAS associé à cet identifiant QuickConnect est hors ligne." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The NAS associated with this QuickConnect ID is offline."
+          }
+        }
+      }
+    },
+    "Le relais QuickConnect n’est pas activé sur ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickConnect relay is not enabled on this NAS."
+          }
+        }
+      }
+    },
+    "Méthode de connexion" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection method"
+          }
+        }
+      }
+    },
+    "MonNAS" : {
+      "shouldTranslate" : false
+    },
+    "QuickConnect" : {
+      "shouldTranslate" : false
+    },
+    "QuickConnect a refusé la connexion (code %lld)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickConnect refused the connection (code %lld)."
+          }
+        }
+      }
+    },
+    "QuickConnect n’a fourni aucune route HTTPS vérifiable vers ce NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QuickConnect did not provide a verifiable HTTPS route to this NAS."
+          }
+        }
+      }
+    },
+    "Recherche du NAS avec QuickConnect…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finding the NAS with QuickConnect…"
+          }
+        }
+      }
+    },
+    "Veuillez renseigner l’adresse du NAS." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter the NAS address."
+          }
+        }
+      }
+    },
+    "Veuillez renseigner le nom d’utilisateur et le mot de passe." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter the username and password."
+          }
+        }
+      }
+    },
     "État indisponible" : {
       "localizations" : {
         "en" : {
