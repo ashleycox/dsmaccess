@@ -97,7 +97,9 @@ struct FileStationModelsTests {
         draft.extensions = ".pdf; docx, jpg"
         draft.recursive = false
         draft.itemType = .file
-        draft.minimumSize = "1,024"
+        // La saisie est analysée selon la locale courante : produire le séparateur
+        // de milliers par la même locale garde le test déterministe partout.
+        draft.minimumSize = 1_024.formatted(.number)
         draft.maximumSize = "2048"
         draft.filtersModifiedDate = true
         draft.modifiedAfter = start
