@@ -68,4 +68,96 @@ struct FileStationModelsTests {
         #expect(!body.contains("\r\nX-Injected: oui.txt"))
         #expect(body.contains("\r\n\r\ncontenu\r\n--test-boundary--\r\n"))
     }
+
+    @Test func offersThumbnailPreviewOnlyForSupportedImageFiles() throws {
+        let decoder = JSONDecoder()
+        let image = try decoder.decode(
+            FileStationItem.self,
+            from: Data(#"{"name":"Photo.JPEG","path":"/photo/Photo.JPEG","isdir":false}"#.utf8)
+        )
+        let document = try decoder.decode(
+            FileStationItem.self,
+            from: Data(#"{"name":"report.pdf","path":"/docs/report.pdf","isdir":false}"#.utf8)
+        )
+        let folder = try decoder.decode(
+            FileStationItem.self,
+            from: Data(#"{"name":"photo.png","path":"/photo/photo.png","isdir":true}"#.utf8)
+        )
+
+        #expect(image.supportsThumbnailPreview)
+        #expect(!document.supportsThumbnailPreview)
+        #expect(!folder.supportsThumbnailPreview)
+    }
+
+    @Test func buildsAllAdvancedSearchCriteria() throws {
+        let start = Date(timeIntervalSince1970: 1_700_000_000)
+        let end = Date(timeIntervalSince1970: 1_800_000_000)
+        var draft = AdvancedFileSearchDraft()
+        draft.pattern = "rapport*"
+        draft.extensions = ".pdf; docx, jpg"
+        draft.recursive = false
+        draft.itemType = .file
+        draft.minimumSize = "1,024"
+        draft.maximumSize = "2048"
+        draft.filtersModifiedDate = true
+        draft.modifiedAfter = start
+        draft.modifiedBefore = end
+        draft.filtersCreatedDate = true
+        draft.createdAfter = start
+        draft.createdBefore = end
+        draft.filtersAccessedDate = true
+        draft.accessedAfter = start
+        draft.accessedBefore = end
+        draft.owner = "ashley"
+        draft.group = "users"
+
+        let criteria = try draft.criteria(folderPath: "/documents")
+
+        #expect(criteria.folderPaths == ["/documents"])
+        #expect(criteria.pattern == "rapport*")
+        #expect(criteria.extensions == "pdf,docx,jpg")
+        #expect(criteria.recursive == false)
+        #expect(criteria.itemType == .file)
+        #expect(criteria.minimumSize == 1_024)
+        #expect(criteria.maximumSize == 2_048)
+        #expect(criteria.modifiedAfter == start)
+        #expect(criteria.modifiedBefore == end)
+        #expect(criteria.createdAfter == start)
+        #expect(criteria.createdBefore == end)
+        #expect(criteria.accessedAfter == start)
+        #expect(criteria.accessedBefore == end)
+        #expect(criteria.owner == "ashley")
+        #expect(criteria.group == "users")
+    }
+
+    @Test func rejectsInvalidAdvancedSearchRanges() {
+        var draft = AdvancedFileSearchDraft()
+        draft.minimumSize = "200"
+        draft.maximumSize = "100"
+        #expect(throws: AdvancedFileSearchValidationError.self) {
+            try draft.criteria(folderPath: "/documents")
+        }
+
+        draft.minimumSize = ""
+        draft.maximumSize = ""
+        draft.filtersModifiedDate = true
+        draft.modifiedAfter = Date(timeIntervalSince1970: 200)
+        draft.modifiedBefore = Date(timeIntervalSince1970: 100)
+        #expect(throws: AdvancedFileSearchValidationError.self) {
+            try draft.criteria(folderPath: "/documents")
+        }
+    }
+
+    @Test func formatsAndParsesSharingDatesWithoutLocaleAmbiguity() throws {
+        let source = try #require(
+            Calendar(identifier: .gregorian).date(
+                from: DateComponents(timeZone: TimeZone(secondsFromGMT: 0), year: 2026, month: 7, day: 20)
+            )
+        )
+
+        #expect(sharingDateString(source) == "2026-07-20")
+        #expect(sharingDate("2026-07-20") == source)
+        #expect(sharingDate("0") == nil)
+        #expect(sharingDate(nil) == nil)
+    }
 }

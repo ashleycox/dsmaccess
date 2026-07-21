@@ -8,6 +8,7 @@
 
 import AppKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct FileBrowserView: View {
     @State private var vm: FileBrowserViewModel
@@ -18,6 +19,18 @@ struct FileBrowserView: View {
     @State private var shareItem: FileStationItem?
     @State private var infoItem: FileStationItem?
     @State private var showingShareLinks = false
+    @State private var showingFavorites = false
+    @State private var showingVirtualFolders = false
+    @State private var showingTransfers = false
+    @State private var showingBackgroundTasks = false
+    @State private var showingAdvancedSearch = false
+    @State private var showingPasteOptions = false
+    @State private var showingUploadOptions = false
+    @State private var pendingUploadURLs = [URL]()
+    @State private var extractionItem: FileStationItem?
+    @State private var transferTask: Task<Void, Never>?
+    @State private var advancedSearchTask: Task<Void, Never>?
+    @State private var operationTask: Task<Void, Never>?
     @State private var tableFocusRequestID = 0
     @AccessibilityFocusState private var focusEmptyState: Bool
 
@@ -40,7 +53,26 @@ struct FileBrowserView: View {
     }
 
     var body: some View {
-        content
+        VStack(spacing: 0) {
+            if let permissionMessage = vm.permissionMessage {
+                Label(permissionMessage, systemImage: "lock.fill")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.quaternary)
+                    .accessibilityLabel(permissionMessage)
+            }
+            if let label = vm.activeOperationLabel {
+                FileOperationProgressBanner(
+                    label: label,
+                    progress: vm.operationProgress,
+                    cancel: cancelOperation
+                )
+            }
+            content
+        }
             .navigationTitle(vm.title)
             .searchable(text: $searchText, prompt: "Rechercher dans ce dossier")
             .toolbar { fileToolbar }
@@ -95,10 +127,8 @@ struct FileBrowserView: View {
                 Button("Supprimer", role: .destructive) {
                     let items = pendingDeleteItems
                     pendingDeleteItems.removeAll()
-                    Task {
-                        VoiceOver.announce(await vm.delete(items), priority: .high) {
-                            selection.removeAll()
-                        }
+                    startOperation({ await vm.delete(items) }) {
+                        selection.removeAll()
                     }
                 }
                 .help("Supprimer définitivement les éléments sélectionnés")
@@ -108,15 +138,72 @@ struct FileBrowserView: View {
                 Text(deleteMessage)
             }
             .sheet(item: $shareItem) { item in
-                ShareSheet(item: item) { password, dateExpired in
-                    await vm.createShareLink(for: item, password: password, dateExpired: dateExpired)
+                ShareSheet(item: item) { password, expirationDate, availableDate in
+                    await vm.createShareLink(
+                        for: item,
+                        password: password,
+                        expirationDate: expirationDate,
+                        availableDate: availableDate
+                    )
                 }
             }
             .sheet(item: $infoItem) { item in
-                FileInfoSheet(item: item)
+                FileInfoSheet(vm: vm, selectedItem: item)
             }
             .sheet(isPresented: $showingShareLinks) {
                 ShareLinksView(vm: vm)
+            }
+            .sheet(isPresented: $showingFavorites) {
+                FileStationFavoritesView(vm: vm) { favorite in
+                    searchText = ""
+                    Task {
+                        await vm.openFavorite(favorite)
+                        settleAfterNavigation()
+                    }
+                }
+            }
+            .sheet(isPresented: $showingVirtualFolders) {
+                FileStationVirtualFoldersView(vm: vm) { folder in
+                    searchText = ""
+                    Task {
+                        await vm.openVirtualFolder(folder)
+                        settleAfterNavigation()
+                    }
+                }
+            }
+            .sheet(isPresented: $showingTransfers) {
+                FileTransfersView(vm: vm) {
+                    transferTask?.cancel()
+                }
+            }
+            .sheet(isPresented: $showingBackgroundTasks) {
+                FileStationTasksView(vm: vm)
+            }
+            .sheet(isPresented: $showingAdvancedSearch) {
+                if let folderPath = vm.currentLevel.path {
+                    AdvancedFileSearchSheet(folderPath: folderPath, onSubmit: startAdvancedSearch)
+                }
+            }
+            .sheet(isPresented: $showingPasteOptions) {
+                FileConflictPolicySheet(title: "Options de collage", confirmLabel: "Coller") {
+                    policy in
+                    performPaste(conflictPolicy: policy)
+                }
+            }
+            .sheet(isPresented: $showingUploadOptions, onDismiss: discardPendingUploads) {
+                FileUploadOptionsSheet(fileCount: pendingUploadURLs.count) { options in
+                    performUpload(options: options)
+                }
+            }
+            .sheet(item: $extractionItem) { item in
+                ArchiveBrowserSheet(vm: vm, archive: item) { options in
+                    performExtraction(item, options: options)
+                }
+            }
+            .onDisappear {
+                transferTask?.cancel()
+                advancedSearchTask?.cancel()
+                operationTask?.cancel()
             }
     }
 
@@ -147,7 +234,7 @@ struct FileBrowserView: View {
                 items: vm.sortedItems,
                 selection: $selection,
                 focusRequestID: tableFocusRequestID,
-                canWrite: vm.canWrite && !vm.isWorking,
+                actionAvailability: actionAvailability,
                 showsPath: vm.isShowingSearchResults,
                 canExtract: vm.canExtract,
                 onActivate: activate,
@@ -158,7 +245,7 @@ struct FileBrowserView: View {
                 onCut: { VoiceOver.announce(vm.cut($0)) },
                 onShare: { shareItem = $0 },
                 onCompress: { activeSheet = .compress($0) },
-                onExtract: extract,
+                onExtract: requestExtraction,
                 onShowInfo: { infoItem = $0 },
                 onGoUp: goUp
             )
@@ -189,15 +276,17 @@ struct FileBrowserView: View {
                 Button("Nouveau dossier", systemImage: "folder.badge.plus") {
                     activeSheet = .createFolder
                 }
+                .disabled(!vm.canCreateFolder)
                 .help("Créer un nouveau dossier")
                 Button("Envoyer des fichiers…", systemImage: "square.and.arrow.up") {
                     startUpload()
                 }
+                .disabled(!vm.canUpload || vm.hasActiveTransfers)
                 .help("Envoyer des fichiers dans ce dossier")
             } label: {
                 Label("Ajouter", systemImage: "plus")
             }
-            .disabled(!vm.canWrite || vm.isWorking)
+            .disabled((!vm.canCreateFolder && !vm.canUpload) || vm.isWorking)
             .help("Ajouter des éléments")
         }
 
@@ -218,43 +307,51 @@ struct FileBrowserView: View {
             Button("Télécharger…", systemImage: "square.and.arrow.down") {
                 startDownload(selectedItems)
             }
+            .disabled(!vm.canDownload || vm.hasActiveTransfers)
             .help("Télécharger les éléments sélectionnés")
+            if selectedItems.count > 1 {
+                Button("Télécharger dans une archive…", systemImage: "archivebox") {
+                    startArchiveDownload(selectedItems)
+                }
+                .disabled(!vm.canDownload || vm.hasActiveTransfers)
+                .help("Télécharger la sélection dans une seule archive ZIP")
+            }
             Divider()
             Button("Copier", systemImage: "doc.on.doc") {
                 VoiceOver.announce(vm.copy(selectedItems), category: .result)
             }
-            .disabled(!vm.canWrite)
+            .disabled(!vm.canCopyMove)
             .help("Copier les éléments sélectionnés")
             Button("Déplacer (couper)", systemImage: "scissors") {
                 VoiceOver.announce(vm.cut(selectedItems), category: .result)
             }
-            .disabled(!vm.canWrite)
+            .disabled(!vm.canCopyMove)
             .help("Déplacer les éléments sélectionnés")
             Button("Créer un lien de partage", systemImage: "link") {
                 shareItem = singleSelectedItem
             }
-            .disabled(singleSelectedItem == nil || !vm.canWrite)
+            .disabled(singleSelectedItem == nil || !vm.canShare)
             .help("Créer un lien vers l’élément sélectionné")
             Button("Renommer…", systemImage: "pencil") {
                 if let item = singleSelectedItem { activeSheet = .rename(item) }
             }
-            .disabled(singleSelectedItem == nil || !vm.canWrite)
+            .disabled(singleSelectedItem == nil || !vm.canRename)
             .help("Renommer l’élément sélectionné")
             Divider()
             Button("Compresser…", systemImage: "archivebox") {
                 activeSheet = .compress(selectedItems)
             }
-            .disabled(!vm.canWrite)
+            .disabled(!vm.canCompress)
             .help("Compresser les éléments sélectionnés")
             Button("Extraire", systemImage: "archivebox.fill") {
-                if let item = singleSelectedItem { extract(item) }
+                if let item = singleSelectedItem { requestExtraction(item) }
             }
-            .disabled(singleSelectedItem.map(vm.canExtract) != true || !vm.canWrite)
+            .disabled(singleSelectedItem.map(vm.canExtract) != true || !vm.canExtractArchives)
             .help("Extraire l’archive sélectionnée")
             Button("Supprimer…", systemImage: "trash", role: .destructive) {
                 pendingDeleteItems = selectedItems
             }
-            .disabled(!vm.canWrite)
+            .disabled(!vm.canDelete)
             .help("Supprimer les éléments sélectionnés")
             Divider()
             Button("Lire les informations", systemImage: "info.circle") {
@@ -269,16 +366,40 @@ struct FileBrowserView: View {
 
     private var moreOptionsMenu: some View {
         Menu("Plus d’options", systemImage: "ellipsis.circle") {
-            Button("Coller", systemImage: "doc.on.clipboard", action: paste)
+            Button("Coller", systemImage: "doc.on.clipboard", action: requestPaste)
                 .disabled(!vm.canPaste || vm.isWorking)
                 .help("Coller dans ce dossier")
 
             favoritesMenu
 
+            Button("Dossiers virtuels…", systemImage: "externaldrive") {
+                showingVirtualFolders = true
+            }
+            .disabled(vm.availableVirtualFolderTypes.isEmpty)
+            .help("Parcourir les montages NFS, CIFS et ISO de File Station")
+
             Button("Liens de partage", systemImage: "link") {
                 showingShareLinks = true
             }
             .help("Gérer les liens de partage")
+
+            Button("Transferts", systemImage: "arrow.up.arrow.down") {
+                showingTransfers = true
+            }
+            .help("Afficher la progression et l’historique des transferts")
+
+            Button("Tâches File Station", systemImage: "list.bullet.rectangle") {
+                showingBackgroundTasks = true
+            }
+            .disabled(!vm.supports(.backgroundTasks))
+            .help("Afficher et gérer les opérations exécutées par le NAS")
+
+            Button("Recherche avancée…", systemImage: "magnifyingglass") {
+                searchText = ""
+                showingAdvancedSearch = true
+            }
+            .disabled(vm.currentLevel.path == nil || !vm.supports(.search) || vm.isSearching)
+            .help("Rechercher par type, taille, date, propriétaire ou groupe")
 
             Divider()
             Menu("Trier", systemImage: "arrow.up.arrow.down") {
@@ -310,6 +431,12 @@ struct FileBrowserView: View {
 
     private var favoritesMenu: some View {
         Menu {
+            Button("Gérer les favoris…", systemImage: "star.square") {
+                showingFavorites = true
+            }
+            .help("Renommer, classer ou retirer des favoris")
+            Divider()
+
             if let path = vm.currentLevel.path {
                 Button {
                     Task {
@@ -327,7 +454,11 @@ struct FileBrowserView: View {
             }
 
             if vm.favorites.isEmpty {
-                Text("Aucun favori")
+                if let error = vm.favoritesError {
+                    Text(String(localized: "Favoris indisponibles : \(error)"))
+                } else {
+                    Text("Aucun favori")
+                }
             } else {
                 ForEach(vm.favorites) { favorite in
                     Button(favorite.name) {
@@ -344,6 +475,7 @@ struct FileBrowserView: View {
         } label: {
             Label("Favoris", systemImage: "star")
         }
+        .disabled(!vm.supports(.favorites))
         .help("Favoris File Station")
     }
 
@@ -386,22 +518,17 @@ struct FileBrowserView: View {
                 }
             }
         case .compress(let items):
-            NameEntrySheet(
-                title: "Compresser",
-                fieldLabel: "Nom de l’archive",
-                confirmLabel: "Créer l’archive",
-                announcement: String(localized: "Créer une archive"),
-                initialName: suggestedArchiveName(for: items)
-            ) { name in
+            FileCompressionOptionsSheet(initialName: suggestedArchiveName(for: items)) {
+                name, options in
                 VoiceOver.announce(
                     String(localized: "Compression en cours…"),
                     category: .progress,
                     priority: .low
                 )
-                Task {
-                    VoiceOver.announce(await vm.compress(items, archiveName: name), priority: .high) {
-                        selection.removeAll()
-                    }
+                startOperation({
+                    await vm.compress(items, archiveName: name, options: options)
+                }) {
+                    selection.removeAll()
                 }
             }
         }
@@ -412,9 +539,18 @@ struct FileBrowserView: View {
             canGoUp: vm.canGoUp,
             hasSelection: !selectedItems.isEmpty,
             hasSingleSelection: selectedItems.count == 1,
-            canWrite: vm.canWrite && !vm.isWorking,
+            canCreateFolder: vm.canCreateFolder && !vm.isWorking,
+            canUpload: vm.canUpload && !vm.isWorking && !vm.hasActiveTransfers,
+            canDownload: vm.canDownload && !vm.hasActiveTransfers,
+            canCopyMove: vm.canCopyMove && !vm.isWorking,
+            canRename: vm.canRename && !vm.isWorking,
+            canCompress: vm.canCompress && !vm.isWorking,
+            canDelete: vm.canDelete && !vm.isWorking,
             canPaste: vm.canPaste && !vm.isWorking,
-            canExtract: selectedItems.count == 1 && vm.canExtract(selectedItems[0]),
+            canExtract: selectedItems.count == 1
+                && vm.canExtract(selectedItems[0])
+                && vm.canExtractArchives
+                && !vm.isWorking,
             refresh: { Task { await refresh() } },
             goUp: goUp,
             open: activateSelection,
@@ -424,9 +560,9 @@ struct FileBrowserView: View {
             rename: { if let item = singleSelectedItem { activeSheet = .rename(item) } },
             copy: { VoiceOver.announce(vm.copy(selectedItems)) },
             cut: { VoiceOver.announce(vm.cut(selectedItems)) },
-            paste: paste,
+            paste: requestPaste,
             compress: { activeSheet = .compress(selectedItems) },
-            extract: { if let item = singleSelectedItem { extract(item) } },
+            extract: { if let item = singleSelectedItem { requestExtraction(item) } },
             delete: { pendingDeleteItems = selectedItems },
             showInfo: { infoItem = singleSelectedItem }
         )
@@ -436,11 +572,26 @@ struct FileBrowserView: View {
         vm.sortedItems.filter { selection.contains($0.path) }
     }
 
+    private var actionAvailability: FileActionAvailability {
+        FileActionAvailability(
+            canDownload: vm.canDownload && !vm.hasActiveTransfers,
+            canRename: vm.canRename && !vm.isWorking,
+            canDelete: vm.canDelete && !vm.isWorking,
+            canCopyMove: vm.canCopyMove && !vm.isWorking,
+            canShare: vm.canShare && !vm.isWorking,
+            canCompress: vm.canCompress && !vm.isWorking,
+            canExtract: vm.canExtractArchives && !vm.isWorking
+        )
+    }
+
     private var singleSelectedItem: FileStationItem? {
         selectedItems.count == 1 ? selectedItems[0] : nil
     }
 
     private var progressLabel: String {
+        if vm.isSearching, let progress = vm.searchProgress, progress.total > 0 {
+            return String(localized: "Recherche en cours, résultats trouvés : \(progress.total)")
+        }
         if vm.isSearching { return String(localized: "Recherche en cours…") }
         if vm.isDownloading { return String(localized: "Téléchargement en cours…") }
         return String(localized: "Opération en cours…")
@@ -486,53 +637,78 @@ struct FileBrowserView: View {
     }
 
     private func refresh() async {
-        await vm.loadCurrent()
-        if !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            await vm.search(searchText)
-        }
+        await vm.reloadCurrentSearch(simpleQuery: searchText)
         announceSummary()
     }
 
-    private func paste() {
+    private func startAdvancedSearch(_ criteria: FileStationSearchCriteria) {
+        advancedSearchTask?.cancel()
+        VoiceOver.announce(
+            String(localized: "Recherche avancée en cours…"),
+            category: .progress,
+            priority: .low
+        )
+        advancedSearchTask = Task {
+            await vm.search(criteria)
+            guard !Task.isCancelled else { return }
+            selection.removeAll()
+            announceSummary()
+            advancedSearchTask = nil
+        }
+    }
+
+    private func requestPaste() {
+        guard vm.canPaste, !vm.isWorking else { return }
+        showingPasteOptions = true
+    }
+
+    private func performPaste(conflictPolicy: FileConflictPolicy) {
         VoiceOver.announce(
             String(localized: "Collage en cours…"),
             category: .progress,
             priority: .low
         )
-        Task {
-            VoiceOver.announce(await vm.paste(), priority: .high) {
-                selection.removeAll()
-            }
+        startOperation({ await vm.paste(conflictPolicy: conflictPolicy) }) {
+            selection.removeAll()
         }
     }
 
-    private func extract(_ item: FileStationItem) {
+    private func requestExtraction(_ item: FileStationItem) {
+        extractionItem = item
+    }
+
+    private func performExtraction(
+        _ item: FileStationItem,
+        options: FileStationExtractionOptions
+    ) {
         VoiceOver.announce(
             String(localized: "Extraction en cours…"),
             category: .progress,
             priority: .low
         )
-        Task {
-            VoiceOver.announce(await vm.extract(item), priority: .high) {
-                selection.removeAll()
-            }
+        startOperation({ await vm.extract(item, options: options) }) {
+            selection.removeAll()
         }
     }
 
     private func startDownload(_ items: [FileStationItem]) {
-        guard !items.isEmpty else { return }
+        guard !items.isEmpty, !vm.hasActiveTransfers else { return }
         if items.count == 1, let item = items.first {
             let panel = NSSavePanel()
             panel.nameFieldStringValue = vm.suggestedFilename(for: item)
             panel.canCreateDirectories = true
             guard panel.runModal() == .OK, let url = panel.url else { return }
+            _ = url.startAccessingSecurityScopedResource()
             VoiceOver.announce(
                 String(localized: "Téléchargement en cours…"),
                 category: .progress,
                 priority: .low
             )
-            Task {
-                VoiceOver.announce(await vm.download(item, to: url), priority: .high)
+            showingTransfers = true
+            transferTask = Task {
+                let outcome = await vm.download(item, to: url)
+                VoiceOver.announce(outcome, priority: .high)
+                transferTask = nil
             }
             return
         }
@@ -545,32 +721,108 @@ struct FileBrowserView: View {
         panel.prompt = String(localized: "Choisir")
         panel.message = String(localized: "Choisissez le dossier de destination des téléchargements.")
         guard panel.runModal() == .OK, let directory = panel.url else { return }
+        _ = directory.startAccessingSecurityScopedResource()
         VoiceOver.announce(
             String(localized: "Téléchargements en cours…"),
             category: .progress,
             priority: .low
         )
-        Task {
-            VoiceOver.announce(await vm.download(items, to: directory), priority: .high)
+        showingTransfers = true
+        transferTask = Task {
+            let outcome = await vm.download(items, to: directory)
+            VoiceOver.announce(outcome, priority: .high)
+            transferTask = nil
+        }
+    }
+
+    private func startArchiveDownload(_ items: [FileStationItem]) {
+        guard items.count > 1, !vm.hasActiveTransfers else { return }
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = String(localized: "Archive File Station.zip")
+        panel.canCreateDirectories = true
+        panel.allowedContentTypes = [.zip]
+        panel.message = String(
+            localized: "File Station regroupera les éléments sélectionnés dans une seule archive ZIP."
+        )
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        _ = url.startAccessingSecurityScopedResource()
+        VoiceOver.announce(
+            String(localized: "Téléchargement de l’archive en cours…"),
+            category: .progress,
+            priority: .low
+        )
+        showingTransfers = true
+        transferTask = Task {
+            let outcome = await vm.downloadAsArchive(items, to: url)
+            VoiceOver.announce(outcome, priority: .high)
+            transferTask = nil
         }
     }
 
     private func startUpload() {
-        guard vm.canWrite else { return }
+        guard vm.canWrite, !vm.hasActiveTransfers else { return }
         let panel = NSOpenPanel()
         panel.canChooseFiles = true
         panel.canChooseDirectories = false
         panel.allowsMultipleSelection = true
         panel.prompt = String(localized: "Envoyer")
         guard panel.runModal() == .OK, !panel.urls.isEmpty else { return }
+        for url in panel.urls {
+            _ = url.startAccessingSecurityScopedResource()
+        }
+        pendingUploadURLs = panel.urls
+        showingUploadOptions = true
+    }
+
+    private func performUpload(options: FileStationUploadOptions) {
+        let urls = pendingUploadURLs
+        pendingUploadURLs.removeAll()
+        guard !urls.isEmpty else { return }
         VoiceOver.announce(
             String(localized: "Envoi en cours…"),
             category: .progress,
             priority: .low
         )
-        Task {
-            VoiceOver.announce(await vm.upload(fileURLs: panel.urls), priority: .high)
+        showingTransfers = true
+        transferTask = Task {
+            let outcome = await vm.upload(fileURLs: urls, options: options)
+            VoiceOver.announce(outcome, priority: .high)
+            transferTask = nil
         }
+    }
+
+    private func discardPendingUploads() {
+        for url in pendingUploadURLs {
+            url.stopAccessingSecurityScopedResource()
+        }
+        pendingUploadURLs.removeAll()
+    }
+
+    private func startOperation(
+        _ operation: @escaping @MainActor () async -> DSMOperationOutcome,
+        onSuccess: @escaping @MainActor () -> Void = {}
+    ) {
+        operationTask?.cancel()
+        operationTask = Task {
+            let outcome = await operation()
+            guard !Task.isCancelled else {
+                operationTask = nil
+                return
+            }
+            VoiceOver.announce(outcome, priority: .high) {
+                onSuccess()
+            }
+            operationTask = nil
+        }
+    }
+
+    private func cancelOperation() {
+        operationTask?.cancel()
+        VoiceOver.announce(
+            String(localized: "Annulation de l’opération demandée"),
+            category: .progress,
+            priority: .high
+        )
     }
 
     private func suggestedArchiveName(for items: [FileStationItem]) -> String {

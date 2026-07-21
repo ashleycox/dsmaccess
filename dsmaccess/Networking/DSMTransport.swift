@@ -10,6 +10,8 @@ import Foundation
 @MainActor
 final class DSMTransport {
     typealias RequestData = @Sendable (URLRequest) async throws -> (Data, URLResponse)
+    typealias DownloadFile = @Sendable (URL) async throws -> (URL, URLResponse)
+    typealias UploadFile = @Sendable (URLRequest, URL) async throws -> (Data, URLResponse)
 
     private static let infoAPI = DSMAPI("SYNO.API.Info", preferredVersion: 1)
     /// Point d'amorçage stable ; toutes les autres routes proviennent de cette découverte.
@@ -19,6 +21,10 @@ final class DSMTransport {
     private let session: URLSession
     private let trustDelegate: ServerTrustDelegate?
     private let requestData: RequestData
+    private let downloadFile: DownloadFile
+    private let uploadFile: UploadFile
+    private let hasInjectedDownloadFile: Bool
+    private let hasInjectedUploadFile: Bool
 
     private(set) var capabilities = DSMCapabilities()
     private var sessionID: String?
@@ -35,6 +41,10 @@ final class DSMTransport {
         let session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
         self.session = session
         requestData = { try await session.data(for: $0) }
+        downloadFile = { try await session.download(from: $0) }
+        uploadFile = { try await session.upload(for: $0, fromFile: $1) }
+        hasInjectedDownloadFile = false
+        hasInjectedUploadFile = false
     }
 
     init(
@@ -47,19 +57,29 @@ final class DSMTransport {
         trustDelegate = nil
         self.capabilities = capabilities
         requestData = { try await session.data(for: $0) }
+        downloadFile = { try await session.download(from: $0) }
+        uploadFile = { try await session.upload(for: $0, fromFile: $1) }
+        hasInjectedDownloadFile = false
+        hasInjectedUploadFile = false
     }
 
     init(
         endpoint: DSMEndpoint,
         session: URLSession,
         capabilities: DSMCapabilities,
-        requestData: @escaping RequestData
+        requestData: @escaping RequestData,
+        downloadFile: DownloadFile? = nil,
+        uploadFile: UploadFile? = nil
     ) {
         self.endpoint = endpoint
         self.session = session
         trustDelegate = nil
         self.capabilities = capabilities
         self.requestData = requestData
+        self.downloadFile = downloadFile ?? { try await session.download(from: $0) }
+        self.uploadFile = uploadFile ?? { try await session.upload(for: $0, fromFile: $1) }
+        hasInjectedDownloadFile = downloadFile != nil
+        hasInjectedUploadFile = uploadFile != nil
     }
 
     convenience init(endpoint: DSMEndpoint, session: URLSession) {
@@ -128,6 +148,7 @@ final class DSMTransport {
         authenticated: Bool = true,
         httpMethod: DSMHTTPMethod = .get,
         requestPolicy: DSMRequestPolicy = .singleAttempt,
+        timeoutInterval: TimeInterval? = nil,
         as type: Value.Type
     ) async throws -> DSMResponse<Value> {
         let resolved = try await resolve(api)
@@ -141,7 +162,8 @@ final class DSMTransport {
             path: resolved.path,
             parameters: query,
             httpMethod: httpMethod,
-            requestPolicy: requestPolicy
+            requestPolicy: requestPolicy,
+            timeoutInterval: timeoutInterval
         )
     }
 
@@ -152,6 +174,7 @@ final class DSMTransport {
         parameters: [String: DSMParameter] = [:],
         authenticated: Bool = true,
         httpMethod: DSMHTTPMethod = .get,
+        timeoutInterval: TimeInterval? = nil,
         as type: Value.Type
     ) async throws -> Value {
         try await value(
@@ -161,6 +184,7 @@ final class DSMTransport {
             authenticated: authenticated,
             httpMethod: httpMethod,
             requestPolicy: .idempotent,
+            timeoutInterval: timeoutInterval,
             as: type
         )
     }
@@ -173,6 +197,7 @@ final class DSMTransport {
         authenticated: Bool = true,
         httpMethod: DSMHTTPMethod = .get,
         requestPolicy: DSMRequestPolicy = .singleAttempt,
+        timeoutInterval: TimeInterval? = nil,
         as type: Value.Type
     ) async throws -> Value {
         let response = try await response(
@@ -182,6 +207,7 @@ final class DSMTransport {
             authenticated: authenticated,
             httpMethod: httpMethod,
             requestPolicy: requestPolicy,
+            timeoutInterval: timeoutInterval,
             as: type
         )
         guard response.success, let data = response.data else {
@@ -194,13 +220,17 @@ final class DSMTransport {
         api: DSMAPI,
         method: String,
         parameters: [String: DSMParameter] = [:],
-        authenticated: Bool = true
+        authenticated: Bool = true,
+        httpMethod: DSMHTTPMethod = .get,
+        timeoutInterval: TimeInterval? = nil
     ) async throws {
         let response = try await response(
             api: api,
             method: method,
             parameters: parameters,
             authenticated: authenticated,
+            httpMethod: httpMethod,
+            timeoutInterval: timeoutInterval,
             as: EmptyData.self
         )
         guard response.success else {
@@ -269,7 +299,31 @@ final class DSMTransport {
 
     func download(from url: URL) async throws -> (URL, URLResponse) {
         do {
-            return try await session.download(from: url)
+            return try await downloadFile(url)
+        } catch let error as URLError {
+            throw mappedNetworkError(error)
+        }
+    }
+
+    func download(
+        from url: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws -> (URL, URLResponse) {
+        if hasInjectedDownloadFile {
+            let result = try await download(from: url)
+            let size = try await MultipartBodyFile.fileSize(at: result.0)
+            progress(DSMTransferProgress(completedBytes: size, totalBytes: size))
+            return result
+        }
+        let delegate = DSMTransferDelegate(progress: progress)
+        do {
+            let result = try await session.download(
+                for: URLRequest(url: url),
+                delegate: delegate
+            )
+            let size = try await MultipartBodyFile.fileSize(at: result.0)
+            progress(DSMTransferProgress(completedBytes: size, totalBytes: size))
+            return result
         } catch let error as URLError {
             throw mappedNetworkError(error)
         }
@@ -277,7 +331,33 @@ final class DSMTransport {
 
     func upload(for request: URLRequest, fromFile fileURL: URL) async throws -> (Data, URLResponse) {
         do {
-            return try await session.upload(for: request, fromFile: fileURL)
+            return try await uploadFile(request, fileURL)
+        } catch let error as URLError {
+            throw mappedNetworkError(error)
+        }
+    }
+
+    func upload(
+        for request: URLRequest,
+        fromFile fileURL: URL,
+        progress: @escaping DSMTransferProgressHandler
+    ) async throws -> (Data, URLResponse) {
+        if hasInjectedUploadFile {
+            let result = try await upload(for: request, fromFile: fileURL)
+            let size = try await MultipartBodyFile.fileSize(at: fileURL)
+            progress(DSMTransferProgress(completedBytes: size, totalBytes: size))
+            return result
+        }
+        let delegate = DSMTransferDelegate(progress: progress)
+        do {
+            let result = try await session.upload(
+                for: request,
+                fromFile: fileURL,
+                delegate: delegate
+            )
+            let size = try await MultipartBodyFile.fileSize(at: fileURL)
+            progress(DSMTransferProgress(completedBytes: size, totalBytes: size))
+            return result
         } catch let error as URLError {
             throw mappedNetworkError(error)
         }
@@ -320,12 +400,14 @@ final class DSMTransport {
         path: String,
         parameters: [String: String],
         httpMethod: DSMHTTPMethod = .get,
-        requestPolicy: DSMRequestPolicy
+        requestPolicy: DSMRequestPolicy,
+        timeoutInterval: TimeInterval? = nil
     ) async throws -> DSMResponse<Value> {
         let request = try makeRequest(
             path: path,
             parameters: parameters,
-            httpMethod: httpMethod
+            httpMethod: httpMethod,
+            timeoutInterval: timeoutInterval
         )
         do {
             return try await sendOnce(request)
@@ -345,13 +427,17 @@ final class DSMTransport {
     private func makeRequest(
         path: String,
         parameters: [String: String],
-        httpMethod: DSMHTTPMethod
+        httpMethod: DSMHTTPMethod,
+        timeoutInterval: TimeInterval?
     ) throws -> URLRequest {
         switch httpMethod {
         case .get:
-            return URLRequest(url: try makeURL(path: path, parameters: parameters))
+            var request = URLRequest(url: try makeURL(path: path, parameters: parameters))
+            if let timeoutInterval { request.timeoutInterval = timeoutInterval }
+            return request
         case .post:
             var request = URLRequest(url: try makeURL(path: path, parameters: [:]))
+            if let timeoutInterval { request.timeoutInterval = timeoutInterval }
             var body = URLComponents()
             body.queryItems = parameters
                 .sorted { $0.key < $1.key }
@@ -402,7 +488,16 @@ final class DSMTransport {
     }
 
     func error(from body: DSMErrorBody?) -> DSMError {
-        switch body?.code {
+        if let body,
+           let detail = body.errors?.first,
+           let detailCode = detail.code {
+            return .itemOperationFailed(
+                code: body.code,
+                item: detail.path ?? detail.name ?? detail.id,
+                itemCode: detailCode
+            )
+        }
+        return switch body?.code {
         case 105: .permissionDenied
         case 106, 107, 119: .sessionExpired
         case let code?: .apiError(code: code)

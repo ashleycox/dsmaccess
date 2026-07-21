@@ -69,6 +69,16 @@ enum MultipartBodyFile {
         return try Data(contentsOf: url, options: .mappedIfSafe)
     }
 
+    @concurrent
+    static func fileSize(at url: URL) async throws -> Int64 {
+        try Task.checkCancellation()
+        let values = try url.resourceValues(forKeys: [.fileSizeKey])
+        guard let fileSize = values.fileSize else {
+            throw CocoaError(.fileReadUnknown)
+        }
+        return Int64(fileSize)
+    }
+
     /// Empêche un nom de fichier local de fermer ou d'injecter un en-tête multipart.
     nonisolated private static func dispositionValue(_ value: String) -> String {
         value

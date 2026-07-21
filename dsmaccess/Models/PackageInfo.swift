@@ -27,9 +27,27 @@ struct ServerPackage: nonisolated Decodable, Sendable {
     let beta: Bool?
     let source: String?
     let type: Int?
+    let dependencyServers: PackageJSONValue?
+    let dependencyPackages: PackageJSONValue?
+    let conflictingPackages: PackageJSONValue?
+    let breakingPackages: PackageJSONValue?
+    let replacementPackages: PackageJSONValue?
+    let installType: String?
+    let installOnColdStorage: PackageJSONValue?
+    let license: PackageJSONValue?
+    let installPages: PackageJSONValue?
 
     private enum CodingKeys: String, CodingKey {
         case id, version, link, md5, size, beta, source, type
+        case dependencyServers = "depsers"
+        case dependencyPackages = "deppkgs"
+        case conflictingPackages = "conflictpkgs"
+        case breakingPackages = "breakpkgs"
+        case replacementPackages = "replacepkgs"
+        case installType = "install_type"
+        case installOnColdStorage = "install_on_cold_storage"
+        case license = "licence"
+        case installPages = "install_pages"
     }
 
     nonisolated init(from decoder: Decoder) throws {
@@ -42,6 +60,33 @@ struct ServerPackage: nonisolated Decodable, Sendable {
         beta = container.flexBool(.beta)
         source = container.flexString(.source)
         type = container.flexInt(.type)
+        dependencyServers = try container.decodeIfPresent(
+            PackageJSONValue.self,
+            forKey: .dependencyServers
+        )
+        dependencyPackages = try container.decodeIfPresent(
+            PackageJSONValue.self,
+            forKey: .dependencyPackages
+        )
+        conflictingPackages = try container.decodeIfPresent(
+            PackageJSONValue.self,
+            forKey: .conflictingPackages
+        )
+        breakingPackages = try container.decodeIfPresent(
+            PackageJSONValue.self,
+            forKey: .breakingPackages
+        )
+        replacementPackages = try container.decodeIfPresent(
+            PackageJSONValue.self,
+            forKey: .replacementPackages
+        )
+        installType = container.flexString(.installType)
+        installOnColdStorage = try container.decodeIfPresent(
+            PackageJSONValue.self,
+            forKey: .installOnColdStorage
+        )
+        license = try container.decodeIfPresent(PackageJSONValue.self, forKey: .license)
+        installPages = try container.decodeIfPresent(PackageJSONValue.self, forKey: .installPages)
     }
 }
 
@@ -86,10 +131,14 @@ struct PackageInfo: nonisolated Decodable, Identifiable, Sendable {
 
     /// État traduit (marche / arrêt).
     var statusText: String {
-        switch additional?.status?.lowercased() {
+        let status = additional?.status?.lowercased()
+        switch status {
         case "running", "start", "started": return String(localized: "En cours")
         case "stop", "stopped", "stopping": return String(localized: "Arrêté")
-        case .some(let value) where !value.isEmpty: return value
+        case .some(let value) where Self.requiresAttention(value):
+            return String(localized: "Réparation requise")
+        case .some(let value) where !value.isEmpty:
+            return String(localized: "État DSM : \(value)")
         default: return "—"
         }
     }
@@ -100,6 +149,26 @@ struct PackageInfo: nonisolated Decodable, Identifiable, Sendable {
         case "running", "start", "started": return true
         default: return false
         }
+    }
+
+    var isStopped: Bool {
+        switch additional?.status?.lowercased() {
+        case "stop", "stopped", "stopping": true
+        default: false
+        }
+    }
+
+    var requiresAttention: Bool {
+        guard let status = additional?.status?.lowercased() else { return false }
+        return Self.requiresAttention(status)
+    }
+
+    private static func requiresAttention(_ status: String) -> Bool {
+        ["repair", "repairing", "broken", "error", "corrupt", "corrupted"].contains(status)
+            || status.hasPrefix("repair_")
+            || status.hasPrefix("broken_")
+            || status.hasPrefix("error_")
+            || status.hasPrefix("corrupt_")
     }
 
     /// Vrai si le paquet peut être démarré/arrêté (certains paquets système ne le sont pas).

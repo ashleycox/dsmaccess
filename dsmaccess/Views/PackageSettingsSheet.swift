@@ -11,11 +11,17 @@ import SwiftUI
 
 struct PackageSettingsSheet: View {
     @State private var vm: PackageSettingsViewModel
+    @State private var showPackageSources = false
     @AccessibilityFocusState private var focusTitle: Bool
     @AccessibilityFocusState private var focusStatus: Bool
     @Environment(\.dismiss) private var dismiss
 
-    init(session: SessionStore) {
+    private let session: SessionStore
+    private let canManagePackageSources: Bool
+
+    init(session: SessionStore, canManagePackageSources: Bool) {
+        self.session = session
+        self.canManagePackageSources = canManagePackageSources
         _vm = State(initialValue: PackageSettingsViewModel(session: session))
     }
 
@@ -28,10 +34,21 @@ struct PackageSettingsSheet: View {
 
             content
 
+            if let error = vm.saveErrorMessage {
+                Label(error, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.red)
+                    .accessibilityFocused($focusStatus)
+            }
+
+            if vm.isSaving {
+                ProgressView("Enregistrement des réglages…")
+            }
+
             HStack {
                 Spacer()
                 Button("Terminé") { dismiss() }
                     .keyboardShortcut(.defaultAction)
+                    .disabled(vm.isSaving)
                     .help("Fermer les réglages du Centre de paquets")
             }
         }
@@ -41,6 +58,10 @@ struct PackageSettingsSheet: View {
             focusTitle = true
             await load()
         }
+        .sheet(isPresented: $showPackageSources) {
+            PackageSourcesSheet(session: session)
+        }
+        .interactiveDismissDisabled(vm.isSaving)
     }
 
     @ViewBuilder
@@ -108,6 +129,34 @@ struct PackageSettingsSheet: View {
                     set: { await vm.setEmailNotify($0) }
                 ))
                 .help("Activer les notifications de mise à jour par courriel")
+            }
+
+            Divider()
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Paramètres conservés")
+                    .font(.subheadline.weight(.semibold))
+                    .accessibilityAddTraits(.isHeader)
+                if let settings = vm.settings {
+                    LabeledContent("Volume par défaut", value: settings.defaultVol)
+                    LabeledContent("Niveau de confiance (code DSM)") {
+                        Text(settings.trustLevel, format: .number.grouping(.never))
+                    }
+                }
+                Text("DSM Access conserve ces valeurs lors de chaque enregistrement. Les API de ce NAS n’exposent pas de commande vérifiée permettant de modifier ici le niveau de confiance ou les certificats d’éditeur.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if canManagePackageSources {
+                    Button("Gérer les sources de paquets…") {
+                        showPackageSources = true
+                    }
+                    .help("Ajouter, modifier ou supprimer les sources tierces du Centre de paquets")
+                } else {
+                    Text("La gestion des sources de paquets n’est pas disponible sur ce NAS.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .disabled(vm.isSaving)

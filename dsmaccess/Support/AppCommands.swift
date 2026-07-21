@@ -20,7 +20,13 @@ struct FileCommandActions {
     let canGoUp: Bool
     let hasSelection: Bool
     let hasSingleSelection: Bool
-    let canWrite: Bool
+    let canCreateFolder: Bool
+    let canUpload: Bool
+    let canDownload: Bool
+    let canCopyMove: Bool
+    let canRename: Bool
+    let canCompress: Bool
+    let canDelete: Bool
     let canPaste: Bool
     let canExtract: Bool
     let refresh: () -> Void
@@ -167,42 +173,52 @@ struct DSMCommands: Commands {
 
             Button("Nouveau dossier") { fileActions?.createFolder() }
                 .keyboardShortcut("n", modifiers: [.command, .shift])
-                .disabled(fileActions?.canWrite != true)
+                .disabled(fileActions?.canCreateFolder != true)
                 .help("Créer un nouveau dossier")
             Button("Envoyer des fichiers…") { fileActions?.upload() }
                 .keyboardShortcut("u", modifiers: .command)
-                .disabled(fileActions?.canWrite != true)
+                .disabled(fileActions?.canUpload != true)
                 .help("Envoyer des fichiers dans ce dossier")
             Button("Télécharger…") { fileActions?.download() }
                 .keyboardShortcut("d", modifiers: [.command, .shift])
-                .disabled(fileActions?.hasSelection != true)
+                .disabled(
+                    fileActions?.hasSelection != true || fileActions?.canDownload != true
+                )
                 .help("Télécharger les éléments sélectionnés")
 
             Divider()
 
             Button("Copier") { fileActions?.copy() }
-                .disabled(fileActions?.hasSelection != true || fileActions?.canWrite != true)
+                .disabled(
+                    fileActions?.hasSelection != true || fileActions?.canCopyMove != true
+                )
                 .help("Copier les éléments sélectionnés")
             Button("Déplacer (couper)") { fileActions?.cut() }
-                .disabled(fileActions?.hasSelection != true || fileActions?.canWrite != true)
+                .disabled(
+                    fileActions?.hasSelection != true || fileActions?.canCopyMove != true
+                )
                 .help("Déplacer les éléments sélectionnés")
             Button("Coller") { fileActions?.paste() }
                 .disabled(fileActions?.canPaste != true)
                 .help("Coller dans ce dossier")
             Button("Renommer…") { fileActions?.rename() }
-                .disabled(fileActions?.hasSingleSelection != true || fileActions?.canWrite != true)
+                .disabled(
+                    fileActions?.hasSingleSelection != true || fileActions?.canRename != true
+                )
                 .help("Renommer l’élément sélectionné")
 
             Divider()
 
             Button("Compresser…") { fileActions?.compress() }
-                .disabled(fileActions?.hasSelection != true || fileActions?.canWrite != true)
+                .disabled(
+                    fileActions?.hasSelection != true || fileActions?.canCompress != true
+                )
                 .help("Compresser les éléments sélectionnés")
             Button("Extraire") { fileActions?.extract() }
-                .disabled(fileActions?.canExtract != true || fileActions?.canWrite != true)
+                .disabled(fileActions?.canExtract != true)
                 .help("Extraire l’archive sélectionnée")
             Button("Supprimer…", role: .destructive) { fileActions?.delete() }
-                .disabled(fileActions?.hasSelection != true || fileActions?.canWrite != true)
+                .disabled(fileActions?.hasSelection != true || fileActions?.canDelete != true)
                 .help("Supprimer les éléments sélectionnés")
 
             Divider()

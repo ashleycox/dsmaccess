@@ -10,11 +10,21 @@
 @preconcurrency import AppKit
 import SwiftUI
 
+struct FileActionAvailability: Equatable {
+    var canDownload: Bool
+    var canRename: Bool
+    var canDelete: Bool
+    var canCopyMove: Bool
+    var canShare: Bool
+    var canCompress: Bool
+    var canExtract: Bool
+}
+
 struct FileTableView: NSViewRepresentable {
     var items: [FileStationItem]
     @Binding var selection: Set<String>
     var focusRequestID: Int
-    var canWrite: Bool
+    var actionAvailability: FileActionAvailability
     var showsPath: Bool
     var canExtract: (FileStationItem) -> Bool
     var onActivate: (FileStationItem) -> Void
@@ -75,7 +85,7 @@ struct FileTableView: NSViewRepresentable {
 
         context.coordinator.isApplyingSelection = true
         let currentRows = items.map {
-            "\(canWrite)|\(showsPath)|\($0.isdir)|\($0.path)|\($0.name)|\($0.detailText ?? "")"
+            "\(actionAvailability)|\(showsPath)|\($0.isdir)|\($0.path)|\($0.name)|\($0.detailText ?? "")"
         }
         if context.coordinator.rowPresentationKeys != currentRows {
             table.reloadData()
@@ -112,8 +122,8 @@ struct FileTableView: NSViewRepresentable {
             let cell = (tableView.makeView(withIdentifier: identifier, owner: self) as? FileCellView)
                 ?? FileCellView(identifier: identifier)
             cell.configure(with: item, showsPath: parent.showsPath)
-            cell.canWrite = parent.canWrite
-            cell.canExtract = parent.canWrite && parent.canExtract(item)
+            cell.actionAvailability = parent.actionAvailability
+            cell.canExtractSelectedItem = parent.actionAvailability.canExtract && parent.canExtract(item)
             cell.onPress = { [weak self] in self?.parent.onActivate(item) }
             cell.onDownload = { [weak self] in self?.parent.onDownload([item]) }
             cell.onRename = { [weak self] in self?.parent.onRename(item) }
@@ -151,25 +161,27 @@ struct FileTableView: NSViewRepresentable {
         }
 
         func renameSelection() {
-            guard parent.canWrite, selectedItems.count == 1, let item = selectedItems.first else { return }
+            guard parent.actionAvailability.canRename,
+                  selectedItems.count == 1,
+                  let item = selectedItems.first else { return }
             parent.onRename(item)
         }
 
         func deleteSelection() {
             let items = selectedItems
-            guard parent.canWrite, !items.isEmpty else { return }
+            guard parent.actionAvailability.canDelete, !items.isEmpty else { return }
             parent.onDelete(items)
         }
 
         func copySelection() {
             let items = selectedItems
-            guard parent.canWrite, !items.isEmpty else { return }
+            guard parent.actionAvailability.canCopyMove, !items.isEmpty else { return }
             parent.onCopy(items)
         }
 
         func cutSelection() {
             let items = selectedItems
-            guard parent.canWrite, !items.isEmpty else { return }
+            guard parent.actionAvailability.canCopyMove, !items.isEmpty else { return }
             parent.onCut(items)
         }
 
@@ -191,8 +203,8 @@ struct FileTableView: NSViewRepresentable {
             guard !items.isEmpty else { return nil }
 
             return makeFileContextMenu(
-                canWrite: parent.canWrite,
-                canExtract: items.count == 1 && parent.canExtract(items[0]),
+                availability: parent.actionAvailability,
+                canExtractSelectedItem: items.count == 1 && parent.canExtract(items[0]),
                 activate: items.count == 1 ? { [weak self] in self?.activateSelection() } : nil,
                 download: { [weak self] in self?.downloadSelection() },
                 rename: items.count == 1 ? { [weak self] in self?.renameSelection() } : nil,
@@ -243,8 +255,8 @@ private func closureMenuItem(title: String, handler: @escaping () -> Void) -> NS
 }
 
 private func makeFileContextMenu(
-    canWrite: Bool,
-    canExtract: Bool,
+    availability: FileActionAvailability,
+    canExtractSelectedItem: Bool,
     activate: (() -> Void)?,
     download: @escaping () -> Void,
     rename: (() -> Void)?,
@@ -260,28 +272,40 @@ private func makeFileContextMenu(
     if let activate {
         menu.addItem(closureMenuItem(title: String(localized: "Ouvrir"), handler: activate))
     }
-    menu.addItem(closureMenuItem(title: String(localized: "Télécharger"), handler: download))
+    if availability.canDownload {
+        menu.addItem(closureMenuItem(title: String(localized: "Télécharger"), handler: download))
+    }
 
-    if canWrite {
-        if let share {
-            menu.addItem(closureMenuItem(title: String(localized: "Créer un lien de partage"), handler: share))
-        }
+    if availability.canShare, let share {
+        menu.addItem(closureMenuItem(title: String(localized: "Créer un lien de partage"), handler: share))
+    }
+    if availability.canCompress || (availability.canExtract && canExtractSelectedItem) {
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(closureMenuItem(title: String(localized: "Compresser…"), handler: compress))
-        if canExtract, let extract {
+        if availability.canCompress {
+            menu.addItem(closureMenuItem(title: String(localized: "Compresser…"), handler: compress))
+        }
+        if availability.canExtract, canExtractSelectedItem, let extract {
             menu.addItem(closureMenuItem(title: String(localized: "Extraire"), handler: extract))
         }
+    }
+    if availability.canCopyMove || availability.canRename || availability.canDelete {
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(closureMenuItem(title: String(localized: "Copier"), handler: copy))
-        menu.addItem(closureMenuItem(title: String(localized: "Déplacer (couper)"), handler: cut))
-        if let rename {
+        if availability.canCopyMove {
+            menu.addItem(closureMenuItem(title: String(localized: "Copier"), handler: copy))
+            menu.addItem(closureMenuItem(title: String(localized: "Déplacer (couper)"), handler: cut))
+        }
+        if availability.canRename, let rename {
             menu.addItem(closureMenuItem(title: String(localized: "Renommer…"), handler: rename))
         }
-        menu.addItem(closureMenuItem(title: String(localized: "Supprimer…"), handler: delete))
+        if availability.canDelete {
+            menu.addItem(closureMenuItem(title: String(localized: "Supprimer…"), handler: delete))
+        }
     }
 
     if let showInfo {
-        menu.addItem(NSMenuItem.separator())
+        if !menu.items.isEmpty {
+            menu.addItem(NSMenuItem.separator())
+        }
         menu.addItem(closureMenuItem(title: String(localized: "Lire les informations"), handler: showInfo))
     }
     return menu
@@ -372,8 +396,16 @@ final class FileCellView: NSTableCellView {
     var onCompress: (() -> Void)?
     var onExtract: (() -> Void)?
     var onShowInfo: (() -> Void)?
-    var canWrite = false
-    var canExtract = false
+    var actionAvailability = FileActionAvailability(
+        canDownload: false,
+        canRename: false,
+        canDelete: false,
+        canCopyMove: false,
+        canShare: false,
+        canCompress: false,
+        canExtract: false
+    )
+    var canExtractSelectedItem = false
 
     init(identifier: NSUserInterfaceItemIdentifier) {
         super.init(frame: .zero)
@@ -434,16 +466,26 @@ final class FileCellView: NSTableCellView {
 
     override func accessibilityCustomActions() -> [NSAccessibilityCustomAction]? {
         var actions = [NSAccessibilityCustomAction]()
-        appendAction(named: String(localized: "Télécharger"), handler: onDownload, to: &actions)
-        if canWrite {
+        if actionAvailability.canDownload {
+            appendAction(named: String(localized: "Télécharger"), handler: onDownload, to: &actions)
+        }
+        if actionAvailability.canShare {
             appendAction(named: String(localized: "Créer un lien de partage"), handler: onShare, to: &actions)
+        }
+        if actionAvailability.canCompress {
             appendAction(named: String(localized: "Compresser"), handler: onCompress, to: &actions)
-            if canExtract {
-                appendAction(named: String(localized: "Extraire"), handler: onExtract, to: &actions)
-            }
+        }
+        if actionAvailability.canExtract, canExtractSelectedItem {
+            appendAction(named: String(localized: "Extraire"), handler: onExtract, to: &actions)
+        }
+        if actionAvailability.canCopyMove {
             appendAction(named: String(localized: "Copier"), handler: onCopy, to: &actions)
             appendAction(named: String(localized: "Déplacer (couper)"), handler: onCut, to: &actions)
+        }
+        if actionAvailability.canRename {
             appendAction(named: String(localized: "Renommer"), handler: onRename, to: &actions)
+        }
+        if actionAvailability.canDelete {
             appendAction(named: String(localized: "Supprimer"), handler: onDelete, to: &actions)
         }
         appendAction(named: String(localized: "Lire les informations"), handler: onShowInfo, to: &actions)
@@ -453,8 +495,8 @@ final class FileCellView: NSTableCellView {
     override func accessibilityPerformShowMenu() -> Bool {
         guard onDownload != nil else { return false }
         let menu = makeFileContextMenu(
-            canWrite: canWrite,
-            canExtract: canExtract,
+            availability: actionAvailability,
+            canExtractSelectedItem: canExtractSelectedItem,
             activate: onPress,
             download: { [weak self] in self?.onDownload?() },
             rename: onRename,
