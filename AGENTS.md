@@ -43,6 +43,11 @@ package dependency. Do not add another dependency without explicit approval.
 - `dsmaccess/Networking`: endpoint construction, API discovery, transport, authentication,
   and errors.
 - `dsmaccess/Networking/Services`: feature-specific DSM requests and response handling.
+- `dsmaccess/Backend`: the HTTP client for the developer's multi-app backend (feedback
+  reports, contact form, launch announcements). Independent of the DSM stack by design:
+  it must not route through `DSMTransport`, `DSMClient`, or `DSMClientProtocol`. Its
+  Bearer secret is read from the git-ignored `dsmaccess/AppBackendSecret.plist`; without
+  that file the build still succeeds and the contact UI stays hidden.
 - `dsmaccess/Session`: session state, preferences, profiles, and Keychain integration.
 - `dsmaccess/ViewModels`: screen state and user-operation orchestration.
 - `dsmaccess/Views`: presentation, focus, keyboard interaction, and accessibility behavior.
@@ -195,6 +200,18 @@ Run all tests:
 ```sh
 xcodebuild -project dsmaccess.xcodeproj -scheme dsmaccess -destination 'platform=macOS' test
 ```
+
+Run a single target, suite, or test with `-only-testing:` (target, `target/Suite`, or
+`target/Suite/testName`):
+
+```sh
+xcodebuild -project dsmaccess.xcodeproj -scheme dsmaccess -destination 'platform=macOS' \
+  test -only-testing:dsmaccessTests/AppBackendClientTests
+```
+
+The UI audit test `testLoginScreenPassesAccessibilityAudit` is sensitive to the machine
+being in active use: it can fail with a "Parent/Child mismatch" whose element is nil.
+Rerun it on an idle machine before attributing the failure to a code change.
 
 Before handing off a code change:
 
