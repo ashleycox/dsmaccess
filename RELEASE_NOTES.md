@@ -1,3 +1,35 @@
+## v1.1-beta.7 (build 8) — 2026-07-22
+
+### Highlights
+
+- Installing a package file (.spk) now works: it used to fail every time with
+  a NAS error (code 101).
+- The app now checks for its own updates at launch, and a new settings pane
+  can install them automatically, with no dialog to answer.
+
+### New
+
+- Settings > Updates: checking at launch is now on by default (you can turn it
+  off), and a "Download and install automatically" option installs the new
+  version when the app quits — no more answering a dialog for every update.
+  The pane also shows the installed version and a check-now button.
+
+### Fixes
+
+- Packages: installing or updating a package from an .spk file you downloaded
+  yourself now goes through, instead of failing right away with a NAS error
+  (code 101). The app now talks to the Package Center exactly the way DSM
+  itself does, verified on DSM 7.4.
+
+### Requirements
+
+- macOS 14 (Sonoma) or later.
+- A Synology NAS running DSM 7 on your local network.
+
+### Download
+
+[dsmaccess-1.1-beta.7.zip](https://github.com/math65/dsmaccess/releases/download/v1.1-beta.7/dsmaccess-1.1-beta.7.zip)
+
 ## v1.1-beta.6 (build 7) — 2026-07-21
 
 ### Highlights
