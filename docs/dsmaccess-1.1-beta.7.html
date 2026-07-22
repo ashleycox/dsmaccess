@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dsmaccess-1.1-beta.7</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1d1d1f;
+  --muted: #6e6e73;
+  --code-bg: #f5f5f7;
+  --link: #0066cc;
+  --link-hover: #0040a0;
+  --rule: #e5e5ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1e1e;
+    --fg: #ececec;
+    --muted: #a0a0a0;
+    --code-bg: #2d2d2d;
+    --link: #4eaaff;
+    --link-hover: #82c4ff;
+    --rule: #3a3a3a;
+  }
+}
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
+  padding: 1rem 1.25rem 1.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+h1, h2, h3, h4 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 1.4em 0 0.5em;
+}
+h1 { font-size: 1.35rem; }
+h2 { font-size: 1.15rem; border-bottom: 1px solid var(--rule); padding-bottom: 0.2em; }
+h3 { font-size: 1.02rem; }
+h4 { font-size: 0.95rem; color: var(--muted); }
+p { margin: 0.6em 0; }
+ul, ol { padding-left: 1.4em; margin: 0.6em 0; }
+li { margin: 0.25em 0; }
+li > p { margin: 0.3em 0; }
+a { color: var(--link); text-decoration: none; }
+a:hover, a:focus { color: var(--link-hover); text-decoration: underline; }
+code {
+  background: var(--code-bg);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.88em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 0.75em 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-size: 0.88em;
+  line-height: 1.45;
+}
+pre code { background: transparent; padding: 0; border-radius: 0; }
+blockquote {
+  border-left: 3px solid var(--rule);
+  margin: 0.8em 0;
+  padding: 0.1em 0 0.1em 1em;
+  color: var(--muted);
+}
+hr { border: 0; border-top: 1px solid var(--rule); margin: 1.5em 0; }
+strong { font-weight: 600; }
+</style>
+</head>
+<body>
+<h2 id="v11-beta7-build-8--2026-07-22">v1.1-beta.7 (build 8) —
+2026-07-22</h2>
+<h3 id="highlights">Highlights</h3>
+<ul>
+<li>Installing a package file (.spk) now works: it used to fail every
+time with a NAS error (code 101).</li>
+<li>The app now checks for its own updates at launch, and a new settings
+pane can install them automatically, with no dialog to answer.</li>
+</ul>
+<h3 id="new">New</h3>
+<ul>
+<li>Settings &gt; Updates: checking at launch is now on by default (you
+can turn it off), and a "Download and install automatically" option
+installs the new version when the app quits — no more answering a dialog
+for every update. The pane also shows the installed version and a
+check-now button.</li>
+</ul>
+<h3 id="fixes">Fixes</h3>
+<ul>
+<li>Packages: installing or updating a package from an .spk file you
+downloaded yourself now goes through, instead of failing right away with
+a NAS error (code 101). The app now talks to the Package Center exactly
+the way DSM itself does, verified on DSM 7.4.</li>
+</ul>
+<h3 id="requirements">Requirements</h3>
+<ul>
+<li>macOS 14 (Sonoma) or later.</li>
+<li>A Synology NAS running DSM 7 on your local network.</li>
+</ul>
+<h3 id="download">Download</h3>
+<p><a
+href="https://github.com/math65/dsmaccess/releases/download/v1.1-beta.7/dsmaccess-1.1-beta.7.zip">dsmaccess-1.1-beta.7.zip</a></p>
+<h2 id="v11-beta6-build-7--2026-07-21">v1.1-beta.6 (build 7) —
+2026-07-21</h2>
+<h3 id="highlights-1">Highlights</h3>
+<ul>
+<li>Connect with QuickConnect: enter your QuickConnect ID instead of an
+address and port, and the app finds the best route to your NAS by
+itself.</li>
+<li>The Package Center becomes a full module: browse the official
+Synology catalog and install, update, repair or uninstall packages
+without leaving the app — and package installs now work reliably on DSM
+7.4.</li>
+<li>Files gains the features that were still missing: detailed file
+information, advanced search, favorites, share link management, archive
+browsing and transfer progress.</li>
+<li>Creating users works again on DSM 7.4, and group members are counted
+correctly.</li>
+</ul>
+<h3 id="new-1">New</h3>
+<ul>
+<li>Sign in with QuickConnect: pick "QuickConnect" on the sign-in
+screen, enter your QuickConnect ID and your usual DSM account. The app
+prefers a direct, verified route to your NAS and only falls back to the
+Synology relay when needed — always over HTTPS. Note that QuickConnect
+has no official public interface, so Synology may change this service
+without notice.</li>
+<li>Packages: browse the official catalog, install a package with one
+action, or install a package file (.spk) you downloaded yourself.
+Updates, repairs and uninstalls are handled from the same list, with
+clear confirmations before anything runs.</li>
+<li>Packages: manage package sources and Package Center settings from
+the app.</li>
+<li>Files: see full details for any file or folder, search with advanced
+criteria (name, type, size, dates, owner), and manage your
+favorites.</li>
+<li>Files: create and manage share links, including passwords and expiry
+dates.</li>
+<li>Files: look inside an archive and extract only the items you
+need.</li>
+<li>Files: uploads and downloads now show their progress, and copy or
+move operations ask you before overwriting anything.</li>
+<li>A contact form in the Help menu lets you write to the developer
+directly from the app; occasional announcements may appear at
+launch.</li>
+</ul>
+<h3 id="fixes-1">Fixes</h3>
+<ul>
+<li>Accounts: creating a user on DSM 7.4 no longer fails with a
+permission error, group member counts are correct, and when something
+does go wrong the app now tells you instead of failing silently.</li>
+<li>Packages: installing or updating a package on DSM 7.4 no longer
+fails with a NAS error.</li>
+<li>VoiceOver: opening Files no longer announces "Empty folder" while
+the content is still loading — you now hear the real item count straight
+away.</li>
+<li>VoiceOver: if your session expires and the app reconnects
+automatically, a notice now explains that the operation in progress was
+interrupted, instead of returning you to the overview without a
+word.</li>
+</ul>
+<h3 id="thanks">Thanks</h3>
+<ul>
+<li>Thanks to Ashley Cox for the QuickConnect, File Station and Package
+Center work at the heart of this release.</li>
+</ul>
+<h3 id="requirements-1">Requirements</h3>
+<ul>
+<li>macOS 14 (Sonoma) or later.</li>
+<li>A Synology NAS running DSM 7 on your local network.</li>
+</ul>
+<h3 id="download-1">Download</h3>
+<p><a
+href="https://github.com/math65/dsmaccess/releases/download/v1.1-beta.6/dsmaccess-1.1-beta.6.zip">dsmaccess-1.1-beta.6.zip</a></p>
+<h2 id="v11-beta5-build-6--2026-07-19">v1.1-beta.5 (build 6) —
+2026-07-19</h2>
+<h3 id="highlights-2">Highlights</h3>
+<ul>
+<li>Fixes a sign-in problem introduced in beta.4: approving your NAS
+certificate now works, instead of the trust prompt coming back again and
+again.</li>
+</ul>
+<h3 id="fixes-2">Fixes</h3>
+<ul>
+<li>When macOS does not recognise your NAS certificate, approving it
+once now signs you in on the first try, and the choice is remembered for
+that server. In beta.4 the approval did not take, so the trust prompt
+kept reappearing and left you stuck on the sign-in screen.</li>
+</ul>
+<h3 id="thanks-1">Thanks</h3>
+<ul>
+<li>Thanks to Ashley Cox, who tracked this down and fixed it.</li>
+</ul>
+<h3 id="requirements-2">Requirements</h3>
+<ul>
+<li>macOS 14 (Sonoma) or later.</li>
+<li>A Synology NAS running DSM 7 on your local network.</li>
+</ul>
+<h3 id="download-2">Download</h3>
+<p><a
+href="https://github.com/math65/dsmaccess/releases/download/v1.1-beta.5/dsmaccess-1.1-beta.5.zip">dsmaccess-1.1-beta.5.zip</a></p>
+</body>
+</html>
