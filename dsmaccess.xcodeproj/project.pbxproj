@@ -206,7 +206,7 @@
 				};
 			};
 			buildConfigurationList = 94BBDF0B2FFF2A0300FA27D3 /* Build configuration list for PBXProject "dsmaccess" */;
-			developmentRegion = fr;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
