@@ -13899,7 +13899,14 @@
       }
     },
     "MonNAS" : {
-      "shouldTranslate" : false
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MyNAS"
+          }
+        }
+      }
     },
     "QuickConnect" : {
       "shouldTranslate" : false
