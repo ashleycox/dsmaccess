@@ -82,16 +82,21 @@ struct QuickConnectResolverTests {
         #expect(await stub.requestCount == 1)
     }
 
-    @Test func rejectsAResponseForADifferentIdentifier() async {
+    @Test func rejectsRoutesWhosePingAnswersForAnotherServer() async {
+        // Le lien entre la réponse de contrôle et la route passe par le pingpong :
+        // une route qui répond pour un autre serveur est écartée, directe comme relais.
+        let host = "192-0-2-10.MY-NAS.direct.quickconnect.to"
         let stub = DSMRequestStub(results: [
-            .response(serverInfo(serverID: "another-nas")),
+            .response(serverInfo(serverID: "077000111", smartDNSHost: host)),
+            .response(ping(serverID: "999999999")),
+            .response(serverInfo(serverID: "077000111", relayReady: true)),
+            .response(ping(serverID: "999999999")),
         ])
         let resolver = QuickConnectResolver(requestData: { try await stub.data(for: $0) })
 
-        await #expect(throws: QuickConnectError.invalidResponse) {
+        await #expect(throws: QuickConnectError.secureRouteUnavailable) {
             try await resolver.resolve(id: "my-nas")
         }
-        #expect(await stub.requestCount == 1)
     }
 
     @Test func rejectsPingVerificationRedirectedToAnotherOrigin() async throws {
@@ -119,6 +124,49 @@ struct QuickConnectResolverTests {
         await #expect(throws: CancellationError.self) {
             try await resolver.resolve(id: "my-nas")
         }
+    }
+
+    @Test func acceptsTheNumericInternalServerIDReturnedByQuickConnect() async throws {
+        // Le service réel renvoie un identifiant interne numérique dans `server.serverID`,
+        // différent de l'alias demandé, et le pingpong répond md5(identifiant interne).
+        let internalID = "077000111"
+        let host = "192-0-2-10.MY-NAS.direct.quickconnect.to"
+        let stub = DSMRequestStub(results: [
+            .response(serverInfo(serverID: internalID, smartDNSHost: host)),
+            .response(ping(serverID: internalID)),
+        ])
+        let resolver = QuickConnectResolver(requestData: { try await stub.data(for: $0) })
+
+        let route = try await resolver.resolve(id: "my-nas")
+
+        #expect(route == QuickConnectRoute(
+            endpoint: DSMEndpoint(useHTTPS: true, host: host, port: 5001),
+            kind: .smartDNS
+        ))
+    }
+
+    @Test func prefersTheRelayHostProvidedByTheResponse() async throws {
+        let internalID = "077000111"
+        let relayDN = "synr-eu1.MY-NAS.direct.quickconnect.to"
+        let relay = #", "relay_ip":"203.0.113.8", "relay_port":32047, "relay_dn":"\#(relayDN)""#
+        let tunnel = Data(
+            #"[{"command":"request_tunnel","errno":0,"server":{"serverID":"\#(internalID)","interface":[],"external":{"ip":"198.51.100.20"}},"service":{"port":5001,"ext_port":0,"pingpong":"CONNECTED"\#(relay)},"env":{"control_host":"global.quickconnect.to","relay_region":"eu1"},"version":1}]"#.utf8
+        )
+        let stub = DSMRequestStub(results: [
+            .response(serverInfo(serverID: internalID)),
+            .response(tunnel),
+            .response(ping(serverID: internalID)),
+        ])
+        let resolver = QuickConnectResolver(requestData: { try await stub.data(for: $0) })
+
+        let route = try await resolver.resolve(id: "my-nas")
+
+        #expect(route == QuickConnectRoute(
+            endpoint: DSMEndpoint(useHTTPS: true, host: relayDN, port: 443),
+            kind: .relay
+        ))
+        let requests = await stub.requests
+        #expect(requests[2].url?.host == relayDN)
     }
 
     private func serverInfo(

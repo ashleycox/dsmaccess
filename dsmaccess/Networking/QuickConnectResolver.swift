@@ -84,7 +84,7 @@ nonisolated struct QuickConnectResolver: Sendable {
             serverID: id,
             at: Self.globalControlURL
         )
-        let initial = try validatedResponse(in: initialResponses, expectedServerID: id)
+        let initial = try validatedResponse(in: initialResponses)
 
         if let direct = try await firstReachableSmartDNSRoute(from: initial) {
             return direct
@@ -99,15 +99,20 @@ nonisolated struct QuickConnectResolver: Sendable {
             serverID: id,
             at: controlURL
         )
-        let tunnel = try validatedResponse(in: tunnelResponses, expectedServerID: id)
+        let tunnel = try validatedResponse(in: tunnelResponses)
+        // Le nom d'hôte du relais vient de la réponse (`relay_dn`) quand il est présent ;
+        // la forme historique `alias.région.quickconnect.*` reste le repli. L'identifiant
+        // interne (`server.serverID`, numérique) ne doit jamais servir à construire l'hôte.
         guard let service = tunnel.service,
               let relayIP = service.relayIP,
               !relayIP.isEmpty,
               let relayPort = service.relayPort,
               (1...65_535).contains(relayPort),
               let tunnelEnvironment = tunnel.environment,
-              let relayHost = Self.relayHost(
-                  serverID: tunnel.server?.serverID,
+              let relayHost = service.relayDN.flatMap({
+                  Self.isQuickConnectHost($0) ? $0 : nil
+              }) ?? Self.relayHost(
+                  serverID: id,
                   region: tunnelEnvironment.relayRegion,
                   controlHost: tunnelEnvironment.controlHost
               ) else {
@@ -173,12 +178,14 @@ nonisolated struct QuickConnectResolver: Sendable {
     }
 
     private func validatedResponse(
-        in responses: [QuickConnectControlResponse],
-        expectedServerID: String
+        in responses: [QuickConnectControlResponse]
     ) throws -> QuickConnectControlResponse {
+        // `server.serverID` est un identifiant interne numérique, pas l'alias demandé :
+        // le lien avec l'alias vient de la requête elle-même, puis du contrôle pingpong
+        // (ezid = md5 de cet identifiant interne) sur la route retenue.
         if let response = responses.first(where: {
             $0.errno == 0
-                && $0.server?.serverID.caseInsensitiveCompare(expectedServerID) == .orderedSame
+                && $0.server != nil
                 && $0.service != nil
                 && $0.environment != nil
         }) {
@@ -231,8 +238,10 @@ nonisolated struct QuickConnectResolver: Sendable {
         endpoint: DSMEndpoint,
         response: QuickConnectControlResponse
     ) async throws -> Bool {
+        // L'identifiant interne renvoyé par QuickConnect est numérique : il ne suit pas
+        // les règles de forme d'un alias, seulement celles d'une étiquette DNS.
         guard let serverID = response.server?.serverID,
-              Self.isValid(id: serverID),
+              Self.isDNSLabel(serverID),
               let url = Self.pingURL(endpoint: endpoint, response: response) else {
             throw QuickConnectError.invalidResponse
         }

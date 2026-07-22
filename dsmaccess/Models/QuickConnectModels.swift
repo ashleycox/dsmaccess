@@ -46,12 +46,15 @@ nonisolated struct QuickConnectControlResponse: Decodable, Sendable {
         let externalPort: Int
         let relayIP: String?
         let relayPort: Int?
+        /// Nom d'hôte du relais fourni par QuickConnect (ex. `synr-xx.ID.direct.quickconnect.to`).
+        let relayDN: String?
 
         enum CodingKeys: String, CodingKey {
             case port
             case externalPort = "ext_port"
             case relayIP = "relay_ip"
             case relayPort = "relay_port"
+            case relayDN = "relay_dn"
         }
     }
 
