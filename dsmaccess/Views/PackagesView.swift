@@ -191,7 +191,6 @@ struct PackagesView: View {
         .pickerStyle(.segmented)
         .labelsHidden()
         .fixedSize()
-        .accessibilityLabel("Centre de paquets")
         .disabled(operationTask != nil || refreshTask != nil)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8)
