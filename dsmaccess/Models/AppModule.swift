@@ -37,6 +37,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
     case files
     case shares
     case downloads
+    case usbCopy
     case usersGroups
     case fileServices
     case packages
@@ -52,7 +53,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .systemInfo, .storage, .logsSecurity: .overview
         case .files, .shares, .downloads: .files
         case .usersGroups, .fileServices, .packages, .controlPanel: .administration
-        case .containers, .virtualMachines, .surveillance: .applications
+        case .containers, .virtualMachines, .surveillance, .usbCopy: .applications
         }
     }
 
@@ -64,6 +65,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .files: "Fichiers"
         case .shares: "Dossiers partagés"
         case .downloads: "Download Station"
+        case .usbCopy: "USB Copy"
         case .usersGroups: "Utilisateurs et groupes"
         case .fileServices: "Services de fichiers"
         case .packages: "Centre de paquets"
@@ -82,6 +84,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .files: String(localized: "Fichiers")
         case .shares: String(localized: "Dossiers partagés")
         case .downloads: String(localized: "Download Station")
+        case .usbCopy: String(localized: "USB Copy")
         case .usersGroups: String(localized: "Utilisateurs et groupes")
         case .fileServices: String(localized: "Services de fichiers")
         case .packages: String(localized: "Centre de paquets")
@@ -100,6 +103,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .files: "folder"
         case .shares: "externaldrive.badge.person.crop"
         case .downloads: "arrow.down.circle"
+        case .usbCopy: "externaldrive.badge.arrowtriangle.2.circlepath"
         case .usersGroups: "person.2"
         case .fileServices: "network"
         case .packages: "shippingbox"
@@ -125,6 +129,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
         case .containers: AppModuleShortcut(key: "1", modifiers: [.command, .shift])
         case .virtualMachines: AppModuleShortcut(key: "2", modifiers: [.command, .shift])
         case .surveillance: AppModuleShortcut(key: "3", modifiers: [.command, .shift])
+        case .usbCopy: AppModuleShortcut(key: "4", modifiers: [.command, .shift])
         }
     }
 
@@ -150,6 +155,8 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
                 || capabilities.supports(prefix: "SYNO.Core.SmartBlock")
         case .downloads:
             capabilities.supports("SYNO.DownloadStation.Task")
+        case .usbCopy:
+            capabilities.supports("SYNO.USBCopy")
         case .usersGroups:
             capabilities.supports("SYNO.Core.User") && capabilities.supports("SYNO.Core.Group")
         case .containers:
@@ -165,6 +172,7 @@ enum AppModule: String, CaseIterable, Identifiable, Codable, Sendable {
     var unavailableHelp: LocalizedStringKey {
         switch self {
         case .downloads: "Download Station n’est pas installé ou son API n’est pas disponible."
+        case .usbCopy: "USB Copy n’est pas installé ou son API n’est pas disponible."
         case .containers: "Container Manager n’est pas installé ou son API n’est pas disponible."
         case .virtualMachines: "Virtual Machine Manager n’est pas installé ou son API n’est pas disponible."
         case .surveillance: "Surveillance Station n’est pas installé ou son API n’est pas disponible."

@@ -153,6 +153,8 @@ struct MainView: View {
             SharesView(session: session)
         case .downloads:
             DownloadStationView(session: session)
+        case .usbCopy:
+            USBCopyView(session: session)
         case .usersGroups:
             UsersGroupsView(session: session)
         case .fileServices:

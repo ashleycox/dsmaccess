@@ -22,11 +22,13 @@ struct SharedFolder: nonisolated Decodable, Identifiable, Sendable {
     let uuid: String?
     let recyclebin: Bool?
     let shareQuota: Int?
+    let externalDeviceType: String?
 
     enum CodingKeys: String, CodingKey {
         case name, desc, uuid, recyclebin
         case volPath = "vol_path"
         case shareQuota = "share_quota"
+        case externalDeviceType = "external_dev_type"
     }
 
     nonisolated init(from decoder: Decoder) throws {
@@ -37,6 +39,7 @@ struct SharedFolder: nonisolated Decodable, Identifiable, Sendable {
         uuid = values.flexString(.uuid)
         recyclebin = values.flexBool(.recyclebin)
         shareQuota = values.flexInt(.shareQuota)
+        externalDeviceType = values.flexString(.externalDeviceType)
     }
 
     var id: String { uuid ?? name }

@@ -133,11 +133,13 @@ struct DSMCapabilitiesTests {
             "SYNO.DSM.Info": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 2),
             "SYNO.Core.FileServ.SMB": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 3),
             "SYNO.Core.Network": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 2),
+            "SYNO.USBCopy": APIInfoEntry(path: "entry.cgi", minVersion: 1, maxVersion: 1),
         ])
 
         #expect(AppModule.systemInfo.isAvailable(in: capabilities))
         #expect(AppModule.fileServices.isAvailable(in: capabilities))
         #expect(AppModule.controlPanel.isAvailable(in: capabilities))
+        #expect(AppModule.usbCopy.isAvailable(in: capabilities))
         #expect(!AppModule.storage.isAvailable(in: capabilities))
         #expect(!AppModule.files.isAvailable(in: capabilities))
         #expect(!AppModule.shares.isAvailable(in: capabilities))
