@@ -208,11 +208,15 @@ final class DSMPackageService {
                 )
             }
             try await feasibilityCheck(packageID: metadata.packageID, type: "install_check")
+            // check_codesign vaut false ici : c'est ce qu'envoie le client web une fois
+            // l'avertissement « paquet tiers » accepté, ce que l'app fait via sa propre
+            // confirmation avant l'envoi du fichier.
             try await finalizeInstallation(
                 metadata: metadata,
                 method: metadata.isAlreadyInstalled ? "upgrade" : "install",
                 packageType: 0,
                 checkDependencies: true,
+                checkCodesign: false,
                 force: false,
                 source: .task(taskID)
             )
@@ -342,6 +346,7 @@ final class DSMPackageService {
                 method: operation.method,
                 packageType: update.packageType,
                 checkDependencies: false,
+                checkCodesign: true,
                 force: true,
                 source: .path(filename)
             )
@@ -552,6 +557,7 @@ final class DSMPackageService {
         method: String,
         packageType: Int,
         checkDependencies: Bool,
+        checkCodesign: Bool,
         force: Bool,
         source: InstallationSource
     ) async throws {
@@ -574,7 +580,7 @@ final class DSMPackageService {
             // chaîne "{}", comme l'envoie le client web du Centre de paquets.
             "extra_values": .string("{}"),
             "type": .integer(packageType),
-            "check_codesign": .boolean(true),
+            "check_codesign": .boolean(checkCodesign),
             "force": .boolean(force),
             "installrunpackage": .boolean(true),
         ]
@@ -617,6 +623,9 @@ final class DSMPackageService {
         progress: @escaping DSMTransferProgressHandler
     ) async throws -> PackageInstallationMetadata {
         let boundary = "Boundary-\(UUID().uuidString)"
+        // Contrat DSM 7.4 (capturé sur le client web du Centre de paquets) : api, method,
+        // version et session vont dans la query de l'URL — placés dans le corps multipart,
+        // DSM répond 101. Le corps ne porte que "additional" puis le fichier.
         let route = try await transport.multipartRoute(
             api: Self.installationAPI,
             method: "upload",
@@ -624,19 +633,23 @@ final class DSMPackageService {
                 "additional": try DSMParameter.json([
                     "description", "maintainer", "distributor", "startable", "dsm_apps",
                     "status", "install_reboot", "install_type", "install_on_cold_storage",
-                    "break_pkgs", "replace_pkgs", "licence", "install_pages",
+                    "break_pkgs", "replace_pkgs",
                 ])
             ]
         )
+        var query = route.fields
+        let additional = query.removeValue(forKey: "additional")
+        let resolved = try await transport.resolvedAPI(Self.installationAPI)
+        let uploadURL = try transport.makeURL(path: resolved.path, parameters: query)
         let bodyURL = try await MultipartBodyFile.create(
-            fields: route.fields,
+            fields: additional.map { ["additional": $0] } ?? [:],
             fileURL: fileURL,
             fileFieldName: "file",
             boundary: boundary
         )
         defer { try? FileManager.default.removeItem(at: bodyURL) }
 
-        var request = URLRequest(url: route.url)
+        var request = URLRequest(url: uploadURL)
         request.httpMethod = "POST"
         request.timeoutInterval = 900
         request.setValue(

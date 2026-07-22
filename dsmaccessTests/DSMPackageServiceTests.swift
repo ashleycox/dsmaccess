@@ -277,12 +277,21 @@ struct DSMPackageServiceTests {
         #expect(requests[0].value(forHTTPHeaderField: "Content-Type")?.hasPrefix(
             "multipart/form-data; boundary="
         ) == true)
+        // DSM 7.4 exige api/method/version dans la query de l'URL d'upload, pas dans le corps.
+        let uploadURL = try #require(requests[0].url)
+        let uploadQuery = try #require(
+            URLComponents(url: uploadURL, resolvingAgainstBaseURL: false)?.queryItems
+        )
+        #expect(uploadQuery.contains(URLQueryItem(name: "api", value: "SYNO.Core.Package.Installation")))
+        #expect(uploadQuery.contains(URLQueryItem(name: "method", value: "upload")))
+        #expect(uploadQuery.contains { $0.name == "version" })
         let uploadedBody = try #require(await stub.uploadedBodies.first)
         let uploadedText = try #require(String(data: uploadedBody, encoding: .utf8))
+        #expect(uploadedText.contains("name=\"additional\""))
         #expect(uploadedText.contains("name=\"file\""))
         #expect(uploadedText.contains("test-spk-contents"))
-        #expect(uploadedText.contains("licence"))
-        #expect(uploadedText.contains("install_pages"))
+        #expect(!uploadedText.contains("name=\"api\""))
+        #expect(!uploadedText.contains("name=\"method\""))
 
         let feasibility = try parameters(from: requests[1])
         #expect(feasibility["method"] == "feasibility_check")
@@ -293,6 +302,7 @@ struct DSMPackageServiceTests {
         #expect(compound[0]["blCheckDep"] as? Bool == true)
         #expect(compound[1]["method"] as? String == "install")
         #expect(compound[1]["task_id"] as? String == "upload-7")
+        #expect(compound[1]["check_codesign"] as? Bool == false)
         #expect(compound[1]["force"] as? Bool == false)
 
         let cleanup = try parameters(from: requests[3])
