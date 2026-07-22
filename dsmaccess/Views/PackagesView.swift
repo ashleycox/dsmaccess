@@ -41,6 +41,9 @@ struct PackagesView: View {
 
     private var baseContent: some View {
         VStack(spacing: 0) {
+            // Dans le contenu et non la barre d'outils : VoiceOver doit rencontrer le
+            // choix Installés/Catalogue dans l'ordre de lecture, comme un vrai sélecteur.
+            sectionPicker
             statusBanners
             content
         }
@@ -179,21 +182,23 @@ struct PackagesView: View {
         }
     }
 
+    private var sectionPicker: some View {
+        Picker("Centre de paquets", selection: $section) {
+            ForEach(PackageCenterSection.allCases) { section in
+                Text(section.title).tag(section)
+            }
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .fixedSize()
+        .accessibilityLabel("Centre de paquets")
+        .disabled(operationTask != nil || refreshTask != nil)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+    }
+
     @ToolbarContentBuilder
     private var packageToolbar: some ToolbarContent {
-        ToolbarItem {
-            Picker("Centre de paquets", selection: $section) {
-                ForEach(PackageCenterSection.allCases) { section in
-                    Text(section.title).tag(section)
-                }
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .fixedSize()
-            .accessibilityLabel("Centre de paquets")
-            .disabled(operationTask != nil || refreshTask != nil)
-        }
-
         ToolbarItem {
             if section == .installed {
                 Picker("Filtrer les paquets", selection: $filter) {
