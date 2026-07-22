@@ -107,6 +107,7 @@ struct UsersGroupsView: View {
                     .tag(user.id)
                     .contextMenu { userActions(user) }
             }
+            .accessibilityLabel("Utilisateurs")
         }
     }
 
@@ -130,6 +131,7 @@ struct UsersGroupsView: View {
                             .help("Supprimer ce groupe")
                     }
             }
+            .accessibilityLabel("Groupes")
         }
     }
 

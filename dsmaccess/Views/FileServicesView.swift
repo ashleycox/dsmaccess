@@ -65,6 +65,7 @@ struct FileServicesView: View {
                     }
                 }
             }
+            .accessibilityLabel("Services de fichiers")
             .accessibilityFocused($focusContent)
         }
     }

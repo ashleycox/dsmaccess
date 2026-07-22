@@ -365,6 +365,7 @@ struct PackagesView: View {
             List(filteredPackages) { package in
                 row(for: package)
             }
+            .accessibilityLabel("Paquets installés")
             .accessibilityFocused($focusContent)
         }
     }

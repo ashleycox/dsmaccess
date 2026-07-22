@@ -1073,6 +1073,38 @@
         }
       }
     },
+    "Paquets installés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installed packages"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paquets installés"
+          }
+        }
+      }
+    },
+    "Pools, volumes et disques" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pools, volumes, and disks"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pools, volumes et disques"
+          }
+        }
+      }
+    },
     "Paramètres conservés" : {
       "localizations" : {
         "en" : {

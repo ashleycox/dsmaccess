@@ -87,6 +87,7 @@ struct SharesView: View {
             List(filteredShares) { share in
                 row(for: share)
             }
+            .accessibilityLabel("Dossiers partagés")
             .accessibilityFocused($focusContent)
         }
     }
@@ -101,6 +102,9 @@ struct SharesView: View {
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(share.accessibilityLabel)
+            // L'élément combiné n'a aucun rôle par défaut ; sans ce trait,
+            // VoiceOver et l'audit le voient comme un élément de nature inconnue.
+            .accessibilityAddTraits(.isStaticText)
             Spacer()
             Button(role: .destructive) {
                 pendingDelete = share
