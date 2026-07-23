@@ -1,6 +1,2426 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
+    "%lld dossiers disponibles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld folders available"
+          }
+        }
+      }
+    },
+    "1 dossier disponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 folder available"
+          }
+        }
+      }
+    },
+    "Charger plus d’entrées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Load more entries"
+          }
+        }
+      }
+    },
+    "Choisissez au moins un jour d’exécution." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose at least one day to run the task."
+          }
+        }
+      }
+    },
+    "Saisissez une date de référence valide au format AAAA/MM/JJ." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid reference date in YYYY/MM/DD format."
+          }
+        }
+      }
+    },
+    "La tâche « %@ » sera définitivement supprimée de USB Copy. Cette action est irréversible. Vérifiez que vous n’avez plus besoin de sa configuration ni de son historique." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The “%1$@” task will be permanently removed from USB Copy. This action cannot be undone. Make sure you no longer need its configuration or history."
+          }
+        }
+      }
+    },
+    "%@ → %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ → %@"
+          }
+        }
+      }
+    },
+    "%lld entrées affichées sur %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld entries shown out of %lld"
+          }
+        }
+      }
+    },
+    "%lld entrées de journal chargées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld log entries loaded"
+          }
+        }
+      }
+    },
+    "%lld tâches USB Copy, %lld actives" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld USB Copy tasks, %lld active"
+          }
+        }
+      }
+    },
+    "*.%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*.%@"
+          }
+        }
+      }
+    },
+    "*.extension ou nom de fichier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*.extension or file name"
+          }
+        }
+      }
+    },
+    "AAAA/MM/JJ" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YYYY/MM/DD"
+          }
+        }
+      }
+    },
+    "Activer la planification" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable schedule"
+          }
+        }
+      }
+    },
+    "Activer la rotation des versions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable version rotation"
+          }
+        }
+      }
+    },
+    "Activer ou désactiver la tâche USB Copy sélectionnée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable or disable the selected USB Copy task"
+          }
+        }
+      }
+    },
+    "Actualiser les tâches USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refresh USB Copy tasks"
+          }
+        }
+      }
+    },
+    "Ajouter cette règle personnalisée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add this custom rule"
+          }
+        }
+      }
+    },
+    "Annulation demandée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancellation requested: %@"
+          }
+        }
+      }
+    },
+    "Annulation en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelling"
+          }
+        }
+      }
+    },
+    "Annuler la copie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel copy"
+          }
+        }
+      }
+    },
+    "Annulez la copie avant de modifier cette tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel the copy before editing this task"
+          }
+        }
+      }
+    },
+    "Appliquer le filtre" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apply Filter"
+          }
+        }
+      }
+    },
+    "Arrêter la tâche USB Copy sélectionnée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop the selected USB Copy task"
+          }
+        }
+      }
+    },
+    "Aucun dossier USB ou carte SD n’est actuellement monté. Connectez le périphérique pour choisir une autre destination." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No USB or SD card shared folder is currently mounted. Connect the device to choose another destination."
+          }
+        }
+      }
+    },
+    "Aucun dossier USB ou carte SD n’est actuellement monté. La création d’une tâche exige normalement un périphérique connecté." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No USB or SD card shared folder is currently mounted. Creating a task normally requires a connected device."
+          }
+        }
+      }
+    },
+    "Aucun événement ne correspond au filtre choisi." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No events match the selected filter."
+          }
+        }
+      }
+    },
+    "Aucune entrée de journal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Log Entries"
+          }
+        }
+      }
+    },
+    "Aucune tâche USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No USB Copy Tasks"
+          }
+        }
+      }
+    },
+    "Audio" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        }
+      }
+    },
+    "Ce périphérique USB est déjà utilisé par une autre tâche." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This USB device is already used by another task."
+          }
+        }
+      }
+    },
+    "Cette règle contient un caractère non autorisé." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This rule contains a disallowed character."
+          }
+        }
+      }
+    },
+    "Chargement de la tâche USB Copy…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading USB Copy task…"
+          }
+        }
+      }
+    },
+    "Chargement des réglages USB Copy…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading USB Copy settings…"
+          }
+        }
+      }
+    },
+    "Chargement des tâches USB Copy…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading USB Copy tasks…"
+          }
+        }
+      }
+    },
+    "Chargement du journal USB Copy…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading USB Copy log…"
+          }
+        }
+      }
+    },
+    "Choisir comment USB Copy met à jour la destination" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose how USB Copy updates the destination"
+          }
+        }
+      }
+    },
+    "Choisir le dossier de destination" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Destination Folder"
+          }
+        }
+      }
+    },
+    "Choisir le dossier source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Source Folder"
+          }
+        }
+      }
+    },
+    "Choisir ce dossier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose This Folder"
+          }
+        }
+      }
+    },
+    "Choisir le sens de la copie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the copy direction"
+          }
+        }
+      }
+    },
+    "Choisir un dossier partagé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Shared Folder"
+          }
+        }
+      }
+    },
+    "Choisir un dossier partagé dans la liste" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a shared folder from the list"
+          }
+        }
+      }
+    },
+    "Choisissez un dossier source et un dossier de destination." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a source folder and a destination folder."
+          }
+        }
+      }
+    },
+    "Choisissez un dossier sur le périphérique USB. La tâche sera enregistrée puis activée." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a folder on the USB device. The task will be saved and then enabled."
+          }
+        }
+      }
+    },
+    "Conserver entre 5 et 100 000 entrées dans le journal USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep between 5 and 100,000 entries in the USB Copy log"
+          }
+        }
+      }
+    },
+    "Copie en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copying"
+          }
+        }
+      }
+    },
+    "Copie incrémentielle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incremental Copy"
+          }
+        }
+      }
+    },
+    "Créer des dossiers selon la date" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create folders by date"
+          }
+        }
+      }
+    },
+    "Créer des dossiers et renommer les photos et vidéos selon la date" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create folders and rename photos and videos by date"
+          }
+        }
+      }
+    },
+    "Créer la tâche miroir" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Mirror Task"
+          }
+        }
+      }
+    },
+    "Créer une copie miroir ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a mirror copy?"
+          }
+        }
+      }
+    },
+    "Créer une tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create Task"
+          }
+        }
+      }
+    },
+    "Créer une tâche USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create USB Copy Task"
+          }
+        }
+      }
+    },
+    "Créez une tâche pour importer ou exporter des fichiers avec un périphérique USB." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create a task to import or export files using a USB device."
+          }
+        }
+      }
+    },
+    "Date au format année, mois et jour, séparés par des barres obliques" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date in year, month, and day format, separated by slashes"
+          }
+        }
+      }
+    },
+    "Date de référence" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reference Date"
+          }
+        }
+      }
+    },
+    "Depuis" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "From"
+          }
+        }
+      }
+    },
+    "Dernière heure d’exécution : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last run hour: %lld"
+          }
+        }
+      }
+    },
+    "Dimanche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sunday"
+          }
+        }
+      }
+    },
+    "Direction" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direction"
+          }
+        }
+      }
+    },
+    "Document" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document"
+          }
+        }
+      }
+    },
+    "Dossier de destination" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Destination Folder"
+          }
+        }
+      }
+    },
+    "Dossier indisponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder Unavailable"
+          }
+        }
+      }
+    },
+    "Dossier source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source Folder"
+          }
+        }
+      }
+    },
+    "Dossier supprimé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folder Deleted"
+          }
+        }
+      }
+    },
+    "Déclenchement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trigger"
+          }
+        }
+      }
+    },
+    "Déclenchement de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trigger for %@"
+          }
+        }
+      }
+    },
+    "Déclenchement modifié pour %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trigger updated for %@"
+          }
+        }
+      }
+    },
+    "Déclenchement…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trigger…"
+          }
+        }
+      }
+    },
+    "Démarrer automatiquement cette tâche lorsque son périphérique USB est connecté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start this task automatically when its USB device is connected"
+          }
+        }
+      }
+    },
+    "Déplacer les fichiers au lieu de les conserver à la source" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move files instead of keeping them at the source"
+          }
+        }
+      }
+    },
+    "En cas de conflit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If a Conflict Occurs"
+          }
+        }
+      }
+    },
+    "Enregistrement de la tâche USB Copy…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saving USB Copy task…"
+          }
+        }
+      }
+    },
+    "Enregistrement…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saving…"
+          }
+        }
+      }
+    },
+    "Erreur de fichier : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File error: %@"
+          }
+        }
+      }
+    },
+    "Exporter des données vers un périphérique USB" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export Data to a USB Device"
+          }
+        }
+      }
+    },
+    "Exécuter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run"
+          }
+        }
+      }
+    },
+    "Exécuter aussi cette tâche selon un horaire" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Also run this task on a schedule"
+          }
+        }
+      }
+    },
+    "Exécuter cette tâche USB Copy ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run This USB Copy Task?"
+          }
+        }
+      }
+    },
+    "Exécuter la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run Task"
+          }
+        }
+      }
+    },
+    "Exécuter la tâche USB Copy sélectionnée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run the selected USB Copy task"
+          }
+        }
+      }
+    },
+    "Exécuter la tâche à la connexion du périphérique" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run task when the device is connected"
+          }
+        }
+      }
+    },
+    "Filtre de fichiers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Filter"
+          }
+        }
+      }
+    },
+    "Filtre de fichiers de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File filter for %@"
+          }
+        }
+      }
+    },
+    "Filtre de fichiers…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Filter…"
+          }
+        }
+      }
+    },
+    "Filtre modifié pour %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter updated for %@"
+          }
+        }
+      }
+    },
+    "Heure de début : %@ h" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start hour: %@"
+          }
+        }
+      }
+    },
+    "Importer des données depuis un périphérique USB" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Data from a USB Device"
+          }
+        }
+      }
+    },
+    "Importer des photos et vidéos" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import Photos and Videos"
+          }
+        }
+      }
+    },
+    "Impossible de charger les réglages USB Copy." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to load USB Copy settings."
+          }
+        }
+      }
+    },
+    "Impossible d’enregistrer cette tâche." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to save this task."
+          }
+        }
+      }
+    },
+    "Inclure les autres types de fichiers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Include Other File Types"
+          }
+        }
+      }
+    },
+    "Inclure tous les types qui ne figurent pas dans les catégories ci-dessous" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Include every type not listed in the categories below"
+          }
+        }
+      }
+    },
+    "Jamais exécutée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Never Run"
+          }
+        }
+      }
+    },
+    "Jeudi" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thursday"
+          }
+        }
+      }
+    },
+    "Journal USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy Log"
+          }
+        }
+      }
+    },
+    "Journal USB Copy…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy Log…"
+          }
+        }
+      }
+    },
+    "Jours d’exécution" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Run Days"
+          }
+        }
+      }
+    },
+    "Jusqu’à" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To"
+          }
+        }
+      }
+    },
+    "La destination est déjà utilisée par une autre tâche." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The destination is already used by another task."
+          }
+        }
+      }
+    },
+    "La mise à niveau de USB Copy a échoué." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The USB Copy upgrade failed."
+          }
+        }
+      }
+    },
+    "Le chemin choisi n’est pas valide." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected path is invalid."
+          }
+        }
+      }
+    },
+    "Le dossier de destination n’existe pas." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The destination folder does not exist."
+          }
+        }
+      }
+    },
+    "Le dossier partagé n’est pas disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shared folder is unavailable."
+          }
+        }
+      }
+    },
+    "Le dossier partagé n’est pas monté." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shared folder is not mounted."
+          }
+        }
+      }
+    },
+    "Le dossier partagé n’existe pas." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shared folder does not exist."
+          }
+        }
+      }
+    },
+    "Le dossier source n’existe pas." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The source folder does not exist."
+          }
+        }
+      }
+    },
+    "Le dépôt USB Copy est en cours de déplacement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The USB Copy repository is being moved."
+          }
+        }
+      }
+    },
+    "La tâche « %@ » supprimera de la destination les fichiers qui ne sont plus présents à la source." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The “%@” task will delete files from the destination when they are no longer present at the source."
+          }
+        }
+      }
+    },
+    "La tâche « %@ » supprimera les fichiers source après leur copie vers la destination." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The “%@” task will delete source files after copying them to the destination."
+          }
+        }
+      }
+    },
+    "Le dépôt USB Copy n’est pas configuré." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The USB Copy repository is not configured."
+          }
+        }
+      }
+    },
+    "Le nombre de journaux doit être compris entre 5 et 100 000." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The number of log entries must be between 5 and 100,000."
+          }
+        }
+      }
+    },
+    "Le dépôt USB Copy sera déplacé de « %@ » vers « %@ ». USB Copy peut être temporairement indisponible pendant le déplacement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The USB Copy repository will be moved from “%@” to “%@”. USB Copy may be temporarily unavailable during the move."
+          }
+        }
+      }
+    },
+    "Le dossier a été enregistré, mais l’activation de la tâche a été annulée." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The folder was saved, but enabling the task was cancelled."
+          }
+        }
+      }
+    },
+    "Le dossier a été enregistré, mais la tâche n’a pas pu être activée. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The folder was saved, but the task could not be enabled. %@"
+          }
+        }
+      }
+    },
+    "Le périphérique associé à cette tâche n’est pas connecté. Le dossier de destination ne peut pas être modifié." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The device associated with this task is not connected. The destination folder cannot be changed."
+          }
+        }
+      }
+    },
+    "Le nombre maximal de versions doit être compris entre 1 et 65 535." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The maximum number of versions must be between 1 and 65,535."
+          }
+        }
+      }
+    },
+    "Le volume choisi pour USB Copy est invalide." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The volume selected for USB Copy is invalid."
+          }
+        }
+      }
+    },
+    "Le volume est verrouillé." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The volume is locked."
+          }
+        }
+      }
+    },
+    "Le volume ne dispose pas d’assez d’espace." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The volume does not have enough space."
+          }
+        }
+      }
+    },
+    "Limiter à une période" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limit to a Date Range"
+          }
+        }
+      }
+    },
+    "Lundi" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Monday"
+          }
+        }
+      }
+    },
+    "Mardi" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tuesday"
+          }
+        }
+      }
+    },
+    "Mercredi" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wednesday"
+          }
+        }
+      }
+    },
+    "Minute de début : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start minute: %@"
+          }
+        }
+      }
+    },
+    "Miroir" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mirror"
+          }
+        }
+      }
+    },
+    "Mode de copie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Mode"
+          }
+        }
+      }
+    },
+    "Modifier la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Task"
+          }
+        }
+      }
+    },
+    "Modifier la tâche USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit USB Copy Task"
+          }
+        }
+      }
+    },
+    "Modifier la tâche USB Copy sélectionnée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit the selected USB Copy task"
+          }
+        }
+      }
+    },
+    "Modifier le déclenchement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Trigger"
+          }
+        }
+      }
+    },
+    "Modifier le déclenchement de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit trigger for %@"
+          }
+        }
+      }
+    },
+    "Modifier le filtre" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Filter"
+          }
+        }
+      }
+    },
+    "Modifier le filtre de fichiers de %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit file filter for %@"
+          }
+        }
+      }
+    },
+    "Modifier les réglages" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Settings"
+          }
+        }
+      }
+    },
+    "Ne pas conserver la structure des dossiers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do not preserve folder structure"
+          }
+        }
+      }
+    },
+    "Nom de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task Name"
+          }
+        }
+      }
+    },
+    "Nom de la tâche USB Copy, jusqu’à 64 caractères" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy task name, up to 64 characters"
+          }
+        }
+      }
+    },
+    "Nom de tâche modifié : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task name changed: %@"
+          }
+        }
+      }
+    },
+    "Nombre maximal de journaux" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum Log Entries"
+          }
+        }
+      }
+    },
+    "Nombre maximal de versions : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maximum versions: %lld"
+          }
+        }
+      }
+    },
+    "Nouvelle extension ou nouveau nom de fichier à inclure" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New extension or file name to include"
+          }
+        }
+      }
+    },
+    "Ouvrir le journal ou les réglages généraux de USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the USB Copy log or global settings"
+          }
+        }
+      }
+    },
+    "Périphérique déconnecté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device Disconnected"
+          }
+        }
+      }
+    },
+    "Rechercher une tâche USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search USB Copy tasks"
+          }
+        }
+      }
+    },
+    "Recyclage intelligent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart Recycle"
+          }
+        }
+      }
+    },
+    "Remplacer le fichier existant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overwrite the Existing File"
+          }
+        }
+      }
+    },
+    "Renommer le nouveau fichier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename the New File"
+          }
+        }
+      }
+    },
+    "Renommer les photos et vidéos selon la date" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename photos and videos by date"
+          }
+        }
+      }
+    },
+    "Retirer %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove %@"
+          }
+        }
+      }
+    },
+    "Retirer la règle %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove the %@ rule"
+          }
+        }
+      }
+    },
+    "Rotation des versions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version Rotation"
+          }
+        }
+      }
+    },
+    "Rotation des versions : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version rotation: %@"
+          }
+        }
+      }
+    },
+    "Règle de rotation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotation Policy"
+          }
+        }
+      }
+    },
+    "Règles personnalisées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom Rules"
+          }
+        }
+      }
+    },
+    "Réglages de la tâche…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task Settings…"
+          }
+        }
+      }
+    },
+    "Réglages de tâche modifiés : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task settings changed: %@"
+          }
+        }
+      }
+    },
+    "Réglages généraux USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy Global Settings"
+          }
+        }
+      }
+    },
+    "Réglages généraux USB Copy enregistrés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy global settings saved"
+          }
+        }
+      }
+    },
+    "Réglages généraux…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Global Settings…"
+          }
+        }
+      }
+    },
+    "Répétition en heures : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repeat interval in hours: %lld"
+          }
+        }
+      }
+    },
+    "Répétition en jours : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repeat interval in days: %lld"
+          }
+        }
+      }
+    },
+    "Saisissez *.extension pour une extension, ou un nom de fichier exact." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter *.extension for an extension, or an exact file name."
+          }
+        }
+      }
+    },
+    "Saisissez un nom de tâche de 1 à 64 caractères." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a task name between 1 and 64 characters."
+          }
+        }
+      }
+    },
+    "Saisissez une extension après *." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter an extension after *."
+          }
+        }
+      }
+    },
+    "Samedi" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saturday"
+          }
+        }
+      }
+    },
+    "Supprimer la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Task"
+          }
+        }
+      }
+    },
+    "Supprimer la tâche USB Copy ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete USB Copy task?"
+          }
+        }
+      }
+    },
+    "Supprimer la tâche USB Copy sélectionnée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete the selected USB Copy task"
+          }
+        }
+      }
+    },
+    "Supprimer les fichiers source après la copie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete source files after copying"
+          }
+        }
+      }
+    },
+    "Supprimer les versions les plus anciennes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete the Oldest Versions"
+          }
+        }
+      }
+    },
+    "Tous les événements" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Events"
+          }
+        }
+      }
+    },
+    "Tout inclure dans %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Include everything in %@"
+          }
+        }
+      }
+    },
+    "Type d’événement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Event Type"
+          }
+        }
+      }
+    },
+    "Types de fichiers à copier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File Types to Copy"
+          }
+        }
+      }
+    },
+    "Tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task"
+          }
+        }
+      }
+    },
+    "Tâche %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task %lld"
+          }
+        }
+      }
+    },
+    "Tâche USB Copy créée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy task created: %@"
+          }
+        }
+      }
+    },
+    "Tâche USB Copy modifiée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy task updated: %@"
+          }
+        }
+      }
+    },
+    "Tâche enregistrée et activée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task saved and enabled: %@"
+          }
+        }
+      }
+    },
+    "Tâche activée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task enabled: %@"
+          }
+        }
+      }
+    },
+    "Tâche annulée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task cancelled: %@"
+          }
+        }
+      }
+    },
+    "Tâche créée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task created: %@"
+          }
+        }
+      }
+    },
+    "Tâche démarrée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task started: %@"
+          }
+        }
+      }
+    },
+    "Tâche désactivée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task disabled: %@"
+          }
+        }
+      }
+    },
+    "Tâche supprimée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task deleted: %@"
+          }
+        }
+      }
+    },
+    "Tâche terminée : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task completed: %@"
+          }
+        }
+      }
+    },
+    "Tâche terminée avec des erreurs : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task completed with errors: %@"
+          }
+        }
+      }
+    },
+    "Tâches USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy Tasks"
+          }
+        }
+      }
+    },
+    "USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy"
+          }
+        }
+      }
+    },
+    "USB Copy a signalé une erreur interne." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy reported an internal error."
+          }
+        }
+      }
+    },
+    "USB Copy est en cours de mise à niveau." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy is being upgraded."
+          }
+        }
+      }
+    },
+    "USB Copy est en cours d’initialisation." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy is initializing."
+          }
+        }
+      }
+    },
+    "USB Copy ne reconnaît pas ce périphérique." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy does not recognize this device."
+          }
+        }
+      }
+    },
+    "USB Copy n’est pas installé ou son API n’est pas disponible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy is not installed or its API is unavailable."
+          }
+        }
+      }
+    },
+    "USB Copy supprimera de la destination les fichiers qui ne sont plus présents à la source. Vérifiez soigneusement le dossier de destination." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy will delete files from the destination when they are no longer present at the source. Check the destination folder carefully."
+          }
+        }
+      }
+    },
+    "Un réglage envoyé à USB Copy est invalide." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A setting sent to USB Copy is invalid."
+          }
+        }
+      }
+    },
+    "Utilisez *.extension pour filtrer une extension." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use *.extension to filter an extension."
+          }
+        }
+      }
+    },
+    "Vendredi" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friday"
+          }
+        }
+      }
+    },
+    "Versions multiples" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multi-versioned"
+          }
+        }
+      }
+    },
+    "Volume du dépôt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repository Volume"
+          }
+        }
+      }
+    },
+    "Volume qui contient la base de données et les versions USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume containing the USB Copy database and versions"
+          }
+        }
+      }
+    },
+    "activation de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "enabling the task"
+          }
+        }
+      }
+    },
+    "annulation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cancellation"
+          }
+        }
+      }
+    },
+    "annulation de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cancelling the task"
+          }
+        }
+      }
+    },
+    "code d’erreur %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "error code %lld"
+          }
+        }
+      }
+    },
+    "conflit avec le dossier des versions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "version folder conflict"
+          }
+        }
+      }
+    },
+    "conflit de destination" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "destination conflict"
+          }
+        }
+      }
+    },
+    "création de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "creating the task"
+          }
+        }
+      }
+    },
+    "de %@ vers %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "from %@ to %@"
+          }
+        }
+      }
+    },
+    "destination pleine" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "destination full"
+          }
+        }
+      }
+    },
+    "dossier démonté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "folder unmounted"
+          }
+        }
+      }
+    },
+    "dossier parent de destination absent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "destination parent folder missing"
+          }
+        }
+      }
+    },
+    "démarrage de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "starting the task"
+          }
+        }
+      }
+    },
+    "désactivation de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "disabling the task"
+          }
+        }
+      }
+    },
+    "enregistrement des réglages généraux" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "saving global settings"
+          }
+        }
+      }
+    },
+    "erreur de fichier" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "file error"
+          }
+        }
+      }
+    },
+    "fichier de destination existant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "destination file already exists"
+          }
+        }
+      }
+    },
+    "fichier source absent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "source file missing"
+          }
+        }
+      }
+    },
+    "fichier trop volumineux" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "file too large"
+          }
+        }
+      }
+    },
+    "modification de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "updating the task"
+          }
+        }
+      }
+    },
+    "modification du déclenchement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "updating the trigger"
+          }
+        }
+      }
+    },
+    "modification du filtre" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "updating the filter"
+          }
+        }
+      }
+    },
+    "nom de fichier incompatible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unsupported file name"
+          }
+        }
+      }
+    },
+    "paramètre invalide" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "invalid parameter"
+          }
+        }
+      }
+    },
+    "racine de destination absente" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "destination root folder missing"
+          }
+        }
+      }
+    },
+    "racine source absente" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "source root folder missing"
+          }
+        }
+      }
+    },
+    "reprise impossible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unable to resume"
+          }
+        }
+      }
+    },
+    "sans détail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no details"
+          }
+        }
+      }
+    },
+    "suppression de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "deleting the task"
+          }
+        }
+      }
+    },
+    "type de destination incompatible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "incompatible destination type"
+          }
+        }
+      }
+    },
+    "Échec" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed"
+          }
+        }
+      }
+    },
+    "Échec de %@ : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed while %@: %@"
+          }
+        }
+      }
+    },
+    "Échec de la tâche : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task failed: %@"
+          }
+        }
+      }
+    },
+    "Éjecter le périphérique USB après la fin de la copie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eject the USB device after copying finishes"
+          }
+        }
+      }
+    },
+    "Éjecter le périphérique à la fin de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eject device when the task finishes"
+          }
+        }
+      }
+    },
+    "Émettre un signal sonore au début et à la fin des tâches" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beep when tasks start and finish"
+          }
+        }
+      }
+    },
+    "État de la tâche" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Task Status"
+          }
+        }
+      }
+    },
+    "État inconnu : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown status: %@"
+          }
+        }
+      }
+    },
+    "Événement USB Copy %lld : %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy event %lld: %@"
+          }
+        }
+      }
+    },
+    "Événements USB Copy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy Events"
+          }
+        }
+      }
+    },
     "Configurer les mises à jour de DSM Access" : {
       "localizations" : {
         "en" : {
@@ -2669,6 +5089,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrer"
+          }
+        }
+      }
+    },
+    "Enregistrer et activer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save and Enable"
           }
         }
       }
@@ -12639,6 +15069,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Déplacer les éléments sélectionnés"
+          }
+        }
+      }
+    },
+    "Déplacer et enregistrer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move and Save"
+          }
+        }
+      }
+    },
+    "Déplacer le dépôt USB Copy ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move the USB Copy Repository?"
           }
         }
       }

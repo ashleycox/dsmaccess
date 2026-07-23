@@ -223,6 +223,28 @@ protocol DSMClientProtocol: AnyObject {
     func pauseDownloads(ids: Set<String>) async throws
     func resumeDownloads(ids: Set<String>) async throws
     func deleteDownloads(ids: Set<String>, forceComplete: Bool) async throws
+    func listUSBCopyTasks() async throws -> [USBCopyTask]
+    func usbCopyTask(id: Int) async throws -> USBCopyTask
+    func createUSBCopyTask(_ task: USBCopyTaskCreation) async throws -> Int
+    func setUSBCopyTaskSettings(_ settings: USBCopyTaskSettings) async throws
+    func usbCopyFilter(taskID: Int) async throws -> USBCopyFilter
+    func setUSBCopyFilter(_ filter: USBCopyFilter, taskID: Int) async throws
+    func usbCopyTrigger(for task: USBCopyTask) async throws -> USBCopyTrigger
+    func setUSBCopyTrigger(_ trigger: USBCopyTrigger, taskID: Int) async throws
+    func usbCopyGlobalSettings() async throws -> USBCopyGlobalSettings
+    func setUSBCopyGlobalSettings(_ settings: USBCopyGlobalSettings) async throws
+    func usbCopyLogs(
+        offset: Int,
+        limit: Int,
+        filter: USBCopyLogFilter
+    ) async throws -> USBCopyLogPage
+    func usbCopyAvailableShares() async throws -> [SharedFolder]
+    func usbCopyAvailableVolumePaths() async throws -> [String]
+    func runUSBCopyTask(id: Int) async throws
+    func cancelUSBCopyTask(id: Int) async throws
+    func enableUSBCopyTask(id: Int) async throws
+    func disableUSBCopyTask(id: Int) async throws
+    func deleteUSBCopyTask(id: Int) async throws
     func listVirtualMachines() async throws -> [VirtualMachine]
     func performVirtualMachineAction(
         _ action: VirtualMachinePowerAction,
@@ -253,6 +275,7 @@ final class DSMClient: DSMClientProtocol {
     let packages: DSMPackageService
     let accounts: DSMAccountService
     let downloadStation: DSMDownloadStationService
+    let usbCopy: DSMUSBCopyService
     let virtualMachines: DSMVirtualMachineService
     let containers: DSMContainerService
     let surveillance: DSMSurveillanceService
@@ -271,6 +294,7 @@ final class DSMClient: DSMClientProtocol {
         packages = DSMPackageService(transport: transport)
         accounts = DSMAccountService(transport: transport)
         downloadStation = DSMDownloadStationService(transport: transport)
+        usbCopy = DSMUSBCopyService(transport: transport)
         virtualMachines = DSMVirtualMachineService(transport: transport)
         containers = DSMContainerService(transport: transport)
         surveillance = DSMSurveillanceService(transport: transport)
@@ -839,6 +863,82 @@ final class DSMClient: DSMClientProtocol {
 
     func deleteDownloads(ids: Set<String>, forceComplete: Bool) async throws {
         try await downloadStation.delete(ids: ids, forceComplete: forceComplete)
+    }
+
+    func listUSBCopyTasks() async throws -> [USBCopyTask] {
+        try await usbCopy.tasks()
+    }
+
+    func usbCopyTask(id: Int) async throws -> USBCopyTask {
+        try await usbCopy.task(id: id)
+    }
+
+    func createUSBCopyTask(_ task: USBCopyTaskCreation) async throws -> Int {
+        try await usbCopy.create(task)
+    }
+
+    func setUSBCopyTaskSettings(_ settings: USBCopyTaskSettings) async throws {
+        try await usbCopy.setSettings(settings)
+    }
+
+    func usbCopyFilter(taskID: Int) async throws -> USBCopyFilter {
+        try await usbCopy.filter(taskID: taskID)
+    }
+
+    func setUSBCopyFilter(_ filter: USBCopyFilter, taskID: Int) async throws {
+        try await usbCopy.setFilter(filter, taskID: taskID)
+    }
+
+    func usbCopyTrigger(for task: USBCopyTask) async throws -> USBCopyTrigger {
+        try await usbCopy.trigger(for: task)
+    }
+
+    func setUSBCopyTrigger(_ trigger: USBCopyTrigger, taskID: Int) async throws {
+        _ = try await usbCopy.setTrigger(trigger, taskID: taskID)
+    }
+
+    func usbCopyGlobalSettings() async throws -> USBCopyGlobalSettings {
+        try await usbCopy.globalSettings()
+    }
+
+    func setUSBCopyGlobalSettings(_ settings: USBCopyGlobalSettings) async throws {
+        try await usbCopy.setGlobalSettings(settings)
+    }
+
+    func usbCopyLogs(
+        offset: Int,
+        limit: Int,
+        filter: USBCopyLogFilter
+    ) async throws -> USBCopyLogPage {
+        try await usbCopy.logs(offset: offset, limit: limit, filter: filter)
+    }
+
+    func usbCopyAvailableShares() async throws -> [SharedFolder] {
+        try await usbCopy.availableShares()
+    }
+
+    func usbCopyAvailableVolumePaths() async throws -> [String] {
+        try await usbCopy.availableVolumePaths()
+    }
+
+    func runUSBCopyTask(id: Int) async throws {
+        try await usbCopy.run(taskID: id)
+    }
+
+    func cancelUSBCopyTask(id: Int) async throws {
+        try await usbCopy.cancel(taskID: id)
+    }
+
+    func enableUSBCopyTask(id: Int) async throws {
+        try await usbCopy.enable(taskID: id)
+    }
+
+    func disableUSBCopyTask(id: Int) async throws {
+        try await usbCopy.disable(taskID: id)
+    }
+
+    func deleteUSBCopyTask(id: Int) async throws {
+        try await usbCopy.delete(taskID: id)
     }
 
     func listVirtualMachines() async throws -> [VirtualMachine] {
