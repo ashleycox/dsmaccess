@@ -97,7 +97,7 @@ struct SharesView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(share.displayName).fontWeight(.medium)
                 if let sub = share.subtitleText {
-                    Text(sub).font(.caption).foregroundStyle(.secondary)
+                    Text(sub).font(.caption).foregroundStyle(.readableSecondary)
                 }
             }
             .accessibilityElement(children: .ignore)

@@ -106,11 +106,11 @@ private struct PackageCatalogRow: View {
                 if item.isBeta {
                     Text("Bêta")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                 }
                 Spacer()
                 Text(formattedFileSize)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
                 if let action {
                     Button(action.title, action: requestAction)
                         .disabled(isDisabled)
@@ -119,7 +119,7 @@ private struct PackageCatalogRow: View {
             }
             Text("Version du catalogue : \(item.version)")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.readableSecondary)
             installationStatus
         }
     }
@@ -129,24 +129,24 @@ private struct PackageCatalogRow: View {
         if let installed = installedPackage {
             Text(String(localized: "Version installée : \(installedVersion(for: installed))"))
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.readableSecondary)
             if updateAvailable {
                 Text("Mise à jour disponible")
                     .font(.caption)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.readableOrange)
             } else {
                 Text("À jour")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
             }
         } else {
             Text("Non installé")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.readableSecondary)
             if let unavailableInstallDescription {
                 Text(unavailableInstallDescription)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
             }
         }
     }
@@ -285,12 +285,12 @@ struct PackageDetailsSheet: View {
             )
             if package.hasUninstallOptions {
                 Text("Ce paquet exige l’assistant de désinstallation de DSM afin de traiter ses données sans choix implicite.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
             }
             if package.requiresAttention {
                 LabeledContent("Réparation", value: yesNo(vm.canRepair(package)))
                 Text(repairAvailabilityDescription)
-                .foregroundStyle(.red)
+                .foregroundStyle(.readableRed)
             }
         }
     }
@@ -307,7 +307,7 @@ struct PackageDetailsSheet: View {
                 LabeledContent("Version bêta", value: yesNo(catalogItem.isBeta))
             } else {
                 Text("Ce paquet n’est pas présent dans le catalogue officiel actuellement chargé.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
             }
         }
     }

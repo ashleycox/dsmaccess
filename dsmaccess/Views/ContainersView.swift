@@ -149,13 +149,13 @@ struct ContainersView: View {
                     if let image = container.image, !image.isEmpty { Text(image) }
                 }
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.readableSecondary)
             }
             Spacer()
             if let cpu = container.cpuPercent, container.isRunning {
                 Text("Processeur \(cpu.formatted(.number.precision(.fractionLength(1)))) %")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
             }
         }
         .accessibilityElement(children: .combine)
@@ -275,7 +275,7 @@ struct ContainersView: View {
                     if let metadata = logMetadata(entry) {
                         Text(metadata)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.readableSecondary)
                     }
                     Text(entry.message)
                         .font(.system(.caption, design: .monospaced))
@@ -294,7 +294,7 @@ struct ContainersView: View {
             Spacer()
         }
         .font(.caption)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(.readableSecondary)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(.bar)

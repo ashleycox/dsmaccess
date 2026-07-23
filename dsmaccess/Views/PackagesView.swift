@@ -300,7 +300,7 @@ struct PackagesView: View {
                 systemImage: "exclamationmark.triangle"
             )
             .font(.callout)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.readableSecondary)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -309,7 +309,7 @@ struct PackagesView: View {
         if let operationError {
             HStack {
                 Label(operationError, systemImage: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(.readableRed)
                     .accessibilityFocused($focusOperationError)
                 Spacer()
                 Button("Fermer l’erreur") { self.operationError = nil }
@@ -376,28 +376,28 @@ struct PackagesView: View {
                 Text(package.displayName).fontWeight(.medium)
                 Text(package.pkgId)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
                 if let version = package.version, !version.isEmpty {
                     Text("Version \(version)")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                 }
                 if let newVersion = vm.updateVersion(for: package) {
                     Text("Mise à jour disponible : \(newVersion)")
                         .font(.caption)
-                        .foregroundStyle(.orange)
+                        .foregroundStyle(.readableOrange)
                 }
                 Text(package.statusText)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
                 if package.requiresAttention {
                     Text("Réparation requise")
                         .font(.caption)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.readableRed)
                 } else if package.hasUninstallOptions {
                     Text("Assistant DSM requis pour la désinstallation")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                 }
             }
             Spacer()

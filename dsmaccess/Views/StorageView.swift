@@ -38,6 +38,7 @@ struct StorageView: View {
                     ForEach(vm.volumes) { volumeSection($0) }
                     ForEach(vm.disks) { diskSection($0) }
                 }
+                .labeledContentStyle(.readable)
                 .accessibilityLabel("Pools, volumes et disques")
                 .accessibilityFocused($focusContent)
             }

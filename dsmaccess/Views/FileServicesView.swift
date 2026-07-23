@@ -57,7 +57,7 @@ struct FileServicesView: View {
             List {
                 Section {
                     Text("Activez ou désactivez les protocoles de partage de fichiers du NAS.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                 }
                 Section("Protocoles") {
                     ForEach(vm.services) { service in
@@ -175,10 +175,10 @@ struct FileServicesView: View {
 
     private func stateColor(_ state: FileServiceState) -> Color {
         switch state {
-        case .on: return .green
-        case .off: return .gray
-        case .unknown: return .orange
-        case .failed: return .red
+        case .on: return .readableGreen
+        case .off: return .readableSecondary
+        case .unknown: return .readableOrange
+        case .failed: return .readableRed
         }
     }
 

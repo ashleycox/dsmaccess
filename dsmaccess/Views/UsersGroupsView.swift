@@ -182,13 +182,13 @@ struct UsersGroupsView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(user.name).fontWeight(.medium)
                 if let detail = userDetail(user) {
-                    Text(detail).font(.caption).foregroundStyle(.secondary)
+                    Text(detail).font(.caption).foregroundStyle(.readableSecondary)
                 }
             }
             Spacer()
             Text(user.isDisabled ? "Désactivé" : "Actif")
                 .font(.caption)
-                .foregroundStyle(user.isDisabled ? Color.secondary : Color.green)
+                .foregroundStyle(user.isDisabled ? Color.readableSecondary : Color.readableGreen)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(userAccessibilityLabel(user))
@@ -214,7 +214,7 @@ struct UsersGroupsView: View {
                 Text(group.name).fontWeight(.medium)
                 Text(groupSummary(group))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
             }
         }
         .accessibilityElement(children: .combine)
@@ -358,7 +358,7 @@ private struct CreateUserSheet: View {
                         .help("Retaper le mot de passe du nouvel utilisateur")
                     if !passwordConfirmation.isEmpty && !passwordsMatch {
                         Text("Les mots de passe ne correspondent pas.")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.readableRed)
                             .accessibilityLabel("Erreur : les mots de passe ne correspondent pas.")
                     }
                     TextField("Adresse e-mail (facultative)", text: $email)

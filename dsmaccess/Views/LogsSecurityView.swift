@@ -122,14 +122,14 @@ struct LogsSecurityView: View {
             Section("Adresses bloquées") {
                 if let message = viewModel.blockedAddressesError {
                     Text(message)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                         .accessibilityLabel("Erreur : \(message)")
                 } else if !supportsAutoBlock {
                     Text("La liste de blocage n’est pas exposée par ce NAS.")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                 } else if filteredBlockedAddresses.isEmpty {
                     Text(searchText.isEmpty ? "Aucune adresse bloquée" : "Aucun résultat")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                 } else {
                     ForEach(filteredBlockedAddresses) { address in
                         blockedAddressRow(address)
@@ -183,7 +183,7 @@ struct LogsSecurityView: View {
                 Text(entry.message).fontWeight(.medium)
                 Text(logMetadata(entry))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
             }
         }
         .accessibilityElement(children: .combine)
@@ -200,7 +200,7 @@ struct LogsSecurityView: View {
             Spacer()
             Text(available ? "Interface disponible" : "Non exposée")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.readableSecondary)
         }
         .accessibilityElement(children: .combine)
     }
@@ -208,13 +208,13 @@ struct LogsSecurityView: View {
     private func blockedAddressRow(_ blockedAddress: BlockedAddress) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "hand.raised.fill")
-                .foregroundStyle(.red)
+                .foregroundStyle(.readableRed)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
                 Text(blockedAddress.address).fontWeight(.medium)
                 Text(blockedAddressDetail(blockedAddress))
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
             }
             Spacer()
             Button("Débloquer…") { pendingUnblock = blockedAddress }
@@ -231,7 +231,7 @@ struct LogsSecurityView: View {
             Spacer()
         }
         .font(.caption)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(.readableSecondary)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(.bar)
@@ -346,9 +346,9 @@ struct LogsSecurityView: View {
 
     private func levelColor(_ level: String) -> Color {
         switch severity(level) {
-        case .error: .red
-        case .warning: .orange
-        case .info: .secondary
+        case .error: .readableRed
+        case .warning: .readableOrange
+        case .info: .readableSecondary
         }
     }
 
