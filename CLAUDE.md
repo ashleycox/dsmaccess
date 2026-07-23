@@ -135,6 +135,11 @@ loading, content, empty, validation failure, operation in progress, and error.
   action or consequence is not clear from the label. Accessibility identifiers are for tests;
   they do not replace labels.
 - Never communicate status only by color, icon, animation, placeholder text, or disabled state.
+- For status and metadata text in module views, use the contrast-checked styles from
+  `Views/Components/ReadableStyles.swift` (`.readableSecondary`, `.readableGreen`,
+  `.readableOrange`, `.readableRed`, `.labeledContentStyle(.readable)`) instead of
+  `.secondary` or raw state colors: the system values fail the AA contrast threshold at the
+  small sizes this app uses.
 - Loading indicators need a meaningful label and a progress announcement. Errors must be both
   visible and announced. Successful mutations need an announced result. Use `VoiceOver.announce`
   with the correct `AnnouncementCategory` and priority; do not post ad hoc accessibility
@@ -155,10 +160,14 @@ control, or keyboard trap is incomplete.
 ## Localization and product copy
 
 French is the source language. English is the supported translation in
-`dsmaccess/Localizable.xcstrings`.
+`dsmaccess/Localizable.xcstrings`. The development region is English so that systems set to
+any other unsupported language fall back to English, which means French is served by a real
+`fr.lproj`, not by key fallback: **every translatable key must carry explicit `fr` and `en`
+entries** (the French value is the key itself). A key without its French entry silently shows
+English to French users. `LocalizationCatalogTests` enforces this invariant.
 
 - SwiftUI literals in `Text`, `Button`, `Label`, `Toggle`, alerts, and accessibility modifiers
-  are localization keys. Add or update their English catalog entries.
+  are localization keys. Add both catalog entries for each new key.
 - Strings created outside SwiftUI—including view-model summaries, errors, confirmation text,
   and VoiceOver announcements—must use `String(localized:)` with interpolation inside the
   localized string.
@@ -208,9 +217,25 @@ xcodebuild -project dsmaccess.xcodeproj -scheme dsmaccess -destination 'platform
   test -only-testing:dsmaccessTests/AppBackendClientTests
 ```
 
-The UI audit test `testLoginScreenPassesAccessibilityAudit` is sensitive to the machine
-being in active use: it can fail with a "Parent/Child mismatch" whose element is nil.
-Rerun it on an idle machine before attributing the failure to a code change.
+UI tests live in a separate scheme, `dsmaccess UI Tests`; the `dsmaccess` scheme only runs
+the unit test target. Accessibility audits (`performAccessibilityAudit`) are sensitive to the
+machine being in active use: they can fail with a "Parent/Child mismatch" whose element is
+nil. Rerun on an idle machine before attributing the failure to a code change.
+
+An opt-in audit walks every module of a connected session and audits each screen. It needs
+the machine's saved NAS profile and must not run unattended:
+
+```sh
+TEST_RUNNER_AUDIT_LIVE_NAS=1 xcodebuild -project dsmaccess.xcodeproj \
+  -scheme 'dsmaccess UI Tests' -destination 'platform=macOS' \
+  test -only-testing:dsmaccessUITests/AccessibilityAuditTests
+```
+
+To launch a development build by hand: build first, then `killall dsmaccess` before `open`ing
+the app from DerivedData, so a previous instance is not brought back to front instead of the
+new binary. When in doubt, verify the binary's modification time, not the version number.
+Keep code signing enabled for worktree builds (`CODE_SIGNING_ALLOWED=NO` breaks Keychain
+access and with it the saved-session flow).
 
 Before handing off a code change:
 
