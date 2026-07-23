@@ -1,3 +1,45 @@
+## v1.1-beta.9 (build 10) — 23 juillet 2026
+
+### En bref
+
+- Nouveau module USB Copy : configurez et lancez vos copies USB entièrement
+  depuis l'app — les sélecteurs de l'interface web de DSM sont inutilisables
+  au lecteur d'écran, il fallait jusqu'ici une aide voyante. Une contribution
+  d'Ashley Cox.
+- Fichiers : l'envoi de fichiers vers le NAS fonctionne à nouveau. Une mise à
+  jour de DSM avait discrètement cassé tous les envois.
+- DSM Access a désormais sa propre icône, dessinée elle aussi par Ashley Cox.
+
+### Nouveautés
+
+- USB Copy : chaque tâche s'affiche avec son sens de copie, ses dossiers et
+  son état ; créez des tâches d'import ou d'export avec de vrais sélecteurs de
+  dossiers accessibles pour la source et la destination ; choisissez le mode
+  de copie, la rotation des versions, les filtres de fichiers et la
+  planification ; exécutez, annulez, activez, désactivez ou supprimez une
+  tâche ; consultez le journal du paquet et réglez ses paramètres généraux.
+  Les opérations risquées expliquent leur conséquence et demandent
+  confirmation — une tâche miroir prévient qu'elle supprime à destination, et
+  la suppression d'une tâche la nomme. Le module n'apparaît que si le paquet
+  USB Copy est installé sur le NAS.
+
+### Corrections
+
+- Fichiers : l'envoi d'un fichier se soldait par une erreur depuis le passage
+  du NAS à la dernière mise à jour de DSM 7.4, qui a changé la façon dont DSM
+  attend les envois. L'app suit désormais la même convention que le File
+  Station de DSM et les envois fonctionnent à nouveau — y compris le choix
+  entre remplacer ou ignorer un fichier existant.
+
+### Configuration requise
+
+- macOS 14 (Sonoma) ou version ultérieure.
+- Un NAS Synology sous DSM 7 sur votre réseau local.
+
+### Téléchargement
+
+[dsmaccess-1.1-beta.9.zip](https://github.com/math65/dsmaccess/releases/download/v1.1-beta.9/dsmaccess-1.1-beta.9.zip)
+
 ## v1.1-beta.8 (build 9) — 23 juillet 2026
 
 ### En bref
