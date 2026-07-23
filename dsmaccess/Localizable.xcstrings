@@ -8,6 +8,12 @@
             "state" : "translated",
             "value" : "%lld folders available"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld dossiers disponibles"
+          }
         }
       }
     },
@@ -17,6 +23,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "1 folder available"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 dossier disponible"
           }
         }
       }
@@ -28,6 +40,12 @@
             "state" : "translated",
             "value" : "Load more entries"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Charger plus d’entrées"
+          }
         }
       }
     },
@@ -37,6 +55,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose at least one day to run the task."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez au moins un jour d’exécution."
           }
         }
       }
@@ -48,6 +72,12 @@
             "state" : "translated",
             "value" : "Enter a valid reference date in YYYY/MM/DD format."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez une date de référence valide au format AAAA/MM/JJ."
+          }
         }
       }
     },
@@ -58,12 +88,24 @@
             "state" : "translated",
             "value" : "The “%1$@” task will be permanently removed from USB Copy. This action cannot be undone. Make sure you no longer need its configuration or history."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tâche « %@ » sera définitivement supprimée de USB Copy. Cette action est irréversible. Vérifiez que vous n’avez plus besoin de sa configuration ni de son historique."
+          }
         }
       }
     },
     "%@ → %@" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ → %@"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ → %@"
@@ -78,6 +120,12 @@
             "state" : "translated",
             "value" : "%lld entries shown out of %lld"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld entrées affichées sur %lld"
+          }
         }
       }
     },
@@ -87,6 +135,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld log entries loaded"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld entrées de journal chargées"
           }
         }
       }
@@ -98,12 +152,24 @@
             "state" : "translated",
             "value" : "%lld USB Copy tasks, %lld active"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld tâches USB Copy, %lld actives"
+          }
         }
       }
     },
     "*.%@" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*.%@"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "*.%@"
@@ -118,6 +184,12 @@
             "state" : "translated",
             "value" : "*.extension or file name"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "*.extension ou nom de fichier"
+          }
         }
       }
     },
@@ -127,6 +199,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "YYYY/MM/DD"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AAAA/MM/JJ"
           }
         }
       }
@@ -138,6 +216,12 @@
             "state" : "translated",
             "value" : "Enable schedule"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer la planification"
+          }
         }
       }
     },
@@ -147,6 +231,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enable version rotation"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer la rotation des versions"
           }
         }
       }
@@ -158,6 +248,12 @@
             "state" : "translated",
             "value" : "Enable or disable the selected USB Copy task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer ou désactiver la tâche USB Copy sélectionnée"
+          }
         }
       }
     },
@@ -167,6 +263,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Refresh USB Copy tasks"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser les tâches USB Copy"
           }
         }
       }
@@ -178,6 +280,12 @@
             "state" : "translated",
             "value" : "Add this custom rule"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter cette règle personnalisée"
+          }
         }
       }
     },
@@ -187,6 +295,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancellation requested: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulation demandée : %@"
           }
         }
       }
@@ -198,6 +312,12 @@
             "state" : "translated",
             "value" : "Cancelling"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulation en cours"
+          }
         }
       }
     },
@@ -207,6 +327,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel copy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler la copie"
           }
         }
       }
@@ -218,6 +344,12 @@
             "state" : "translated",
             "value" : "Cancel the copy before editing this task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annulez la copie avant de modifier cette tâche"
+          }
         }
       }
     },
@@ -227,6 +359,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Apply Filter"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appliquer le filtre"
           }
         }
       }
@@ -238,6 +376,12 @@
             "state" : "translated",
             "value" : "Stop the selected USB Copy task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêter la tâche USB Copy sélectionnée"
+          }
         }
       }
     },
@@ -247,6 +391,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No USB or SD card shared folder is currently mounted. Connect the device to choose another destination."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun dossier USB ou carte SD n’est actuellement monté. Connectez le périphérique pour choisir une autre destination."
           }
         }
       }
@@ -258,6 +408,12 @@
             "state" : "translated",
             "value" : "No USB or SD card shared folder is currently mounted. Creating a task normally requires a connected device."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun dossier USB ou carte SD n’est actuellement monté. La création d’une tâche exige normalement un périphérique connecté."
+          }
         }
       }
     },
@@ -267,6 +423,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No events match the selected filter."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun événement ne correspond au filtre choisi."
           }
         }
       }
@@ -278,6 +440,12 @@
             "state" : "translated",
             "value" : "No Log Entries"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune entrée de journal"
+          }
         }
       }
     },
@@ -288,12 +456,24 @@
             "state" : "translated",
             "value" : "No USB Copy Tasks"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune tâche USB Copy"
+          }
         }
       }
     },
     "Audio" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Audio"
@@ -308,6 +488,12 @@
             "state" : "translated",
             "value" : "This USB device is already used by another task."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce périphérique USB est déjà utilisé par une autre tâche."
+          }
         }
       }
     },
@@ -317,6 +503,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This rule contains a disallowed character."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette règle contient un caractère non autorisé."
           }
         }
       }
@@ -328,6 +520,12 @@
             "state" : "translated",
             "value" : "Loading USB Copy task…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement de la tâche USB Copy…"
+          }
         }
       }
     },
@@ -337,6 +535,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading USB Copy settings…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des réglages USB Copy…"
           }
         }
       }
@@ -348,6 +552,12 @@
             "state" : "translated",
             "value" : "Loading USB Copy tasks…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des tâches USB Copy…"
+          }
         }
       }
     },
@@ -357,6 +567,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Loading USB Copy log…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement du journal USB Copy…"
           }
         }
       }
@@ -368,6 +584,12 @@
             "state" : "translated",
             "value" : "Choose how USB Copy updates the destination"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir comment USB Copy met à jour la destination"
+          }
         }
       }
     },
@@ -377,6 +599,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose Destination Folder"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir le dossier de destination"
           }
         }
       }
@@ -388,6 +616,12 @@
             "state" : "translated",
             "value" : "Choose Source Folder"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir le dossier source"
+          }
         }
       }
     },
@@ -397,6 +631,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose This Folder"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir ce dossier"
           }
         }
       }
@@ -408,6 +648,12 @@
             "state" : "translated",
             "value" : "Choose the copy direction"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir le sens de la copie"
+          }
         }
       }
     },
@@ -417,6 +663,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose Shared Folder"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir un dossier partagé"
           }
         }
       }
@@ -428,6 +680,12 @@
             "state" : "translated",
             "value" : "Choose a shared folder from the list"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir un dossier partagé dans la liste"
+          }
         }
       }
     },
@@ -437,6 +695,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choose a source folder and a destination folder."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un dossier source et un dossier de destination."
           }
         }
       }
@@ -448,6 +712,12 @@
             "state" : "translated",
             "value" : "Choose a folder on the USB device. The task will be saved and then enabled."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un dossier sur le périphérique USB. La tâche sera enregistrée puis activée."
+          }
         }
       }
     },
@@ -457,6 +727,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Keep between 5 and 100,000 entries in the USB Copy log"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conserver entre 5 et 100 000 entrées dans le journal USB Copy"
           }
         }
       }
@@ -468,6 +744,12 @@
             "state" : "translated",
             "value" : "Copying"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copie en cours"
+          }
         }
       }
     },
@@ -477,6 +759,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Incremental Copy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copie incrémentielle"
           }
         }
       }
@@ -488,6 +776,12 @@
             "state" : "translated",
             "value" : "Create folders by date"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer des dossiers selon la date"
+          }
         }
       }
     },
@@ -497,6 +791,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Create folders and rename photos and videos by date"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer des dossiers et renommer les photos et vidéos selon la date"
           }
         }
       }
@@ -508,6 +808,12 @@
             "state" : "translated",
             "value" : "Create Mirror Task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer la tâche miroir"
+          }
         }
       }
     },
@@ -517,6 +823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Create a mirror copy?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer une copie miroir ?"
           }
         }
       }
@@ -528,6 +840,12 @@
             "state" : "translated",
             "value" : "Create Task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer une tâche"
+          }
         }
       }
     },
@@ -537,6 +855,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Create USB Copy Task"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer une tâche USB Copy"
           }
         }
       }
@@ -548,6 +872,12 @@
             "state" : "translated",
             "value" : "Create a task to import or export files using a USB device."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créez une tâche pour importer ou exporter des fichiers avec un périphérique USB."
+          }
         }
       }
     },
@@ -557,6 +887,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date in year, month, and day format, separated by slashes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date au format année, mois et jour, séparés par des barres obliques"
           }
         }
       }
@@ -568,6 +904,12 @@
             "state" : "translated",
             "value" : "Reference Date"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date de référence"
+          }
         }
       }
     },
@@ -577,6 +919,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "From"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuis"
           }
         }
       }
@@ -588,6 +936,12 @@
             "state" : "translated",
             "value" : "Last run hour: %lld"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière heure d’exécution : %lld"
+          }
         }
       }
     },
@@ -598,12 +952,24 @@
             "state" : "translated",
             "value" : "Sunday"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimanche"
+          }
         }
       }
     },
     "Direction" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direction"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Direction"
@@ -618,6 +984,12 @@
             "state" : "translated",
             "value" : "Document"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Document"
+          }
         }
       }
     },
@@ -627,6 +999,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Destination Folder"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossier de destination"
           }
         }
       }
@@ -638,6 +1016,12 @@
             "state" : "translated",
             "value" : "Folder Unavailable"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossier indisponible"
+          }
         }
       }
     },
@@ -647,6 +1031,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Source Folder"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossier source"
           }
         }
       }
@@ -658,6 +1048,12 @@
             "state" : "translated",
             "value" : "Folder Deleted"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dossier supprimé"
+          }
         }
       }
     },
@@ -667,6 +1063,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trigger"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déclenchement"
           }
         }
       }
@@ -678,6 +1080,12 @@
             "state" : "translated",
             "value" : "Trigger for %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déclenchement de %@"
+          }
         }
       }
     },
@@ -687,6 +1095,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trigger updated for %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déclenchement modifié pour %@"
           }
         }
       }
@@ -698,6 +1112,12 @@
             "state" : "translated",
             "value" : "Trigger…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déclenchement…"
+          }
         }
       }
     },
@@ -707,6 +1127,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Start this task automatically when its USB device is connected"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Démarrer automatiquement cette tâche lorsque son périphérique USB est connecté"
           }
         }
       }
@@ -718,6 +1144,12 @@
             "state" : "translated",
             "value" : "Move files instead of keeping them at the source"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer les fichiers au lieu de les conserver à la source"
+          }
         }
       }
     },
@@ -727,6 +1159,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "If a Conflict Occurs"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En cas de conflit"
           }
         }
       }
@@ -738,6 +1176,12 @@
             "state" : "translated",
             "value" : "Saving USB Copy task…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrement de la tâche USB Copy…"
+          }
         }
       }
     },
@@ -747,6 +1191,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saving…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrement…"
           }
         }
       }
@@ -758,6 +1208,12 @@
             "state" : "translated",
             "value" : "File error: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur de fichier : %@"
+          }
         }
       }
     },
@@ -767,6 +1223,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Export Data to a USB Device"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter des données vers un périphérique USB"
           }
         }
       }
@@ -778,6 +1240,12 @@
             "state" : "translated",
             "value" : "Run"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exécuter"
+          }
         }
       }
     },
@@ -787,6 +1255,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Also run this task on a schedule"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exécuter aussi cette tâche selon un horaire"
           }
         }
       }
@@ -798,6 +1272,12 @@
             "state" : "translated",
             "value" : "Run This USB Copy Task?"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exécuter cette tâche USB Copy ?"
+          }
         }
       }
     },
@@ -807,6 +1287,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Run Task"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exécuter la tâche"
           }
         }
       }
@@ -818,6 +1304,12 @@
             "state" : "translated",
             "value" : "Run the selected USB Copy task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exécuter la tâche USB Copy sélectionnée"
+          }
         }
       }
     },
@@ -827,6 +1319,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Run task when the device is connected"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exécuter la tâche à la connexion du périphérique"
           }
         }
       }
@@ -838,6 +1336,12 @@
             "state" : "translated",
             "value" : "File Filter"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtre de fichiers"
+          }
         }
       }
     },
@@ -847,6 +1351,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "File filter for %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtre de fichiers de %@"
           }
         }
       }
@@ -858,6 +1368,12 @@
             "state" : "translated",
             "value" : "File Filter…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtre de fichiers…"
+          }
         }
       }
     },
@@ -867,6 +1383,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Filter updated for %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtre modifié pour %@"
           }
         }
       }
@@ -878,6 +1400,12 @@
             "state" : "translated",
             "value" : "Start hour: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heure de début : %@ h"
+          }
         }
       }
     },
@@ -887,6 +1415,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Import Data from a USB Device"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer des données depuis un périphérique USB"
           }
         }
       }
@@ -898,6 +1432,12 @@
             "state" : "translated",
             "value" : "Import Photos and Videos"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer des photos et vidéos"
+          }
         }
       }
     },
@@ -907,6 +1447,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unable to load USB Copy settings."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de charger les réglages USB Copy."
           }
         }
       }
@@ -918,6 +1464,12 @@
             "state" : "translated",
             "value" : "Unable to save this task."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d’enregistrer cette tâche."
+          }
         }
       }
     },
@@ -927,6 +1479,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Include Other File Types"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure les autres types de fichiers"
           }
         }
       }
@@ -938,6 +1496,12 @@
             "state" : "translated",
             "value" : "Include every type not listed in the categories below"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure tous les types qui ne figurent pas dans les catégories ci-dessous"
+          }
         }
       }
     },
@@ -947,6 +1511,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Never Run"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jamais exécutée"
           }
         }
       }
@@ -958,6 +1528,12 @@
             "state" : "translated",
             "value" : "Thursday"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeudi"
+          }
         }
       }
     },
@@ -967,6 +1543,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy Log"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Journal USB Copy"
           }
         }
       }
@@ -978,6 +1560,12 @@
             "state" : "translated",
             "value" : "USB Copy Log…"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Journal USB Copy…"
+          }
         }
       }
     },
@@ -987,6 +1575,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Run Days"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jours d’exécution"
           }
         }
       }
@@ -998,6 +1592,12 @@
             "state" : "translated",
             "value" : "To"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jusqu’à"
+          }
         }
       }
     },
@@ -1007,6 +1607,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The destination is already used by another task."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La destination est déjà utilisée par une autre tâche."
           }
         }
       }
@@ -1018,6 +1624,12 @@
             "state" : "translated",
             "value" : "The USB Copy upgrade failed."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La mise à niveau de USB Copy a échoué."
+          }
         }
       }
     },
@@ -1027,6 +1639,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The selected path is invalid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le chemin choisi n’est pas valide."
           }
         }
       }
@@ -1038,6 +1656,12 @@
             "state" : "translated",
             "value" : "The destination folder does not exist."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier de destination n’existe pas."
+          }
         }
       }
     },
@@ -1047,6 +1671,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The shared folder is unavailable."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier partagé n’est pas disponible."
           }
         }
       }
@@ -1058,6 +1688,12 @@
             "state" : "translated",
             "value" : "The shared folder is not mounted."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier partagé n’est pas monté."
+          }
         }
       }
     },
@@ -1067,6 +1703,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The shared folder does not exist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier partagé n’existe pas."
           }
         }
       }
@@ -1078,6 +1720,12 @@
             "state" : "translated",
             "value" : "The source folder does not exist."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier source n’existe pas."
+          }
         }
       }
     },
@@ -1087,6 +1735,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The USB Copy repository is being moved."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dépôt USB Copy est en cours de déplacement."
           }
         }
       }
@@ -1098,6 +1752,12 @@
             "state" : "translated",
             "value" : "The “%@” task will delete files from the destination when they are no longer present at the source."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tâche « %@ » supprimera de la destination les fichiers qui ne sont plus présents à la source."
+          }
         }
       }
     },
@@ -1107,6 +1767,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The “%@” task will delete source files after copying them to the destination."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tâche « %@ » supprimera les fichiers source après leur copie vers la destination."
           }
         }
       }
@@ -1118,6 +1784,12 @@
             "state" : "translated",
             "value" : "The USB Copy repository is not configured."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dépôt USB Copy n’est pas configuré."
+          }
         }
       }
     },
@@ -1127,6 +1799,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The number of log entries must be between 5 and 100,000."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nombre de journaux doit être compris entre 5 et 100 000."
           }
         }
       }
@@ -1138,6 +1816,12 @@
             "state" : "translated",
             "value" : "The USB Copy repository will be moved from “%@” to “%@”. USB Copy may be temporarily unavailable during the move."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dépôt USB Copy sera déplacé de « %@ » vers « %@ ». USB Copy peut être temporairement indisponible pendant le déplacement."
+          }
         }
       }
     },
@@ -1147,6 +1831,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The folder was saved, but enabling the task was cancelled."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier a été enregistré, mais l’activation de la tâche a été annulée."
           }
         }
       }
@@ -1158,6 +1848,12 @@
             "state" : "translated",
             "value" : "The folder was saved, but the task could not be enabled. %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le dossier a été enregistré, mais la tâche n’a pas pu être activée. %@"
+          }
         }
       }
     },
@@ -1167,6 +1863,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The device associated with this task is not connected. The destination folder cannot be changed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le périphérique associé à cette tâche n’est pas connecté. Le dossier de destination ne peut pas être modifié."
           }
         }
       }
@@ -1178,6 +1880,12 @@
             "state" : "translated",
             "value" : "The maximum number of versions must be between 1 and 65,535."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nombre maximal de versions doit être compris entre 1 et 65 535."
+          }
         }
       }
     },
@@ -1187,6 +1895,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The volume selected for USB Copy is invalid."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le volume choisi pour USB Copy est invalide."
           }
         }
       }
@@ -1198,6 +1912,12 @@
             "state" : "translated",
             "value" : "The volume is locked."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le volume est verrouillé."
+          }
         }
       }
     },
@@ -1207,6 +1927,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The volume does not have enough space."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le volume ne dispose pas d’assez d’espace."
           }
         }
       }
@@ -1218,6 +1944,12 @@
             "state" : "translated",
             "value" : "Limit to a Date Range"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limiter à une période"
+          }
         }
       }
     },
@@ -1227,6 +1959,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Monday"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lundi"
           }
         }
       }
@@ -1238,6 +1976,12 @@
             "state" : "translated",
             "value" : "Tuesday"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mardi"
+          }
         }
       }
     },
@@ -1247,6 +1991,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wednesday"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mercredi"
           }
         }
       }
@@ -1258,6 +2008,12 @@
             "state" : "translated",
             "value" : "Start minute: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minute de début : %@"
+          }
         }
       }
     },
@@ -1267,6 +2023,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mirror"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miroir"
           }
         }
       }
@@ -1278,6 +2040,12 @@
             "state" : "translated",
             "value" : "Copy Mode"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode de copie"
+          }
         }
       }
     },
@@ -1287,6 +2055,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit Task"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la tâche"
           }
         }
       }
@@ -1298,6 +2072,12 @@
             "state" : "translated",
             "value" : "Edit USB Copy Task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la tâche USB Copy"
+          }
         }
       }
     },
@@ -1307,6 +2087,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit the selected USB Copy task"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier la tâche USB Copy sélectionnée"
           }
         }
       }
@@ -1318,6 +2104,12 @@
             "state" : "translated",
             "value" : "Edit Trigger"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le déclenchement"
+          }
         }
       }
     },
@@ -1327,6 +2119,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit trigger for %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le déclenchement de %@"
           }
         }
       }
@@ -1338,6 +2136,12 @@
             "state" : "translated",
             "value" : "Edit Filter"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le filtre"
+          }
         }
       }
     },
@@ -1347,6 +2151,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit file filter for %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le filtre de fichiers de %@"
           }
         }
       }
@@ -1358,6 +2168,12 @@
             "state" : "translated",
             "value" : "Edit Settings"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier les réglages"
+          }
         }
       }
     },
@@ -1367,6 +2183,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Do not preserve folder structure"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ne pas conserver la structure des dossiers"
           }
         }
       }
@@ -1378,6 +2200,12 @@
             "state" : "translated",
             "value" : "Task Name"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de la tâche"
+          }
         }
       }
     },
@@ -1387,6 +2215,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy task name, up to 64 characters"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de la tâche USB Copy, jusqu’à 64 caractères"
           }
         }
       }
@@ -1398,6 +2232,12 @@
             "state" : "translated",
             "value" : "Task name changed: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nom de tâche modifié : %@"
+          }
         }
       }
     },
@@ -1407,6 +2247,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Maximum Log Entries"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre maximal de journaux"
           }
         }
       }
@@ -1418,6 +2264,12 @@
             "state" : "translated",
             "value" : "Maximum versions: %lld"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre maximal de versions : %lld"
+          }
         }
       }
     },
@@ -1427,6 +2279,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "New extension or file name to include"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle extension ou nouveau nom de fichier à inclure"
           }
         }
       }
@@ -1438,6 +2296,12 @@
             "state" : "translated",
             "value" : "Open the USB Copy log or global settings"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir le journal ou les réglages généraux de USB Copy"
+          }
         }
       }
     },
@@ -1447,6 +2311,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Device Disconnected"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Périphérique déconnecté"
           }
         }
       }
@@ -1458,6 +2328,12 @@
             "state" : "translated",
             "value" : "Search USB Copy tasks"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher une tâche USB Copy"
+          }
         }
       }
     },
@@ -1467,6 +2343,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Smart Recycle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recyclage intelligent"
           }
         }
       }
@@ -1478,6 +2360,12 @@
             "state" : "translated",
             "value" : "Overwrite the Existing File"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplacer le fichier existant"
+          }
         }
       }
     },
@@ -1487,6 +2375,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rename the New File"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renommer le nouveau fichier"
           }
         }
       }
@@ -1498,6 +2392,12 @@
             "state" : "translated",
             "value" : "Rename photos and videos by date"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renommer les photos et vidéos selon la date"
+          }
         }
       }
     },
@@ -1507,6 +2407,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Remove %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer %@"
           }
         }
       }
@@ -1518,6 +2424,12 @@
             "state" : "translated",
             "value" : "Remove the %@ rule"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirer la règle %@"
+          }
         }
       }
     },
@@ -1527,6 +2439,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Version Rotation"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotation des versions"
           }
         }
       }
@@ -1538,6 +2456,12 @@
             "state" : "translated",
             "value" : "Version rotation: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rotation des versions : %@"
+          }
         }
       }
     },
@@ -1547,6 +2471,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rotation Policy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règle de rotation"
           }
         }
       }
@@ -1558,6 +2488,12 @@
             "state" : "translated",
             "value" : "Custom Rules"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Règles personnalisées"
+          }
         }
       }
     },
@@ -1567,6 +2503,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task Settings…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages de la tâche…"
           }
         }
       }
@@ -1578,6 +2520,12 @@
             "state" : "translated",
             "value" : "Task settings changed: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages de tâche modifiés : %@"
+          }
         }
       }
     },
@@ -1587,6 +2535,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy Global Settings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages généraux USB Copy"
           }
         }
       }
@@ -1598,6 +2552,12 @@
             "state" : "translated",
             "value" : "USB Copy global settings saved"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages généraux USB Copy enregistrés"
+          }
         }
       }
     },
@@ -1607,6 +2567,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Global Settings…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages généraux…"
           }
         }
       }
@@ -1618,6 +2584,12 @@
             "state" : "translated",
             "value" : "Repeat interval in hours: %lld"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Répétition en heures : %lld"
+          }
         }
       }
     },
@@ -1627,6 +2599,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Repeat interval in days: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Répétition en jours : %lld"
           }
         }
       }
@@ -1638,6 +2616,12 @@
             "state" : "translated",
             "value" : "Enter *.extension for an extension, or an exact file name."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez *.extension pour une extension, ou un nom de fichier exact."
+          }
         }
       }
     },
@@ -1647,6 +2631,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enter a task name between 1 and 64 characters."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un nom de tâche de 1 à 64 caractères."
           }
         }
       }
@@ -1658,6 +2648,12 @@
             "state" : "translated",
             "value" : "Enter an extension after *."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez une extension après *."
+          }
         }
       }
     },
@@ -1667,6 +2663,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Saturday"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Samedi"
           }
         }
       }
@@ -1678,6 +2680,12 @@
             "state" : "translated",
             "value" : "Delete Task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la tâche"
+          }
         }
       }
     },
@@ -1687,6 +2695,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete USB Copy task?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la tâche USB Copy ?"
           }
         }
       }
@@ -1698,6 +2712,12 @@
             "state" : "translated",
             "value" : "Delete the selected USB Copy task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la tâche USB Copy sélectionnée"
+          }
         }
       }
     },
@@ -1707,6 +2727,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete source files after copying"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer les fichiers source après la copie"
           }
         }
       }
@@ -1718,6 +2744,12 @@
             "state" : "translated",
             "value" : "Delete the Oldest Versions"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer les versions les plus anciennes"
+          }
         }
       }
     },
@@ -1727,6 +2759,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "All Events"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tous les événements"
           }
         }
       }
@@ -1738,6 +2776,12 @@
             "state" : "translated",
             "value" : "Include everything in %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout inclure dans %@"
+          }
         }
       }
     },
@@ -1747,6 +2791,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Event Type"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type d’événement"
           }
         }
       }
@@ -1758,6 +2808,12 @@
             "state" : "translated",
             "value" : "File Types to Copy"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Types de fichiers à copier"
+          }
         }
       }
     },
@@ -1767,6 +2823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche"
           }
         }
       }
@@ -1778,6 +2840,12 @@
             "state" : "translated",
             "value" : "Task %lld"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche %lld"
+          }
         }
       }
     },
@@ -1787,6 +2855,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy task created: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche USB Copy créée : %@"
           }
         }
       }
@@ -1798,6 +2872,12 @@
             "state" : "translated",
             "value" : "USB Copy task updated: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche USB Copy modifiée : %@"
+          }
         }
       }
     },
@@ -1807,6 +2887,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task saved and enabled: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche enregistrée et activée : %@"
           }
         }
       }
@@ -1818,6 +2904,12 @@
             "state" : "translated",
             "value" : "Task enabled: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche activée : %@"
+          }
         }
       }
     },
@@ -1827,6 +2919,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task cancelled: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche annulée : %@"
           }
         }
       }
@@ -1838,6 +2936,12 @@
             "state" : "translated",
             "value" : "Task created: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche créée : %@"
+          }
         }
       }
     },
@@ -1847,6 +2951,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task started: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche démarrée : %@"
           }
         }
       }
@@ -1858,6 +2968,12 @@
             "state" : "translated",
             "value" : "Task disabled: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche désactivée : %@"
+          }
         }
       }
     },
@@ -1867,6 +2983,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task deleted: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche supprimée : %@"
           }
         }
       }
@@ -1878,6 +3000,12 @@
             "state" : "translated",
             "value" : "Task completed: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche terminée : %@"
+          }
         }
       }
     },
@@ -1887,6 +3015,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task completed with errors: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâche terminée avec des erreurs : %@"
           }
         }
       }
@@ -1898,12 +3032,24 @@
             "state" : "translated",
             "value" : "USB Copy Tasks"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tâches USB Copy"
+          }
         }
       }
     },
     "USB Copy" : {
       "localizations" : {
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy"
+          }
+        },
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy"
@@ -1918,6 +3064,12 @@
             "state" : "translated",
             "value" : "USB Copy reported an internal error."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy a signalé une erreur interne."
+          }
         }
       }
     },
@@ -1927,6 +3079,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy is being upgraded."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy est en cours de mise à niveau."
           }
         }
       }
@@ -1938,6 +3096,12 @@
             "state" : "translated",
             "value" : "USB Copy is initializing."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy est en cours d’initialisation."
+          }
         }
       }
     },
@@ -1947,6 +3111,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy does not recognize this device."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy ne reconnaît pas ce périphérique."
           }
         }
       }
@@ -1958,6 +3128,12 @@
             "state" : "translated",
             "value" : "USB Copy is not installed or its API is unavailable."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy n’est pas installé ou son API n’est pas disponible."
+          }
         }
       }
     },
@@ -1967,6 +3143,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy will delete files from the destination when they are no longer present at the source. Check the destination folder carefully."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USB Copy supprimera de la destination les fichiers qui ne sont plus présents à la source. Vérifiez soigneusement le dossier de destination."
           }
         }
       }
@@ -1978,6 +3160,12 @@
             "state" : "translated",
             "value" : "A setting sent to USB Copy is invalid."
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un réglage envoyé à USB Copy est invalide."
+          }
         }
       }
     },
@@ -1987,6 +3175,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Use *.extension to filter an extension."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisez *.extension pour filtrer une extension."
           }
         }
       }
@@ -1998,6 +3192,12 @@
             "state" : "translated",
             "value" : "Friday"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vendredi"
+          }
         }
       }
     },
@@ -2007,6 +3207,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Multi-versioned"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versions multiples"
           }
         }
       }
@@ -2018,6 +3224,12 @@
             "state" : "translated",
             "value" : "Repository Volume"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume du dépôt"
+          }
         }
       }
     },
@@ -2027,6 +3239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Volume containing the USB Copy database and versions"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volume qui contient la base de données et les versions USB Copy"
           }
         }
       }
@@ -2038,6 +3256,12 @@
             "state" : "translated",
             "value" : "enabling the task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "activation de la tâche"
+          }
         }
       }
     },
@@ -2047,6 +3271,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "cancellation"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "annulation"
           }
         }
       }
@@ -2058,6 +3288,12 @@
             "state" : "translated",
             "value" : "cancelling the task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "annulation de la tâche"
+          }
         }
       }
     },
@@ -2067,6 +3303,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "error code %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "code d’erreur %lld"
           }
         }
       }
@@ -2078,6 +3320,12 @@
             "state" : "translated",
             "value" : "version folder conflict"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "conflit avec le dossier des versions"
+          }
         }
       }
     },
@@ -2087,6 +3335,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "destination conflict"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "conflit de destination"
           }
         }
       }
@@ -2098,6 +3352,12 @@
             "state" : "translated",
             "value" : "creating the task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "création de la tâche"
+          }
         }
       }
     },
@@ -2107,6 +3367,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "from %@ to %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "de %@ vers %@"
           }
         }
       }
@@ -2118,6 +3384,12 @@
             "state" : "translated",
             "value" : "destination full"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "destination pleine"
+          }
         }
       }
     },
@@ -2127,6 +3399,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "folder unmounted"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "dossier démonté"
           }
         }
       }
@@ -2138,6 +3416,12 @@
             "state" : "translated",
             "value" : "destination parent folder missing"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "dossier parent de destination absent"
+          }
         }
       }
     },
@@ -2147,6 +3431,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "starting the task"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "démarrage de la tâche"
           }
         }
       }
@@ -2158,6 +3448,12 @@
             "state" : "translated",
             "value" : "disabling the task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "désactivation de la tâche"
+          }
         }
       }
     },
@@ -2167,6 +3463,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "saving global settings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "enregistrement des réglages généraux"
           }
         }
       }
@@ -2178,6 +3480,12 @@
             "state" : "translated",
             "value" : "file error"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "erreur de fichier"
+          }
         }
       }
     },
@@ -2187,6 +3495,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "destination file already exists"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fichier de destination existant"
           }
         }
       }
@@ -2198,6 +3512,12 @@
             "state" : "translated",
             "value" : "source file missing"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fichier source absent"
+          }
         }
       }
     },
@@ -2207,6 +3527,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "file too large"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "fichier trop volumineux"
           }
         }
       }
@@ -2218,6 +3544,12 @@
             "state" : "translated",
             "value" : "updating the task"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "modification de la tâche"
+          }
         }
       }
     },
@@ -2227,6 +3559,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "updating the trigger"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "modification du déclenchement"
           }
         }
       }
@@ -2238,6 +3576,12 @@
             "state" : "translated",
             "value" : "updating the filter"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "modification du filtre"
+          }
         }
       }
     },
@@ -2247,6 +3591,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "unsupported file name"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nom de fichier incompatible"
           }
         }
       }
@@ -2258,6 +3608,12 @@
             "state" : "translated",
             "value" : "invalid parameter"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "paramètre invalide"
+          }
         }
       }
     },
@@ -2267,6 +3623,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "destination root folder missing"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "racine de destination absente"
           }
         }
       }
@@ -2278,6 +3640,12 @@
             "state" : "translated",
             "value" : "source root folder missing"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "racine source absente"
+          }
         }
       }
     },
@@ -2287,6 +3655,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "unable to resume"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "reprise impossible"
           }
         }
       }
@@ -2298,6 +3672,12 @@
             "state" : "translated",
             "value" : "no details"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sans détail"
+          }
         }
       }
     },
@@ -2307,6 +3687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "deleting the task"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "suppression de la tâche"
           }
         }
       }
@@ -2318,6 +3704,12 @@
             "state" : "translated",
             "value" : "incompatible destination type"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "type de destination incompatible"
+          }
         }
       }
     },
@@ -2327,6 +3719,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Failed"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec"
           }
         }
       }
@@ -2338,6 +3736,12 @@
             "state" : "translated",
             "value" : "Failed while %@: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de %@ : %@"
+          }
         }
       }
     },
@@ -2347,6 +3751,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task failed: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la tâche : %@"
           }
         }
       }
@@ -2358,6 +3768,12 @@
             "state" : "translated",
             "value" : "Eject the USB device after copying finishes"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éjecter le périphérique USB après la fin de la copie"
+          }
         }
       }
     },
@@ -2367,6 +3783,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Eject device when the task finishes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Éjecter le périphérique à la fin de la tâche"
           }
         }
       }
@@ -2378,6 +3800,12 @@
             "state" : "translated",
             "value" : "Beep when tasks start and finish"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Émettre un signal sonore au début et à la fin des tâches"
+          }
         }
       }
     },
@@ -2387,6 +3815,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Task Status"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "État de la tâche"
           }
         }
       }
@@ -2398,6 +3832,12 @@
             "state" : "translated",
             "value" : "Unknown status: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "État inconnu : %@"
+          }
         }
       }
     },
@@ -2408,6 +3848,12 @@
             "state" : "translated",
             "value" : "USB Copy event %lld: %@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Événement USB Copy %lld : %@"
+          }
         }
       }
     },
@@ -2417,6 +3863,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "USB Copy Events"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Événements USB Copy"
           }
         }
       }
@@ -5099,6 +6551,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Save and Enable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer et activer"
           }
         }
       }
@@ -15080,6 +16538,12 @@
             "state" : "translated",
             "value" : "Move and Save"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer et enregistrer"
+          }
         }
       }
     },
@@ -15089,6 +16553,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Move the USB Copy Repository?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer le dépôt USB Copy ?"
           }
         }
       }
