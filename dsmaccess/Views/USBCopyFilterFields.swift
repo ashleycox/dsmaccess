@@ -31,7 +31,7 @@ struct USBCopyFilterFields: View {
         GroupBox("Règles personnalisées") {
             VStack(alignment: .leading) {
                 Text("Saisissez *.extension pour une extension, ou un nom de fichier exact.")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
                 HStack {
                     TextField("*.extension ou nom de fichier", text: $newRule)
                         .onSubmit(addRule)
@@ -43,7 +43,7 @@ struct USBCopyFilterFields: View {
 
                 if let validationMessage {
                     Label(validationMessage, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.readableRed)
                         .accessibilityFocused($validationFocused)
                 }
 

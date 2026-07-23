@@ -40,7 +40,7 @@ struct USBCopyFilterEditorSheet: View {
                 if let errorMessage {
                     Section {
                         Label(errorMessage, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.readableRed)
                             .accessibilityFocused($errorFocused)
                     }
                 }

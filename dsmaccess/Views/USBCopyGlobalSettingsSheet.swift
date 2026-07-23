@@ -54,7 +54,7 @@ struct USBCopyGlobalSettingsSheet: View {
 
                     if let errorMessage {
                         Label(errorMessage, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.readableRed)
                             .accessibilityFocused($errorFocused)
                     }
                 }

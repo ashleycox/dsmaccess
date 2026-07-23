@@ -166,7 +166,7 @@ struct USBCopyTaskEditorSheet: View {
                             "Le périphérique associé à cette tâche n’est pas connecté. Le dossier de destination ne peut pas être modifié.",
                             systemImage: "externaldrive.badge.xmark"
                         )
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                     }
 
                     if enablesDefaultTaskOnSave {
@@ -174,7 +174,7 @@ struct USBCopyTaskEditorSheet: View {
                             "Choisissez un dossier sur le périphérique USB. La tâche sera enregistrée puis activée.",
                             systemImage: "externaldrive.badge.plus"
                         )
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                     }
 
                     if externalShares.isEmpty {
@@ -184,7 +184,7 @@ struct USBCopyTaskEditorSheet: View {
                                 : "Aucun dossier USB ou carte SD n’est actuellement monté. Connectez le périphérique pour choisir une autre destination.",
                             systemImage: "externaldrive.badge.questionmark"
                         )
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.readableSecondary)
                     }
 
                     Picker("Mode de copie", selection: $strategy) {
@@ -260,7 +260,7 @@ struct USBCopyTaskEditorSheet: View {
                 if let errorMessage {
                     Section {
                         Label(errorMessage, systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(.red)
+                            .foregroundStyle(.readableRed)
                             .accessibilityFocused($errorFocused)
                     }
                 }

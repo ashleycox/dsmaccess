@@ -85,14 +85,14 @@ struct USBCopyLogSheet: View {
             Divider()
             HStack {
                 Text("\(entries.count) entrées affichées sur \(totalCount)")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
                 if isLoading && !entries.isEmpty {
                     ProgressView("Chargement du journal USB Copy…")
                         .controlSize(.small)
                 }
                 if let errorMessage, !entries.isEmpty {
                     Label(errorMessage, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.readableRed)
                         .accessibilityFocused($errorFocused)
                 }
                 Spacer()
@@ -170,11 +170,11 @@ private struct USBCopyLogRow: View {
                 }
                 if let error = errorText {
                     Text(error)
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.readableRed)
                 }
             }
             .font(.caption)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.readableSecondary)
         }
         .accessibilityElement(children: .combine)
     }

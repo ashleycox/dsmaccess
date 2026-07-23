@@ -76,7 +76,7 @@ struct USBCopyFolderPickerSheet: View {
             } else if let errorMessage {
                 VStack(alignment: .leading, spacing: 12) {
                     Label(errorMessage, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.readableRed)
                         .accessibilityFocused($errorFocused)
                     Button("Réessayer") { Task { await loadCurrentFolder() } }
                 }

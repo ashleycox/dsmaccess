@@ -197,7 +197,7 @@ struct USBCopyView: View {
             }
         }
         .font(.caption)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(.readableSecondary)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(.bar)
@@ -400,7 +400,7 @@ private struct USBCopyTaskRow: View {
             VStack(alignment: .leading) {
                 Text(task.name).bold()
                 Text(task.knownType?.localizedName ?? task.type)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.readableSecondary)
                 Text("\(task.sourcePath) → \(task.destinationPath)")
                 HStack {
                     Text(task.knownStatus?.localizedName ?? task.status)
@@ -410,7 +410,7 @@ private struct USBCopyTaskRow: View {
                     }
                 }
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.readableSecondary)
             }
         }
         .padding(.vertical, 3)
@@ -444,9 +444,9 @@ private struct USBCopyTaskRow: View {
 
     private var statusStyle: Color {
         switch task.knownStatus {
-        case .successful: .green
-        case .failed, .shareDeleted, .shareUnavailable: .red
-        case .disabled, .unmounted, .notAvailable: .secondary
+        case .successful: .readableGreen
+        case .failed, .shareDeleted, .shareUnavailable: .readableRed
+        case .disabled, .unmounted, .notAvailable: .readableSecondary
         default: .accentColor
         }
     }
