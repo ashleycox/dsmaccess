@@ -313,36 +313,34 @@ final class DSMFileStationService {
     ) async throws {
         let resolved = try await transport.resolvedAPI(Self.uploadAPI)
         let boundary = "Boundary-\(UUID().uuidString)"
-        var parameters: [String: DSMParameter] = [
-            "path": .string(folderPath),
-            "create_parents": .boolean(options.createParentFolders),
+        // Contrat capturé sur DSM 7.4-90075 : api, version, method et la session
+        // doivent être dans la query de l'URL (erreur 101 s'ils sont dans le corps
+        // multipart), et les valeurs multipart s'envoient brutes, sans les
+        // guillemets JSON du requestFormat (erreur 401 sinon).
+        var fields: [String: String] = [
+            "path": folderPath,
+            "create_parents": options.createParentFolders ? "true" : "false",
         ]
         if options.conflictPolicy != .ask {
             if resolved.version >= 3 {
-                parameters["overwrite"] = .string(
-                    options.conflictPolicy == .overwrite ? "overwrite" : "skip"
-                )
+                fields["overwrite"] = options.conflictPolicy == .overwrite ? "overwrite" : "skip"
             } else {
-                parameters["overwrite"] = .boolean(options.conflictPolicy == .overwrite)
+                fields["overwrite"] = options.conflictPolicy == .overwrite ? "true" : "false"
             }
         }
-        addMilliseconds(options.modificationDate, key: "mtime", to: &parameters)
-        addMilliseconds(options.creationDate, key: "crtime", to: &parameters)
-        addMilliseconds(options.accessDate, key: "atime", to: &parameters)
-        let route = try await transport.multipartRoute(
-            api: Self.uploadAPI,
-            method: "upload",
-            parameters: parameters
-        )
+        addRawMilliseconds(options.modificationDate, key: "mtime", to: &fields)
+        addRawMilliseconds(options.creationDate, key: "crtime", to: &fields)
+        addRawMilliseconds(options.accessDate, key: "atime", to: &fields)
+        let url = try await transport.makeURL(api: Self.uploadAPI, method: "upload")
         let bodyURL = try await MultipartBodyFile.create(
-            fields: route.fields,
+            fields: fields,
             fileURL: fileURL,
             fileFieldName: "file",
             boundary: boundary
         )
         defer { try? FileManager.default.removeItem(at: bodyURL) }
 
-        var request = URLRequest(url: route.url)
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         let (data, response) = try await transport.upload(
@@ -1127,13 +1125,13 @@ final class DSMFileStationService {
         }
     }
 
-    private func addMilliseconds(
+    private func addRawMilliseconds(
         _ date: Date?,
         key: String,
-        to parameters: inout [String: DSMParameter]
+        to fields: inout [String: String]
     ) {
         if let date {
-            parameters[key] = .integer(Int(date.timeIntervalSince1970 * 1_000))
+            fields[key] = String(Int(date.timeIntervalSince1970 * 1_000))
         }
     }
 

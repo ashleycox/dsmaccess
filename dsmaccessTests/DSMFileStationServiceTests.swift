@@ -459,13 +459,20 @@ struct DSMFileStationServiceTests {
         #expect(request["rotate"] == "1")
     }
 
-    @Test func uploadsWithVersionThreeConflictAndTimestampFields() async throws {
+    @Test func uploadsWithAuthenticationInQueryAndRawMultipartFields() async throws {
         let stub = DSMRequestStub(results: [
             .response(Data(#"{"success":true,"data":{}}"#.utf8)),
         ])
         let service = makeService(
             stub: stub,
-            entries: ["SYNO.FileStation.Upload": entry(maxVersion: 3)]
+            entries: [
+                "SYNO.FileStation.Upload": APIInfoEntry(
+                    path: "entry.cgi",
+                    minVersion: 2,
+                    maxVersion: 3,
+                    requestFormat: "JSON"
+                ),
+            ]
         )
         let fileURL = FileManager.default.temporaryDirectory
             .appending(path: "upload-\(UUID().uuidString).txt")
@@ -486,14 +493,27 @@ struct DSMFileStationServiceTests {
 
         let request = try #require(await stub.requests.first)
         #expect(request.httpMethod == "POST")
+        let query = try query(from: request)
+        #expect(query["api"] == "SYNO.FileStation.Upload")
+        #expect(query["version"] == "3")
+        #expect(query["method"] == "upload")
+        #expect(query["_sid"] == "session-id")
         let bodyData = try #require(await stub.uploadedBodies.first)
         let body = try #require(String(data: bodyData, encoding: .utf8))
-        #expect(body.contains("name=\"version\"\r\n\r\n3"))
+        // DSM 7.4 répond 101 quand l'identité d'API ou la session est dans le
+        // corps multipart, et 401 quand les valeurs portent les guillemets JSON
+        // du requestFormat : le corps ne contient que des champs métier bruts.
+        #expect(!body.contains("name=\"api\""))
+        #expect(!body.contains("name=\"version\""))
+        #expect(!body.contains("name=\"_sid\""))
         #expect(body.contains("name=\"path\"\r\n\r\n/documents"))
         #expect(body.contains("name=\"overwrite\"\r\n\r\nskip"))
         #expect(body.contains("name=\"create_parents\"\r\n\r\nfalse"))
         #expect(body.contains("name=\"mtime\"\r\n\r\n1700000000000"))
         #expect(body.contains("name=\"file\"; filename=\"\(fileURL.lastPathComponent)\""))
+        let pathRange = try #require(body.range(of: "name=\"path\""))
+        let fileRange = try #require(body.range(of: "name=\"file\""))
+        #expect(pathRange.lowerBound < fileRange.lowerBound)
         #expect(progressUpdates.last?.fractionCompleted == 1)
     }
 
